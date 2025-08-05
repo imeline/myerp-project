@@ -1,0 +1,24 @@
+<mapper namespace="erp.auth.mapper.AuthMapper">
+
+    <select id="findByUuid" parameterType="string" resultType="ErpAccount">
+        SELECT *
+        FROM erp_account
+        WHERE uuid = #{uuid}
+    </select>
+
+    <insert id="saveAccount" parameterType="erp.auth.model.ErpAccount">
+        INSERT INTO erp_account (
+        id, uuid, login_email, login_password, name, role
+        ) VALUES (
+        erp_account_seq.NEXTVAL,
+        #{uuid}, #{loginEmail}, #{loginPassword}, #{name}, #{role}
+        )
+    </insert>
+
+    <select id="findByEmail" parameterType="string" resultType="erp.auth.model.ErpAccount">
+        SELECT *
+        FROM erp_account
+        WHERE login_email = #{loginEmail}
+    </select>
+
+</mapper>
