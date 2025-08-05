@@ -1,0 +1,14 @@
+package erp.order.domain;
+
+import lombok.*;
+
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class OrderItem {
+    private Long id;
+    private Integer quantity;
+    private Long orderId;
+    private Long itemId;
+}
