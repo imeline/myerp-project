@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Stock extends TimeStamped {
-    private Long id;
+    private Long stockId;
     private String warehouse;
     private Integer quantity;
     private Integer safeQuantity;

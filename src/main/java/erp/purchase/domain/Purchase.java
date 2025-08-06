@@ -1,14 +1,17 @@
 package erp.purchase.domain;
 
+import erp.global.base.TimeStamped;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Purchase {
-    private Long id;
-    private Integer quantity;
+public class Purchase extends TimeStamped {
     private Long purchaseId;
-    private Long itemId;
+    private Long employeeId;
+    private String supplier;
+    private LocalDate purchaseDate;
 }
