@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErpAccount extends TimeStamped {
-    private Long accountId;
+    private Long erpAccountId;
     private String loginEmail;
     private String password;
     private String uuid;

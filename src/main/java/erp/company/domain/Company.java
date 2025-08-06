@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Company extends TimeStamped {
-    private Long id;
+    private Long companyId;
     private String name;
     private String bizNo;
     private String address;

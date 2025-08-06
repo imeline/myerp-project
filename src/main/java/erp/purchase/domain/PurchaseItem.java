@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PurchaseItem {
-    private Long id;
+    private Long purchaseItemId;
     private Integer quantity;
     private Long purchaseId;
     private Long itemId;
