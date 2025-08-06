@@ -11,8 +11,8 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Order extends TimeStamped {
-    private Long id;
-    private Long memberId;
+    private Long orderId;
+    private Long employeeId;
     private String customer;
     private LocalDate orderDate;
 }

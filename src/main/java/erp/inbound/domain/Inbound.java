@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Inbound extends TimeStamped {
-    private Long id;
+    private Long inboundId;
     private LocalDate inboundDate;
     private String status;
     private Long employeeId;

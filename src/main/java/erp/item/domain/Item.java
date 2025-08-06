@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Item extends TimeStamped {
-    private Long id;
+    private Long itemId;
     private String name;
     private String code;
     private BigDecimal price;
