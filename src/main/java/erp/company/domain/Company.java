@@ -5,8 +5,8 @@ import lombok.*;
 
 @Getter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 외부(new) 생성 제한
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더용 내부 생성자
 public class Company extends TimeStamped {
     private Long companyId;
     private String name;

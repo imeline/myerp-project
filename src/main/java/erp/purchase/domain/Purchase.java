@@ -13,5 +13,6 @@ public class Purchase extends TimeStamped {
     private Long purchaseId;
     private Long employeeId;
     private String supplier;
+    private String code;
     private LocalDate purchaseDate;
 }
