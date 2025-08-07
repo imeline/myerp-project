@@ -1,6 +1,6 @@
-package erp.auth.domain;
+package erp.auth.security;
 
-import erp.user.domain.ErpAccount;
+import erp.auth.domain.ErpAccount;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

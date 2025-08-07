@@ -1,6 +1,6 @@
 package erp.global.config;
 
-import erp.auth.infra.security.JwtAuthenticationFilter;
+import erp.auth.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

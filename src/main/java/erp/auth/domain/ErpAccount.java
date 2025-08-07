@@ -1,4 +1,4 @@
-package erp.user.domain;
+package erp.auth.domain;
 
 import erp.global.base.TimeStamped;
 import lombok.*;

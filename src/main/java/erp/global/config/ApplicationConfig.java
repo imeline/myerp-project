@@ -1,7 +1,7 @@
 package erp.global.config;
 
 
-import erp.auth.service.CustomUserDetailsService;
+import erp.auth.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
