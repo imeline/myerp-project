@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Item extends TimeStamped {
     private Long itemId;
+    private Long companyId;
     private String name;
     private String code;
     private BigDecimal price;

@@ -11,8 +11,8 @@ import java.time.LocalDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Outbound extends TimeStamped {
     private Long outboundId;
+    private String code;
     private LocalDate outboundDate;
-    private String status;
     private Long employeeId;
     private Long orderId;
 }

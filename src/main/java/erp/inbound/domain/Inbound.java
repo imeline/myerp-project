@@ -11,8 +11,8 @@ import java.time.LocalDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Inbound extends TimeStamped {
     private Long inboundId;
+    private String code;
     private LocalDate inboundDate;
-    private String status;
     private Long employeeId;
     private Long purchaseId;
 }
