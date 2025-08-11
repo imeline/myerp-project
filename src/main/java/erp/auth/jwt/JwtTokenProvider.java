@@ -23,6 +23,9 @@ public class JwtTokenProvider {
 
     private final Environment env;
 
+    // *의문 - 파라미터를 UserPrincipal로 안 받아도 되나?
+    // UserPrincipal은 UserDetails를 구현하므로
+    // `UserDetails userDetails = principal;` - 업캐스팅 가능. 더 유연한 코드
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
