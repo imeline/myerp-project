@@ -2,6 +2,7 @@ package erp.auth.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record SignupRequest(
@@ -11,7 +12,7 @@ public record SignupRequest(
 
         @NotBlank
         @Size(min = 6, message = "비밀번호는 최소 6자 이상이어야 합니다.")
-        String loginPassword,
+        String password,
 
         @NotBlank
         String empNo,
@@ -28,7 +29,7 @@ public record SignupRequest(
         @NotBlank
         String phone,
 
-        @NotBlank
+        @NotNull
         long companyId
 ) {
 

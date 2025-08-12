@@ -1,7 +1,7 @@
 package erp.auth.service;
 
-import erp.auth.dto.SignupRequest;
 import erp.auth.dto.request.LoginRequest;
+import erp.auth.dto.request.SignupRequest;
 import erp.auth.dto.response.LoginResponse;
 import erp.auth.enums.ErpAccountRole;
 

@@ -1,8 +1,8 @@
 package erp.auth.service;
 
 import erp.auth.domain.ErpAccount;
-import erp.auth.dto.SignupRequest;
 import erp.auth.dto.request.LoginRequest;
+import erp.auth.dto.request.SignupRequest;
 import erp.auth.dto.response.LoginResponse;
 import erp.auth.enums.ErpAccountRole;
 import erp.auth.jwt.JwtTokenProvider;
@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
         ErpAccount account = ErpAccount.register(
                 erpAccountId,
                 dto.loginEmail(),
-                passwordEncoder.encode(dto.loginPassword()),
+                passwordEncoder.encode(dto.password()),
                 role,
                 employee.getEmployeeId()
         );
