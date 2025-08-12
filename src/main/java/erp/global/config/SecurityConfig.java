@@ -1,6 +1,8 @@
 package erp.global.config;
 
 import erp.auth.jwt.JwtAuthenticationFilter;
+import erp.global.exception.RestAccessDeniedHandler;
+import erp.global.exception.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,11 +26,19 @@ public class SecurityConfig {
     // 클라이언트로부터 온 요청에 JWT가 포함됐는지 검사하고, 유저 인증 처리
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CorsConfig corsConfig;
+    // 401 error 처리 핸들러
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
+    // 403 error 처리 핸들러
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // 세션을 안 쓰기 때문에 CSRF 보호 비활성화
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(restAuthenticationEntryPoint)
+                        .accessDeniedHandler(restAccessDeniedHandler)
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
