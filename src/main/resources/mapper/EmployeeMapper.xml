@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.employee.mapper.EmployeeMapper">
+
+    <insert id="saveEmployee" parameterType="Employee">
+        INSERT INTO employee (employee_id, emp_no, name, department, position,
+                              phone, updated_at, company_id)
+        VALUES (#{employeeId}, #{empNo}, #{name}, #{department}, #{position},
+                #{phone}, SYSTIMESTAMP, #{companyId})
+    </insert>
+
+    <select id="getNextEmployeeId" resultType="Long">
+        SELECT employee_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <!--    <update id="updateCompany" parameterType="Company">-->
+    <!--        UPDATE company-->
+    <!--        SET name = #{name},-->
+    <!--            address = #{address},-->
+    <!--            updated_at = SYSTIMESTAMP-->
+    <!--        WHERE id = #{id}-->
+    <!--    </update>-->
+</mapper>

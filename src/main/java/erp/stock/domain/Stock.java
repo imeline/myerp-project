@@ -11,6 +11,5 @@ public class Stock extends TimeStamped {
     private Long stockId;
     private String warehouse;
     private Integer quantity;
-    private Integer safeQuantity;
     private Long itemId;
 }

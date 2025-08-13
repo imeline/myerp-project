@@ -17,7 +17,10 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(erpAccount.getRole()));
+        String roleName = erpAccount.getRole().name();
+        // security에서는 ROLE_ 접두사를 붙여야 인식하므로 (ex) ROLE_ADMIN 등)
+        // ErpAccountRole의 이름에 ROLE_ 접두사를 붙임
+        return List.of(new SimpleGrantedAuthority("ROLE_" + roleName));
     }
 
     @Override

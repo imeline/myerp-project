@@ -1,0 +1,71 @@
+### sys 회원가입
+POST http://localhost:8080/api/v1/auth/signup/sys
+Content-Type: application/json
+# Authorization: Bearer 999999
+
+{
+  "loginEmail": "sys1@naver.com",
+  "password": "123456",
+  "empNo": "DF123",
+  "name": "sys1",
+  "department": "ERP 담당부서",
+  "position": "부장",
+  "phone": "010-1234-5678",
+  "companyId": 1
+}
+### admin 회원가입
+POST http://localhost:8080/api/v1/auth/signup/admin
+Content-Type: application/json
+
+{
+  "loginEmail": "admin1@naver.com",
+  "password": "123456",
+  "empNo": "AD123",
+  "name": "admin1",
+  "department": "개발부",
+  "position": "부장",
+  "phone": "010-3322-5678",
+  "companyId": 2
+}
+
+### user 회원가입
+POST http://localhost:8080/api/v1/auth/signup/user
+Content-Type: application/json
+
+{
+  "loginEmail": "user1@naver.com",
+  "password": "123456",
+  "empNo": "US123",
+  "name": "user1",
+  "department": "개발부",
+  "position": "사원",
+  "phone": "010-1122-5678",
+  "companyId": 2
+}
+
+### SYS 로그인
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "loginEmail": "sys1@naver.com",
+  "password": "123456"
+}
+
+### ADMIN 로그인
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "loginEmail": "admin1@naver.com",
+  "password": "123456"
+}
+
+### USER 로그인
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "loginEmail": "user1@naver.com",
+  "password": "123456"
+}
