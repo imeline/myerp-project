@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface EmployeeMapper {
-    Employee saveEmployee(Employee employee);
+    void saveEmployee(Employee employee);
 
     Long getNextEmployeeId();
 }

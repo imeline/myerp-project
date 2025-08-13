@@ -1,5 +1,6 @@
 package erp.global.config;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +10,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@MapperScan("erp")
+@MapperScan(basePackages = "erp", annotationClass = Mapper.class)
 public class MyBatisConfig {
 
     @Bean

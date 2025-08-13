@@ -12,10 +12,10 @@
 
     <insert id="saveErpAccount" parameterType="ErpAccount">
         INSERT INTO erp_account (erp_account_id, login_email,
-                                 login_password, uuid, role,
+                                 password, uuid, role,
                                  updated_at, employee_id)
         VALUES (#{erpAccountId}, #{loginEmail},
-                #{loginPassword}, #{uuid}, #{role},
+                #{password}, #{uuid}, #{role},
                 SYSTIMESTAMP, #{employeeId})
     </insert>
 
