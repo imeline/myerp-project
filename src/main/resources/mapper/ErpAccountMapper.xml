@@ -36,14 +36,13 @@
 
     <select id="findLoginRowByEmail" parameterType="string"
             resultType="LoginRow">
-        SELECT a.UUID      AS uuid,
-               a.ROLE      AS role,
-               a.PASSWORD  AS passwordHash,
-               e.name      AS name,
-               c.TENANT_ID AS tenantId
+        SELECT a.UUID       AS uuid,
+               a.ROLE       AS role,
+               a.PASSWORD   AS passwordHash,
+               e.name       AS name,
+               e.COMPANY_ID AS tenantId
         FROM ERP_ACCOUNT a
                  JOIN EMPLOYEE e ON e.EMPLOYEE_ID = a.EMPLOYEE_ID
-                 JOIN COMPANY c ON c.COMPANY_ID = e.COMPANY_ID
         WHERE a.LOGIN_EMAIL = #{loginEmail}
     </select>
 
