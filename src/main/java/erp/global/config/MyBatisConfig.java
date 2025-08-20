@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 @Configuration
 @MapperScan(basePackages = "erp", annotationClass = Mapper.class)
 public class MyBatisConfig {
-
+    
     @Bean
     // @transactional 사용 설정
     public PlatformTransactionManager transactionManager(DataSource dataSource) {

@@ -18,7 +18,8 @@ public enum ErrorStatus {
 
     // AUTH
     EXIST_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
-    INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다.");
+    INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103", "존재하지 않는 테넌트 ID입니다."),
+    ;
 
     private final String status;
     private final String message;

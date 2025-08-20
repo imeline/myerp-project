@@ -1,6 +1,7 @@
 package erp.auth.mapper;
 
 import erp.auth.domain.ErpAccount;
+import erp.auth.dto.internal.LoginRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,6 +14,10 @@ public interface ErpAccountMapper {
     void saveErpAccount(ErpAccount account);
 
     Long getNextErpAccountId();
+    
+    boolean existsByLoginEmail(@Param("loginEmail") String loginEmail);
 
-    ErpAccount findByLoginEmail(@Param("loginEmail") String loginEmail);
+    LoginRow findLoginRowByEmail(
+            @Param("loginEmail") String loginEmail
+    );
 }

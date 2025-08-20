@@ -1,20 +1,22 @@
 package erp.auth.dto.response;
 
-import erp.auth.enums.ErpAccountRole;
 import lombok.Builder;
 
 @Builder
 public record LoginResponse(
         String token,
         String uuid,
-        ErpAccountRole role
+        // service의 login 메소드에서 role은 String으로 사용됨
+        String role,
+        String name
 ) {
     public static LoginResponse from(String token, String uuid,
-                                     ErpAccountRole role) {
+                                     String role, String name) {
         return LoginResponse.builder()
                 .token(token)
                 .uuid(uuid)
                 .role(role)
+                .name(name)
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package erp.auth.security;
 
-import erp.auth.domain.ErpAccount;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,29 +9,36 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+@Builder
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString(exclude = "password") // 보안상 ToString에서 제외
 public class UserPrincipal implements UserDetails {
-    private final ErpAccount erpAccount;
+    // 로그인 시 전부 주입
+    private final String uuid;
+    // GrantedAuthority가 String 기반이라 String으로 사용
+    private final String role;
+    @JsonIgnore // 외부에 노출되지 않게 보안
+    private final String password;
+    private final Long tenantId;
 
-    public UserPrincipal(ErpAccount erpAccount) {
-        this.erpAccount = erpAccount;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String roleName = erpAccount.getRole().name();
-        // security에서는 ROLE_ 접두사를 붙여야 인식하므로 (ex) ROLE_ADMIN 등)
-        // ErpAccountRole의 이름에 ROLE_ 접두사를 붙임
-        return List.of(new SimpleGrantedAuthority("ROLE_" + roleName));
+        String auth = (role != null && role.startsWith("ROLE_"))
+                ? role
+                : "ROLE_" + role;
+        return List.of(new SimpleGrantedAuthority(auth));
     }
 
     @Override
     public String getPassword() {
-        return erpAccount.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return erpAccount.getUuid();
+        return uuid;
     }
 
     @Override
@@ -53,9 +61,15 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    // 추가 정보(이메일, 이름, 부서 등) 가 필요할 때는
-    // ErpAccount 전체 객체에 접근해야 하므로 생성
-    public ErpAccount getErpAccount() {
-        return erpAccount;
+    public static UserPrincipal of(String uuid, String role,
+                                   String password, Long tenantId) {
+        return UserPrincipal.builder()
+                .uuid(uuid)
+                // security에서는 ROLE_ 접두사를 붙여야 인식하므로 (ex) ROLE_ADMIN 등)
+                // ErpAccountRole의 이름에 ROLE_ 접두사를 붙임
+                .role("ROLE_" + role)
+                .password(password)
+                .tenantId(tenantId)
+                .build();
     }
 }

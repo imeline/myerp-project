@@ -24,16 +24,27 @@
         FROM dual
     </select>
 
-    <!-- 로그인 시-->
-    <!-- *필요 데이터만 가져올 때 이점 -->
-    <!-- 1. 네트워크 부하 감소 - DB → 애플리케이션 전송 데이터가 줄어듦-->
-    <!-- 2. 성능 향상 - 필요한 데이터만 조회하여 처리 속도 개선-->
-    <!-- 3. 메모리 사용량 절약, 4. 보안 강화 -->
-    <select id="findByLoginEmail" parameterType="string"
-            resultType="ErpAccount">
-        SELECT password, uuid, role
-        FROM erp_account
-        WHERE login_email = #{loginEmail}
+    <select id="existsByLoginEmail" parameterType="string" resultType="boolean">
+        SELECT CASE
+                   WHEN EXISTS (SELECT 1
+                                FROM ERP_ACCOUNT a
+                                WHERE a.LOGIN_EMAIL = #{loginEmail})
+                       THEN 1
+                   ELSE 0 END
+        FROM DUAL
+    </select>
+
+    <select id="findLoginRowByEmail" parameterType="string"
+            resultType="LoginRow">
+        SELECT a.UUID      AS uuid,
+               a.ROLE      AS role,
+               a.PASSWORD  AS passwordHash,
+               e.name      AS name,
+               c.TENANT_ID AS tenantId
+        FROM ERP_ACCOUNT a
+                 JOIN EMPLOYEE e ON e.EMPLOYEE_ID = a.EMPLOYEE_ID
+                 JOIN COMPANY c ON c.COMPANY_ID = e.COMPANY_ID
+        WHERE a.LOGIN_EMAIL = #{loginEmail}
     </select>
 
 </mapper>

@@ -12,8 +12,8 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErpAccount extends TimeStamped {
     private Long erpAccountId;
-    private Long employeeId;
-    private String loginEmail;
+    private Long employeeId; // 인덱스 필요 시 추가
+    private String loginEmail; // 인덱스 설정
     private String password;
     private String uuid;
     private ErpAccountRole role;
