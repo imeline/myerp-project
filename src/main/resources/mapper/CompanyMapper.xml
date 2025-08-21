@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.company.mapper.CompanyMapper">
+    <insert id="createCompany" parameterType="Company" useGeneratedKeys="false">
+        <selectKey keyProperty="companyId" resultType="Long" order="BEFORE">
+            SELECT COMPANY_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO COMPANY (company_id, name, biz_no, address, phone,
+        created_at)
+        VALUES (#{companyId}, #{name}, #{bizNo}, #{address}, #{phone},
+        SYSTIMESTAMP)
+    </insert>
+
+    <update id="updateCompany" parameterType="Company">
+        UPDATE COMPANY
+        SET NAME    = #{name},
+            BIZ_NO  = #{bizNo},
+            ADDRESS = #{address},
+            PHONE   = #{phone}
+        WHERE COMPANY_ID = #{companyId}
+    </update>
+
+    <delete id="delete">
+        DELETE
+        FROM COMPANY
+        WHERE COMPANY_ID = #{companyId}
+    </delete>
+
+    <select id="existsRelated" resultType="boolean">
+        SELECT CASE
+                   WHEN
+                       EXISTS (SELECT 1
+                               FROM employee
+                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
+                       EXISTS (SELECT 1
+                               FROM item
+                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
+                       EXISTS (SELECT 1
+                               FROM orders
+                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
+                       EXISTS (SELECT 1
+                               FROM purchase
+                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
+                       EXISTS (SELECT 1
+                               FROM inbound
+                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
+                       EXISTS (SELECT 1
+                               FROM outbound
+                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
+                       EXISTS (SELECT 1
+                               FROM log
+                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY)
+                       THEN 1
+                   ELSE 0 END
+        FROM dual
+    </select>
+
+</mapper>
+
+        <!--    <update id="updateCompany" parameterType="Company">-->
+        <!--        UPDATE company-->
+        <!--        SET name = #{name},-->
+        <!--            address = #{address},-->
+        <!--            updated_at = SYSTIMESTAMP-->
+        <!--        WHERE id = #{id}-->
+        <!--    </update>-->

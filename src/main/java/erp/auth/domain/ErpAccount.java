@@ -17,6 +17,7 @@ public class ErpAccount extends TimeStamped {
     private String password;
     private String uuid;
     private ErpAccountRole role;
+    private Long companyId;
 
     public static ErpAccount register(Long erpAccountId, String loginEmail,
                                       String hashPassword,

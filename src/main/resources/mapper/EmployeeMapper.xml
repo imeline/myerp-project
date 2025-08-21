@@ -16,11 +16,4 @@
         FROM dual
     </select>
 
-    <!--    <update id="updateCompany" parameterType="Company">-->
-    <!--        UPDATE company-->
-    <!--        SET name = #{name},-->
-    <!--            address = #{address},-->
-    <!--            updated_at = SYSTIMESTAMP-->
-    <!--        WHERE id = #{id}-->
-    <!--    </update>-->
 </mapper>

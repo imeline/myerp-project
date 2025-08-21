@@ -24,7 +24,7 @@
         FROM dual
     </select>
 
-    <select id="existsByLoginEmail" parameterType="string" resultType="boolean">
+    <select id="existsByLoginEmail" parameterType="string" resultType="Boolean">
         SELECT CASE
                    WHEN EXISTS (SELECT 1
                                 FROM ERP_ACCOUNT a

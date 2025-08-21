@@ -15,4 +15,5 @@ public class Outbound extends TimeStamped {
     private LocalDate outboundDate;
     private Long employeeId;
     private Long orderId;
+    private Long companyId;
 }

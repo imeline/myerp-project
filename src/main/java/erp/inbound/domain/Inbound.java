@@ -15,4 +15,5 @@ public class Inbound extends TimeStamped {
     private LocalDate inboundDate;
     private Long employeeId;
     private Long purchaseId;
+    private Long companyId;
 }
