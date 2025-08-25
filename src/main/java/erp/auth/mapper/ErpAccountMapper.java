@@ -15,7 +15,7 @@ public interface ErpAccountMapper {
 
     Long getNextErpAccountId();
     
-    boolean existsByLoginEmail(@Param("loginEmail") String loginEmail);
+    Boolean existsByLoginEmail(@Param("loginEmail") String loginEmail);
 
     LoginRow findLoginRowByEmail(
             @Param("loginEmail") String loginEmail
