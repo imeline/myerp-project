@@ -9,5 +9,6 @@ public class Log {
     private String description;
     private String ipAddress;
     private Long employeeId;
+    private Long companyId;
     private LocalDateTime createdAt;
 }

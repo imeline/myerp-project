@@ -16,4 +16,5 @@ public class Order extends TimeStamped {
     private String customer;
     private String code;
     private LocalDate orderDate;
+    private Long companyId;
 }
