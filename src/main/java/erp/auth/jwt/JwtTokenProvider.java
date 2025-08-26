@@ -25,6 +25,7 @@ public class JwtTokenProvider {
 
     public static final String CLAIM_ROLE = "role";
     public static final String CLAIM_TENANT_ID = "tenant_id";
+    public static final String BEARER_PREFIX = "Bearer ";
     private final Environment env;
 
     // *파라미터를 UserPrincipal로 안 받아도 되나?
@@ -48,7 +49,7 @@ public class JwtTokenProvider {
             builder.claim(CLAIM_TENANT_ID, tenantId);
         }
 
-        return builder.compact();
+        return BEARER_PREFIX + builder.compact();
     }
 
     // 보통 시큐리티에서 알아서 SecurityContextHolder.getContext().getAuthentication()

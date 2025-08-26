@@ -1,8 +1,6 @@
 package erp.global.config;
 
-import erp.global.tenant.TenantSqlInterceptor;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.plugin.Interceptor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +19,8 @@ public class MyBatisConfig {
         return new DataSourceTransactionManager(dataSource);
     }
 
-    @Bean
-    public Interceptor tenantSqlInterceptor() {
-        return new TenantSqlInterceptor();
-    }
+//    @Bean
+//    public Interceptor tenantSqlInterceptor() {
+//        return new TenantSqlInterceptor();
+//    }
 }

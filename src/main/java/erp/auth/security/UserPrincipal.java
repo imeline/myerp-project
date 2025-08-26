@@ -25,10 +25,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String auth = (role != null && role.startsWith("ROLE_"))
-                ? role
-                : "ROLE_" + role;
-        return List.of(new SimpleGrantedAuthority(auth));
+        return List.of(new SimpleGrantedAuthority(this.role));
     }
 
     @Override
@@ -63,11 +60,16 @@ public class UserPrincipal implements UserDetails {
 
     public static UserPrincipal of(String uuid, String role,
                                    String password, Long tenantId) {
+
+        // null/공백 방어 + 접두사 정규화
+        String r = (role == null || role.isBlank()) ? "USER" : role.trim();
+        String normalized = r.startsWith("ROLE_") ? r : "ROLE_" + r;
+
         return UserPrincipal.builder()
                 .uuid(uuid)
                 // security에서는 ROLE_ 접두사를 붙여야 인식하므로 (ex) ROLE_ADMIN 등)
                 // ErpAccountRole의 이름에 ROLE_ 접두사를 붙임
-                .role("ROLE_" + role)
+                .role(normalized)
                 .password(password)
                 .tenantId(tenantId)
                 .build();

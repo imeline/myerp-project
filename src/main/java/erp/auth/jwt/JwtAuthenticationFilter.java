@@ -6,7 +6,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -26,9 +27,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain
+            HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
         Long tenantIdToUse = null; // 이번 요청에서 사용할 tenantId
@@ -36,15 +37,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String authHeader = request.getHeader("Authorization");
             // 아래 조건을 만족하지 않으면, 인증 로직 패스함 (다음 필터로 넘김)
-
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 // 다음 필터로 넘기거나(체인 계속) 마지막이면 서블릿/컨트롤러로 진입시키는 호출
                 // JwtAuthenticationFilter 는 패스, soft-pass 전략(다음 어떤 필터가 401 응답)
                 filterChain.doFilter(request, response);
                 return;
             }
+            final String header = authHeader.trim();
+            final String BEARER = "Bearer ";
+            if (!header.regionMatches(true, 0, BEARER, 0, BEARER.length())) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            final String jwt = header.substring(BEARER.length()).trim();
 
-            final String jwt = authHeader.substring(7);
             // jwt 서명/만료 검증
             if (!jwtTokenProvider.validateToken(jwt)) {
                 filterChain.doFilter(request, response);
@@ -60,19 +66,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 final Long tenantId = jwtTokenProvider.extractTenantId(jwt);
 
                 UserPrincipal principal = UserPrincipal.of(
-                    uuid, role, null, tenantId
+                        uuid, role, null, tenantId
                 );
 
                 // 시큐리티에서 사용할 인증 객체 생성
                 // 두 번째 파라미터는 credentials인데, JWT 기반 인증에서는 필요 없으므로 null
                 UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(
-                        principal, null, principal.getAuthorities()
-                    );
+                        new UsernamePasswordAuthenticationToken(
+                                principal, null, principal.getAuthorities()
+                        );
 
                 // authenticationToken 에 인증 정보 설정
                 authenticationToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
+                        new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
                 // 현재 요청의 SecurityContext에 인증 객체 등록
