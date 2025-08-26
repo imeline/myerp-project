@@ -10,8 +10,8 @@ public record LoginResponse(
         String role,
         String name
 ) {
-    public static LoginResponse from(String token, String uuid,
-                                     String role, String name) {
+    public static LoginResponse of(String token, String uuid,
+                                   String role, String name) {
         return LoginResponse.builder()
                 .token(token)
                 .uuid(uuid)

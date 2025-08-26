@@ -3,66 +3,100 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="erp.company.mapper.CompanyMapper">
-    <insert id="createCompany" parameterType="Company" useGeneratedKeys="false">
-        <selectKey keyProperty="companyId" resultType="Long" order="BEFORE">
-            SELECT COMPANY_SEQ.NEXTVAL FROM DUAL
-        </selectKey>
-        INSERT INTO COMPANY (company_id, name, biz_no, address, phone,
-        created_at)
+    <select id="nextId" resultType="long">
+        SELECT COMPANY_SEQ.NEXTVAL
+        FROM DUAL
+    </select>
+
+    <insert id="create" parameterType="Company">
+        INSERT INTO company (company_id, name, biz_no, address, phone,
+                             updated_at)
         VALUES (#{companyId}, #{name}, #{bizNo}, #{address}, #{phone},
-        SYSTIMESTAMP)
+                SYSTIMESTAMP)
     </insert>
 
-    <update id="updateCompany" parameterType="Company">
-        UPDATE COMPANY
-        SET NAME    = #{name},
-            BIZ_NO  = #{bizNo},
-            ADDRESS = #{address},
-            PHONE   = #{phone}
-        WHERE COMPANY_ID = #{companyId}
+    <update id="update" parameterType="Company">
+        UPDATE company
+        SET name       = #{name},
+            biz_no     = #{bizNo},
+            address    = #{address},
+            phone      = #{phone},
+            updated_at = SYSTIMESTAMP
+        WHERE company_id = #{companyId}
     </update>
 
-    <delete id="delete">
+    <select id="findById" resultType="Company">
+        SELECT *
+        FROM company c
+        WHERE c.company_id = #{companyId}
+    </select>
+
+    <select id="findCompanyRows" resultType="CompanyRow">
+        SELECT
+        c.company_id AS companyId,
+        c.name AS name,
+        c.biz_no AS bizNo,
+        c.address AS address,
+        c.phone AS phone,
+        TO_CHAR(c.created_at, 'YYYY.MM.DD') AS createdAt
+        FROM company c
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND INSTR(LOWER(c.name), LOWER(#{name})) > 0
+        </if>
+        ORDER BY c.created_at DESC, c.company_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="countByName" resultType="long">
+        SELECT COUNT(*)
+        FROM company c
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND INSTR(LOWER(c.name), LOWER(#{name})) > 0
+        </if>
+    </select>
+
+    <delete id="deleteById">
         DELETE
-        FROM COMPANY
-        WHERE COMPANY_ID = #{companyId}
+        FROM company
+        WHERE company_id = #{companyId}
     </delete>
 
-    <select id="existsRelated" resultType="boolean">
-        SELECT CASE
-                   WHEN
-                       EXISTS (SELECT 1
-                               FROM employee
-                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
-                       EXISTS (SELECT 1
-                               FROM item
-                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
-                       EXISTS (SELECT 1
-                               FROM orders
-                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
-                       EXISTS (SELECT 1
-                               FROM purchase
-                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
-                       EXISTS (SELECT 1
-                               FROM inbound
-                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
-                       EXISTS (SELECT 1
-                               FROM outbound
-                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY) OR
-                       EXISTS (SELECT 1
-                               FROM log
-                               WHERE company_id = #{companyId} FETCH FIRST 1 ROWS ONLY)
-                       THEN 1
-                   ELSE 0 END
-        FROM dual
+    <!-- 중복 검사 -->
+    <select id="existsByBizNo" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END AS exists_flag
+        FROM COMPANY
+        WHERE biz_no = #{bizNo}
+        <if test="excludeId != null">
+            AND company_id != #{excludeId}
+        </if>
+    </select>
+
+    <select id="existsByName" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END AS exists_flag
+        FROM COMPANY
+        WHERE LOWER(name) = LOWER(#{name})
+        <if test="excludeId != null">
+            AND company_id != #{excludeId}
+        </if>
+    </select>
+
+    <!-- 연관 존재 여부 -->
+    <select id="countEmployees" resultType="long">
+        SELECT COUNT(*)
+        FROM employee
+        WHERE company_id = #{companyId}
+    </select>
+    <select id="countOrders" resultType="long">
+        SELECT COUNT(*)
+        FROM orders
+        WHERE company_id = #{companyId}
+    </select>
+    <select id="countOutbounds" resultType="long">
+        SELECT COUNT(*)
+        FROM outbound
+        WHERE company_id = #{companyId}
     </select>
 
 </mapper>
-
-        <!--    <update id="updateCompany" parameterType="Company">-->
-        <!--        UPDATE company-->
-        <!--        SET name = #{name},-->
-        <!--            address = #{address},-->
-        <!--            updated_at = SYSTIMESTAMP-->
-        <!--        WHERE id = #{id}-->
-        <!--    </update>-->

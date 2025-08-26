@@ -18,8 +18,19 @@ public enum ErrorStatus {
 
     // AUTH
     EXIST_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
-    INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103", "존재하지 않는 테넌트 ID입니다."),
+    INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103", "테넌트 ID가 설정되지 않았습니다."),
+    SIGNUP_FAIL("AUTH104", "회원가입에 실패했습니다."),
+
+    // COMPANY,
+    DUPLICATE_BIZ_NO("COMP101", "이미 등록된 사업자등록번호입니다."),
+    DUPLICATE_NAME("COMP102", "이미 등록된 회사명입니다."),
+    NOT_FOUND_COMPANY("COMP103", "존재하지 않는 회사입니다."),
+    CREATE_COMPANY_FAIL("COMP104", "회사 등록에 실패했습니다."),
+    UPDATE_COMPANY_FAIL("COMP105", "회사 수정에 실패했습니다."),
+    DELETE_COMPANY_FAIL("COMP106", "회사 삭제에 실패했습니다."),
+    EXTERNAL_DATA_EXISTS("COMP107", "연관된 데이터가 존재하여 삭제할 수 없습니다."),
     ;
+
 
     private final String status;
     private final String message;

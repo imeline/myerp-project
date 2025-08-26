@@ -1,31 +1,41 @@
 package erp.company.mapper;
 
 import erp.company.domain.Company;
+import erp.company.dto.internal.CompanyRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 @Mapper
 public interface CompanyMapper {
-    Long createCompany(Company company);
+    long nextId();
 
-    Long updateCompany(Company company);
+    int create(Company company);
 
-    Long deleteCompany(Long companyId);
+    int update(Company company);
 
-    Optional<Company> findById(@Param("companyId") Long companyId);
+    Company findById(@Param("companyId") Long companyId);
 
-    Boolean existsByBizNo(@Param("bizNo") String bizNo, @Param("excludeId") Long excludeId);
+    // excludeId는 제외하고 검사(자기 자신 제외)
+    boolean existsByBizNo(@Param("bizNo") String bizNo, @Param("excludeId") Long excludeId);
 
-    Boolean existsByName(@Param("name") String name, @Param("excludeId") Long excludeId);
+    boolean existsByName(@Param("name") String name, @Param("excludeId") Long excludeId);
 
-    List<Company> findPage(
-            @Param("keyword") String keyword,
+    List<CompanyRow> findCompanyRows(
+            @Param("name") String name,
             @Param("offset") int offset,
             @Param("size") int size
     );
 
-    long count(@Param("keyword") String keyword);
+    long countByName(@Param("name") String name);
+
+    int deleteById(@Param("companyId") Long companyId);
+
+    // 연관 데이터 존재 여부
+    long countEmployees(@Param("companyId") long companyId);
+
+    long countOrders(@Param("companyId") long companyId);
+
+    long countOutbounds(@Param("companyId") long companyId);
 }

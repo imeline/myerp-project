@@ -4,14 +4,14 @@
 
 <mapper namespace="erp.employee.mapper.EmployeeMapper">
 
-    <insert id="saveEmployee" parameterType="Employee">
+    <insert id="create" parameterType="Employee">
         INSERT INTO employee (employee_id, emp_no, name, department, position,
                               phone, updated_at, company_id)
         VALUES (#{employeeId}, #{empNo}, #{name}, #{department}, #{position},
                 #{phone}, SYSTIMESTAMP, #{companyId})
     </insert>
 
-    <select id="getNextEmployeeId" resultType="Long">
+    <select id="nextId" resultType="long">
         SELECT employee_seq.NEXTVAL
         FROM dual
     </select>

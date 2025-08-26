@@ -1,0 +1,46 @@
+### 회사 생성
+POST http://localhost:8080/api/v1/sys/company
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjOTJlM2Q5MjA1NzE0YzNiOGQzOWQwNDNhNGQ5MTQxNCIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc1NjIwMjU5NiwiZXhwIjoxNzU2MjM4NTk2LCJ0ZW5hbnRfaWQiOjF9.fqFgqiMk55ltFYFQ3E2UIhPxgnlJwotpZTrxFLpJME8
+Content-Type: application/json
+
+{
+    "name": "테스트회사2",
+    "bizNo": "333-22-22222",
+    "address": "서울 강남동",
+    "phone": "010-3333-1111"
+}
+
+
+### 1개 회사 조회
+GET http://localhost:8080/api/v1/sys/company/5
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjOTJlM2Q5MjA1NzE0YzNiOGQzOWQwNDNhNGQ5MTQxNCIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc1NjIwMjk0MSwiZXhwIjoxNzU2MjM4OTQxLCJ0ZW5hbnRfaWQiOjF9.skhevGd8Y3MElUj4zbitdZapqEwyiWOZ2Gji8ybmBRk
+Content-Type: application/json
+
+###  여러개 회사 조회 (페이징, 검색 조건)
+GET http://localhost:8080/api/v1/sys/company
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjOTJlM2Q5MjA1NzE0YzNiOGQzOWQwNDNhNGQ5MTQxNCIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc1NjIwMjk0MSwiZXhwIjoxNzU2MjM4OTQxLCJ0ZW5hbnRfaWQiOjF9.skhevGd8Y3MElUj4zbitdZapqEwyiWOZ2Gji8ybmBRk
+Content-Type: application/json
+
+{
+    "page": 0,
+    "size": 10
+}
+
+### 회사 수정
+PUT http://localhost:8080/api/v1/sys/company
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjOTJlM2Q5MjA1NzE0YzNiOGQzOWQwNDNhNGQ5MTQxNCIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc1NjIwMjk0MSwiZXhwIjoxNzU2MjM4OTQxLCJ0ZW5hbnRfaWQiOjF9.skhevGd8Y3MElUj4zbitdZapqEwyiWOZ2Gji8ybmBRk
+Content-Type: application/json
+
+{
+    "companyId": 3,
+    "name": "테스트회사수정",
+    "bizNo": "432-22-22222",
+    "address": "서울 구로동",
+    "phone": "010-1131-1111"
+}
+
+
+### 회사 삭제(연관 데이터 존재시 삭제 안됨)
+DELETE http://localhost:8080/api/v1/sys/company/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjOTJlM2Q5MjA1NzE0YzNiOGQzOWQwNDNhNGQ5MTQxNCIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc1NjIwMTQyNSwiZXhwIjoxNzU2MjM3NDI1LCJ0ZW5hbnRfaWQiOjF9.ETnyIMlQw4vmpvYr6VxJHctrO5CsQYyg3O70VvAu5aQ
+Content-Type: application/json

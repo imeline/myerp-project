@@ -19,20 +19,21 @@ public class ErpAccount extends TimeStamped {
     private ErpAccountRole role;
     private Long companyId;
 
-    public static ErpAccount register(Long erpAccountId, String loginEmail,
-                                      String hashPassword,
-                                      ErpAccountRole role, Long employeeId) {
+    public static ErpAccount register(Long erpAccountId, Long employeeId,
+                                      String loginEmail, String hashPassword,
+                                      ErpAccountRole role, Long companyId) {
 
         String newUuid = UUID.randomUUID().toString()
                 .replace("-", "");
 
         return ErpAccount.builder()
                 .erpAccountId(erpAccountId)
+                .employeeId(employeeId)
                 .loginEmail(loginEmail)
                 .password(hashPassword)
                 .uuid(newUuid)
                 .role(role)
-                .employeeId(employeeId)
+                .companyId(companyId)
                 .build();
     }
 }
