@@ -13,6 +13,6 @@ public record LoginRow(
         @NotBlank
         String name,
         @NotNull
-        long tenantId
+        Long tenantId
 ) {
 }

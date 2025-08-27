@@ -4,6 +4,7 @@ import erp.global.base.TimeStamped;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -11,10 +12,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Item extends TimeStamped {
     private Long itemId;
-    private Long companyId;
     private String name;
     private String code;
     private BigDecimal price;
     private String unit;
     private String category;
+    private long companyId;
+    private LocalDateTime deletedAt;
 }

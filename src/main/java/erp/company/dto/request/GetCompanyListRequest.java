@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Min;
 public record GetCompanyListRequest(
         String name,
         @Min(0)
-        int page,
+        Integer page,
         @Min(1)
-        int size
+        Integer size
 ) {
 }

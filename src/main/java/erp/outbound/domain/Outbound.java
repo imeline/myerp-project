@@ -1,6 +1,7 @@
 package erp.outbound.domain;
 
 import erp.global.base.TimeStamped;
+import erp.shared.enums.DocumentStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -13,7 +14,8 @@ public class Outbound extends TimeStamped {
     private Long outboundId;
     private String code;
     private LocalDate outboundDate;
-    private Long employeeId;
-    private Long orderId;
-    private Long companyId;
+    private DocumentStatus status;
+    private long employeeId;
+    private long orderId;
+    private long companyId;
 }

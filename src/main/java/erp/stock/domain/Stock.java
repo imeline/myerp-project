@@ -10,6 +10,6 @@ import lombok.*;
 public class Stock extends TimeStamped {
     private Long stockId;
     private String warehouse;
-    private Integer quantity;
-    private Long itemId;
+    private int quantity;
+    private long itemId;
 }

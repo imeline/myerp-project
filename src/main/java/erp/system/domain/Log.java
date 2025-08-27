@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 public class Log {
     private Long logId;
     private String type;
-    private Boolean success;
+    private boolean success;
     private String description;
     private String ipAddress;
-    private Long employeeId;
-    private Long companyId;
+    private long employeeId;
+    private long companyId;
     private LocalDateTime createdAt;
 }

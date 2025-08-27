@@ -12,16 +12,16 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErpAccount extends TimeStamped {
     private Long erpAccountId;
-    private Long employeeId; // 인덱스 필요 시 추가
+    private long employeeId; // 인덱스 필요 시 추가
     private String loginEmail; // 인덱스 설정
     private String password;
     private String uuid;
     private ErpAccountRole role;
-    private Long companyId;
+    private long companyId;
 
-    public static ErpAccount register(Long erpAccountId, Long employeeId,
+    public static ErpAccount register(Long erpAccountId, long employeeId,
                                       String loginEmail, String hashPassword,
-                                      ErpAccountRole role, Long companyId) {
+                                      ErpAccountRole role, long companyId) {
 
         String newUuid = UUID.randomUUID().toString()
                 .replace("-", "");

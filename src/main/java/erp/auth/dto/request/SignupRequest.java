@@ -30,7 +30,7 @@ public record SignupRequest(
         String phone,
 
         @NotNull
-        long companyId
+        Long companyId
 ) {
 
 }
