@@ -9,10 +9,8 @@
     </select>
 
     <insert id="create" parameterType="Company">
-        INSERT INTO company (company_id, name, biz_no, address, phone,
-                             updated_at)
-        VALUES (#{companyId}, #{name}, #{bizNo}, #{address}, #{phone},
-                SYSTIMESTAMP)
+        INSERT INTO company (company_id, name, biz_no, address, phone)
+        VALUES (#{companyId}, #{name}, #{bizNo}, #{address}, #{phone})
     </insert>
 
     <update id="update" parameterType="Company">
@@ -21,7 +19,6 @@
             biz_no     = #{bizNo},
             address    = #{address},
             phone      = #{phone},
-            updated_at = SYSTIMESTAMP
         WHERE company_id = #{companyId}
     </update>
 

@@ -88,7 +88,7 @@ public class CompanyServiceImpl implements CompanyService {
                 + companyMapper.countOutbounds(companyId);
         if (related > 0)
             throw new GlobalException(ErrorStatus.EXTERNAL_DATA_EXISTS);
-
+        // todo: deletedAt 갱신 필요
         int affected = companyMapper.deleteById(companyId);
         assertAffected(affected, ErrorStatus.DELETE_COMPANY_FAIL);
     }

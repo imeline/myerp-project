@@ -5,15 +5,15 @@
 <mapper namespace="erp.employee.mapper.EmployeeMapper">
 
     <insert id="create" parameterType="Employee">
-        INSERT INTO employee (employee_id, emp_no, name, department, position,
-                              phone, updated_at, company_id)
-        VALUES (#{employeeId}, #{empNo}, #{name}, #{department}, #{position},
-                #{phone}, SYSTIMESTAMP, #{companyId})
+        INSERT INTO employee (employeeId, empNo, name, phone, status,
+                              departmentId, positionId, companyId)
+        VALUES (#{employeeId}, #{empNo}, #{name}, #{phone}, #{status},
+                #{departmentId}, #{positionId}, #{companyId})
     </insert>
 
     <select id="nextId" resultType="long">
-        SELECT employee_seq.NEXTVAL
-        FROM dual
+      SELECT employee_seq.NEXTVAL
+      FROM dual
     </select>
 
 </mapper>

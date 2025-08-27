@@ -14,8 +14,8 @@ public class Employee extends TimeStamped {
     private String name;
     private String phone;
     private EmployeeStatus status;
-    private long departmentId;
-    private long positionId;
+    private Long departmentId;
+    private Long positionId;
     private long companyId;
 
     public static Employee register(Long employeeId,

@@ -10,6 +10,7 @@ import erp.auth.jwt.JwtTokenProvider;
 import erp.auth.mapper.ErpAccountMapper;
 import erp.auth.security.UserPrincipal;
 import erp.employee.domain.Employee;
+import erp.employee.enums.EmployeeStatus;
 import erp.employee.mapper.EmployeeMapper;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
@@ -37,13 +38,14 @@ public class AuthServiceImpl implements AuthService {
         long employeeId = employeeMapper.nextId();
 
         Employee employee = Employee.register(
-                employeeId,
-                request.companyId(),
-                request.empNo(),
-                request.name(),
-                request.department(),
-                request.position(),
-                request.phone()
+            employeeId,
+            request.empNo(),
+            request.name(),
+            request.phone(),
+            EmployeeStatus.ACTIVE,
+            request.departmentId(),
+            request.positionId(),
+            request.companyId()
         );
 
         int affected = employeeMapper.create(employee);
