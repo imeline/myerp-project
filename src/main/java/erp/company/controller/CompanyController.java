@@ -5,7 +5,7 @@ import erp.company.dto.request.AddCompanyRequest;
 import erp.company.dto.request.GetCompanyListRequest;
 import erp.company.dto.request.ModifyCompanyRequest;
 import erp.company.dto.response.CompanyInfoResponse;
-import erp.company.dto.response.GetCompanyListResponse;
+import erp.company.dto.response.CompanyListResponse;
 import erp.company.service.CompanyService;
 import erp.global.response.BaseResponse;
 import jakarta.validation.Valid;
@@ -32,7 +32,7 @@ public class CompanyController {
     }
 
     @GetMapping
-    public BaseResponse<GetCompanyListResponse<CompanyRow>> getCompanyList(
+    public BaseResponse<CompanyListResponse<CompanyRow>> getCompanyList(
             @Valid @RequestBody GetCompanyListRequest request
     ) {
         return BaseResponse.onSuccess(companyService.listCompany(request));

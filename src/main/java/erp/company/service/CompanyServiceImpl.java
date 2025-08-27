@@ -6,7 +6,7 @@ import erp.company.dto.request.AddCompanyRequest;
 import erp.company.dto.request.GetCompanyListRequest;
 import erp.company.dto.request.ModifyCompanyRequest;
 import erp.company.dto.response.CompanyInfoResponse;
-import erp.company.dto.response.GetCompanyListResponse;
+import erp.company.dto.response.CompanyListResponse;
 import erp.company.mapper.CompanyMapper;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
@@ -48,7 +48,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public GetCompanyListResponse<CompanyRow> listCompany(GetCompanyListRequest request) {
+    public CompanyListResponse<CompanyRow> listCompany(GetCompanyListRequest request) {
         int size = request.size();
         int page = request.page();
         String name = request.name();
@@ -59,7 +59,7 @@ public class CompanyServiceImpl implements CompanyService {
         int totalPages = (int) Math.ceil(total / (double) size);
         boolean hasNext = (page + 1) < totalPages;
 
-        return GetCompanyListResponse.of(rows, page, total, totalPages, hasNext);
+        return CompanyListResponse.of(rows, page, total, totalPages, hasNext);
     }
 
     @Transactional
@@ -82,6 +82,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Transactional
     public void deleteCompany(long companyId) {
+        // todo: 연관 데이터 존재 여부 체크 추가 필요
         long related = companyMapper.countEmployees(companyId)
                 + companyMapper.countOrders(companyId)
                 + companyMapper.countOutbounds(companyId);
