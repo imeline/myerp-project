@@ -20,4 +20,6 @@ public interface ErpAccountMapper {
     LoginRow findLoginRowByEmail(
             @Param("loginEmail") String loginEmail
     );
+
+    void softDeleteByCompanyId(@Param("companyId") Long companyId);
 }

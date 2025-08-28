@@ -27,7 +27,7 @@ public enum ErrorStatus {
     NOT_FOUND_COMPANY("COMP103", "존재하지 않는 회사입니다."),
     CREATE_COMPANY_FAIL("COMP104", "회사 등록에 실패했습니다."),
     UPDATE_COMPANY_FAIL("COMP105", "회사 수정에 실패했습니다."),
-    DELETE_COMPANY_FAIL("COMP106", "회사 삭제에 실패했습니다."),
+    DELETE_COMPANY_FAIL("COMP106", "회사를 찾을 수 없거나 이미 삭제된 회사입니다."),
     EXTERNAL_DATA_EXISTS("COMP107", "연관된 데이터가 존재하여 삭제할 수 없습니다."),
     ;
 

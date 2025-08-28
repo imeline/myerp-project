@@ -1,5 +1,6 @@
 package erp.company.service;
 
+import erp.auth.mapper.ErpAccountMapper;
 import erp.company.domain.Company;
 import erp.company.dto.internal.CompanyRow;
 import erp.company.dto.request.AddCompanyRequest;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyMapper companyMapper;
+    private final ErpAccountMapper erpAccountMapper;
 
     @Transactional
     public void addCompany(AddCompanyRequest request) {
@@ -63,13 +65,13 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Transactional
-    public void modifyCompany(ModifyCompanyRequest request) {
+    public void modifyCompany(Long companyId, ModifyCompanyRequest request) {
         // 중복 여부 체크
-        validateBizNo(request.bizNo(), request.companyId());
-        validateName(request.name(), request.companyId());
+        validateBizNo(request.bizNo(), companyId);
+        validateName(request.name(), companyId);
 
         Company company = Company.of(
-                request.companyId(),
+                companyId,
                 request.name(),
                 request.bizNo(),
                 request.address(),
@@ -88,9 +90,11 @@ public class CompanyServiceImpl implements CompanyService {
                 + companyMapper.countOutbounds(companyId);
         if (related > 0)
             throw new GlobalException(ErrorStatus.EXTERNAL_DATA_EXISTS);
-        // todo: deletedAt 갱신 필요
-        int affected = companyMapper.deleteById(companyId);
+
+        int affected = companyMapper.softDeleteById(companyId);
         assertAffected(affected, ErrorStatus.DELETE_COMPANY_FAIL);
+        // 해당 회사 직원들의 erp_account 도 소프트 삭제
+        erpAccountMapper.softDeleteByCompanyId(companyId);
     }
 
     // 중복 검사

@@ -30,7 +30,9 @@ public interface CompanyMapper {
 
     long countByName(@Param("name") String name);
 
-    int deleteById(@Param("companyId") Long companyId);
+    int softDeleteById(@Param("companyId") Long companyId);
+
+    boolean isActive(@Param("companyId") Long companyId);
 
     // 연관 데이터 존재 여부
     long countEmployees(@Param("companyId") long companyId);

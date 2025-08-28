@@ -57,12 +57,18 @@
         AND c.deleted_at IS NULL
     </select>
 
-    <delete id="deleteById">
-        DELETE
-        FROM company
+    <update id="softDeleteById">
+        UPDATE company
+        SET deleted_at = SYSTIMESTAMP
         WHERE company_id = #{companyId}
           AND deleted_at IS NULL
-    </delete>
+    </update>
+
+    <select id="isActive" resultType="boolean">
+        SELECT CASE WHEN c.deleted_at IS NULL THEN 1 ELSE 0 END
+        FROM company c
+        WHERE c.company_id = #{companyId}
+    </select>
 
     <!-- 중복 검사 -->
     <select id="existsByBizNo" resultType="boolean">

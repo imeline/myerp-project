@@ -28,7 +28,8 @@
         SELECT CASE
                    WHEN EXISTS (SELECT 1
                                 FROM ERP_ACCOUNT a
-                                WHERE a.LOGIN_EMAIL = #{loginEmail})
+                                WHERE a.LOGIN_EMAIL = #{loginEmail}
+                                  AND a.deleted_at IS NULL)
                        THEN 1
                    ELSE 0 END
         FROM DUAL
@@ -44,6 +45,17 @@
         FROM ERP_ACCOUNT a
                  JOIN EMPLOYEE e ON e.EMPLOYEE_ID = a.EMPLOYEE_ID
         WHERE a.LOGIN_EMAIL = #{loginEmail}
+          AND a.deleted_at IS NULL
     </select>
+
+    <update id="softDeleteByCompanyId">
+        UPDATE erp_accounts a
+        SET a.deleted_at = SYSTIMESTAMP
+        WHERE a.deleted_at IS NULL
+          AND EXISTS (SELECT 1
+                      FROM employees e
+                      WHERE e.employee_id = a.employee_id
+                        AND e.company_id = #{companyId})
+    </update>
 
 </mapper>

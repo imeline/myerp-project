@@ -4,6 +4,7 @@ import erp.auth.enums.ErpAccountRole;
 import erp.global.base.TimeStamped;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -18,6 +19,7 @@ public class ErpAccount extends TimeStamped {
     private String uuid;
     private ErpAccountRole role;
     private long companyId;
+    private LocalDateTime deletedAt;
 
     public static ErpAccount register(Long erpAccountId, long employeeId,
                                       String loginEmail, String hashPassword,
