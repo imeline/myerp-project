@@ -15,17 +15,18 @@
 
     <update id="update" parameterType="Company">
         UPDATE company
-        SET name       = #{name},
-            biz_no     = #{bizNo},
-            address    = #{address},
-            phone      = #{phone},
-        WHERE company_id = #{companyId}
+        SET name    = #{name},
+            biz_no  = #{bizNo},
+            address = #{address},
+            phone   = #{phone},
+            WHERE company_id = #{companyId}
     </update>
 
     <select id="findById" resultType="Company">
         SELECT *
         FROM company c
         WHERE c.company_id = #{companyId}
+          AND deleted_at IS NULL
     </select>
 
     <select id="findCompanyRows" resultType="CompanyRow">
@@ -41,6 +42,7 @@
         <if test="name != null and name != ''">
             AND INSTR(LOWER(c.name), LOWER(#{name})) > 0
         </if>
+        AND c.deleted_at IS NULL
         ORDER BY c.created_at DESC, c.company_id DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
@@ -52,12 +54,14 @@
         <if test="name != null and name != ''">
             AND INSTR(LOWER(c.name), LOWER(#{name})) > 0
         </if>
+        AND c.deleted_at IS NULL
     </select>
 
     <delete id="deleteById">
         DELETE
         FROM company
         WHERE company_id = #{companyId}
+          AND deleted_at IS NULL
     </delete>
 
     <!-- 중복 검사 -->
@@ -68,6 +72,7 @@
         <if test="excludeId != null">
             AND company_id != #{excludeId}
         </if>
+        AND deleted_at IS NULL
     </select>
 
     <select id="existsByName" resultType="boolean">
@@ -77,6 +82,7 @@
         <if test="excludeId != null">
             AND company_id != #{excludeId}
         </if>
+        AND deleted_at IS NULL
     </select>
 
     <!-- 연관 존재 여부 -->
@@ -84,6 +90,7 @@
         SELECT COUNT(*)
         FROM employee
         WHERE company_id = #{companyId}
+          AND status = 'ACTIVE'
     </select>
     <select id="countOrders" resultType="long">
         SELECT COUNT(*)

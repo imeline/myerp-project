@@ -82,7 +82,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Transactional
     public void deleteCompany(long companyId) {
-        // todo: 연관 데이터 존재 여부 체크 추가 필요
+        // todo: 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
         long related = companyMapper.countEmployees(companyId)
                 + companyMapper.countOrders(companyId)
                 + companyMapper.countOutbounds(companyId);
