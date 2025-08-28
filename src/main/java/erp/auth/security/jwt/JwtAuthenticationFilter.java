@@ -1,4 +1,4 @@
-package erp.auth.jwt;
+package erp.auth.security.jwt;
 
 import erp.auth.security.UserPrincipal;
 import erp.global.tenant.TenantContext;
@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        Long tenantIdToUse = null; // 이번 요청에서 사용할 tenantId
+        Long tenantIdToUse; // 이번 요청에서 사용할 tenantId
 
         try {
             final String authHeader = request.getHeader("Authorization");

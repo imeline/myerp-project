@@ -1,4 +1,4 @@
-package erp.auth.jwt;
+package erp.auth.security.jwt;
 
 import erp.auth.security.UserPrincipal;
 import io.jsonwebtoken.Claims;

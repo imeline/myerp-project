@@ -1,6 +1,7 @@
 package erp.global.config;
 
-import erp.auth.jwt.JwtAuthenticationFilter;
+import erp.auth.security.CompanyActiveGuardFilter;
+import erp.auth.security.jwt.JwtAuthenticationFilter;
 import erp.global.exception.RestAccessDeniedHandler;
 import erp.global.exception.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,8 @@ public class SecurityConfig {
 
     // 클라이언트로부터 온 요청에 JWT가 포함됐는지 검사하고, 유저 인증 처리
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    // 회사가 활성 상태인지 검사하는 필터
+    private final CompanyActiveGuardFilter companyActiveGuardFilter;
     private final CorsConfig corsConfig;
     // 401 error 처리 핸들러
     private final RestAccessDeniedHandler restAccessDeniedHandler;
@@ -59,6 +62,7 @@ public class SecurityConfig {
                 // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
                 //→ 그래야 로그인 요청이 아니라도 JWT 인증을 먼저 처리할 수 있음
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(companyActiveGuardFilter, JwtAuthenticationFilter.class)
                 // CORS 허용 필터 추가 (프론트에서 토큰 보낼 수 있게)
                 .addFilter(corsConfig.corsFilter());
 
