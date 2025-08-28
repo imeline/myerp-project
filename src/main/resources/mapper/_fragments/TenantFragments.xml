@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="frag">
+
+    <!-- 테넌트 가드 (단일 테이블) -->
+    <sql id="tenantGuard">
+        company_id
+        =
+        #{tenantId}
+    </sql>
+
+    <!-- 테넌트 가드 (별칭 있는 경우) -->
+    <sql id="tenantGuardAlias">
+        ${alias}
+        .
+        company_id
+        =
+        #{tenantId}
+    </sql>
+
+    <!-- 소프트삭제 활성만 조회 -->
+    <sql id="activeGuard">
+        ${alias}
+        .
+        deleted_at
+        IS NULL
+    </sql>
+
+</mapper>
