@@ -14,7 +14,7 @@ public interface CompanyService {
 
     CompanyListResponse<CompanyRow> listCompany(GetCompanyListRequest request);
 
-    void modifyCompany(ModifyCompanyRequest request);
+    void modifyCompany(Long companyId, ModifyCompanyRequest request);
 
     void deleteCompany(long companyId);
 

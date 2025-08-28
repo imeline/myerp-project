@@ -6,9 +6,9 @@ import erp.auth.dto.request.LoginRequest;
 import erp.auth.dto.request.SignupRequest;
 import erp.auth.dto.response.LoginResponse;
 import erp.auth.enums.ErpAccountRole;
-import erp.auth.jwt.JwtTokenProvider;
 import erp.auth.mapper.ErpAccountMapper;
 import erp.auth.security.UserPrincipal;
+import erp.auth.security.jwt.JwtTokenProvider;
 import erp.employee.domain.Employee;
 import erp.employee.enums.EmployeeStatus;
 import erp.employee.mapper.EmployeeMapper;
@@ -38,14 +38,14 @@ public class AuthServiceImpl implements AuthService {
         long employeeId = employeeMapper.nextId();
 
         Employee employee = Employee.register(
-            employeeId,
-            request.empNo(),
-            request.name(),
-            request.phone(),
-            EmployeeStatus.ACTIVE,
-            request.departmentId(),
-            request.positionId(),
-            request.companyId()
+                employeeId,
+                request.empNo(),
+                request.name(),
+                request.phone(),
+                EmployeeStatus.ACTIVE,
+                request.departmentId(),
+                request.positionId(),
+                request.companyId()
         );
 
         int affected = employeeMapper.create(employee);

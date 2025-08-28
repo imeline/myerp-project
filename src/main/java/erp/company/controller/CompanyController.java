@@ -27,7 +27,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{companyId}")
-    public BaseResponse<CompanyInfoResponse> getCompany(@PathVariable long companyId) {
+    public BaseResponse<CompanyInfoResponse> getCompany(@PathVariable Long companyId) {
         return BaseResponse.onSuccess(companyService.getCompany(companyId));
     }
 
@@ -38,14 +38,14 @@ public class CompanyController {
         return BaseResponse.onSuccess(companyService.listCompany(request));
     }
 
-    @PutMapping
-    public BaseResponse<Void> modifyCompany(@Valid @RequestBody ModifyCompanyRequest request) {
-        companyService.modifyCompany(request);
+    @PutMapping("/{companyId}")
+    public BaseResponse<Void> modifyCompany(@PathVariable Long companyId, @Valid @RequestBody ModifyCompanyRequest request) {
+        companyService.modifyCompany(companyId, request);
         return BaseResponse.onSuccess(null);
     }
 
     @DeleteMapping("/{companyId}")
-    public BaseResponse<Void> deleteCompany(@PathVariable long companyId) {
+    public BaseResponse<Void> deleteCompany(@PathVariable Long companyId) {
         companyService.deleteCompany(companyId);
         return BaseResponse.onSuccess(null);
     }
