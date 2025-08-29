@@ -10,7 +10,7 @@
         WHERE uuid = #{uuid}
     </select>
 
-    <insert id="create" parameterType="ErpAccount">
+    <insert id="save" parameterType="ErpAccount">
         INSERT INTO erp_account (erp_account_id, login_email,
                                  password, uuid, role,
                                  employee_id, company_id)
@@ -35,7 +35,7 @@
         FROM DUAL
     </select>
 
-    <select id="findLoginRowByEmail" parameterType="string"
+    <select id="findLoginRowByLoginEmail" parameterType="string"
             resultType="LoginRow">
         SELECT a.UUID       AS uuid,
                a.ROLE       AS role,

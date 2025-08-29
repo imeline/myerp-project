@@ -11,13 +11,13 @@ public interface ErpAccountMapper {
     // 객체 하나 일때는 필요 없지만, 파라미터가 여러 개거나 단일 값(String, int 등)일 때는 필요
     ErpAccount findByUuid(@Param("uuid") String uuid);
 
-    int create(ErpAccount account);
+    int save(ErpAccount account);
 
     long nextId();
 
     boolean existsByLoginEmail(@Param("loginEmail") String loginEmail);
 
-    LoginRow findLoginRowByEmail(
+    LoginRow findLoginRowByLoginEmail(
             @Param("loginEmail") String loginEmail
     );
 

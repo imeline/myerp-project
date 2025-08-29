@@ -1,21 +1,21 @@
 package erp.company.service;
 
 import erp.company.dto.internal.CompanyRow;
-import erp.company.dto.request.AddCompanyRequest;
-import erp.company.dto.request.GetCompanyListRequest;
-import erp.company.dto.request.ModifyCompanyRequest;
-import erp.company.dto.response.CompanyInfoResponse;
-import erp.company.dto.response.CompanyListResponse;
+import erp.company.dto.request.CompanyFindAllRequest;
+import erp.company.dto.request.CompanySaveRequest;
+import erp.company.dto.request.CompanyUpdateRequest;
+import erp.company.dto.response.CompanyFindAllResponse;
+import erp.company.dto.response.CompanyItemResponse;
 
 public interface CompanyService {
-    Long addCompany(AddCompanyRequest request);
+    Long saveCompany(CompanySaveRequest request);
 
-    CompanyInfoResponse getCompany(long companyId);
+    CompanyItemResponse findCompany(long companyId);
 
-    CompanyListResponse<CompanyRow> listCompany(GetCompanyListRequest request);
+    CompanyFindAllResponse<CompanyRow> findAllCompany(CompanyFindAllRequest request);
 
-    void modifyCompany(Long companyId, ModifyCompanyRequest request);
+    void updateCompany(Long companyId, CompanyUpdateRequest request);
 
-    void deleteCompany(long companyId);
+    void softDeleteCompany(long companyId);
 
 }

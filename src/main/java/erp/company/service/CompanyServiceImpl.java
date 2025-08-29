@@ -3,11 +3,11 @@ package erp.company.service;
 import erp.auth.mapper.ErpAccountMapper;
 import erp.company.domain.Company;
 import erp.company.dto.internal.CompanyRow;
-import erp.company.dto.request.AddCompanyRequest;
-import erp.company.dto.request.GetCompanyListRequest;
-import erp.company.dto.request.ModifyCompanyRequest;
-import erp.company.dto.response.CompanyInfoResponse;
-import erp.company.dto.response.CompanyListResponse;
+import erp.company.dto.request.CompanyFindAllRequest;
+import erp.company.dto.request.CompanySaveRequest;
+import erp.company.dto.request.CompanyUpdateRequest;
+import erp.company.dto.response.CompanyFindAllResponse;
+import erp.company.dto.response.CompanyItemResponse;
 import erp.company.mapper.CompanyMapper;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
@@ -25,9 +25,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional
-    public Long addCompany(AddCompanyRequest request) {
-        validateBizNo(request.bizNo(), null);
-        validateName(request.name(), null);
+    public Long saveCompany(CompanySaveRequest request) {
+        validateBizNoUnique(request.bizNo(), null);
+        validateNameUnique(request.name(), null);
 
         long newId = companyMapper.nextId();
         Company company = Company.of(
@@ -38,42 +38,42 @@ public class CompanyServiceImpl implements CompanyService {
                 request.phone()
         );
 
-        int affected = companyMapper.create(company);
-        assertAffected(affected, ErrorStatus.CREATE_COMPANY_FAIL);
+        int affectedRowCount = companyMapper.save(company);
+        assertAffected(affectedRowCount, ErrorStatus.CREATE_COMPANY_FAIL);
         return newId;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CompanyInfoResponse getCompany(long companyId) {
+    public CompanyItemResponse findCompany(long companyId) {
         Company company = companyMapper.findById(companyId);
         if (company == null)
             throw new GlobalException(ErrorStatus.NOT_FOUND_COMPANY);
-        return CompanyInfoResponse.from(company);
+        return CompanyItemResponse.from(company);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CompanyListResponse<CompanyRow> listCompany(GetCompanyListRequest request) {
+    public CompanyFindAllResponse<CompanyRow> findAllCompany(CompanyFindAllRequest request) {
         int size = request.size();
         int page = request.page();
         String name = request.name();
         int offset = page * size;
 
-        List<CompanyRow> rows = companyMapper.findCompanyRows(name, offset, request.size());
+        List<CompanyRow> rows = companyMapper.findAllCompanyRow(name, offset, request.size());
         long total = companyMapper.countByName(name);
         int totalPages = (int) Math.ceil(total / (double) size);
         boolean hasNext = (page + 1) < totalPages;
 
-        return CompanyListResponse.of(rows, page, total, totalPages, hasNext);
+        return CompanyFindAllResponse.of(rows, page, total, totalPages, hasNext);
     }
 
     @Override
     @Transactional
-    public void modifyCompany(Long companyId, ModifyCompanyRequest request) {
+    public void updateCompany(Long companyId, CompanyUpdateRequest request) {
         // 중복 여부 체크
-        validateBizNo(request.bizNo(), companyId);
-        validateName(request.name(), companyId);
+        validateBizNoUnique(request.bizNo(), companyId);
+        validateNameUnique(request.name(), companyId);
 
         Company company = Company.of(
                 companyId,
@@ -83,13 +83,13 @@ public class CompanyServiceImpl implements CompanyService {
                 request.phone()
         );
 
-        int affected = companyMapper.update(company);
-        assertAffected(affected, ErrorStatus.UPDATE_COMPANY_FAIL);
+        int affectedRowCount = companyMapper.update(company);
+        assertAffected(affectedRowCount, ErrorStatus.UPDATE_COMPANY_FAIL);
     }
 
     @Override
     @Transactional
-    public void deleteCompany(long companyId) {
+    public void softDeleteCompany(long companyId) {
         // todo: 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
         long related = companyMapper.countEmployees(companyId)
                 + companyMapper.countOrders(companyId)
@@ -97,19 +97,19 @@ public class CompanyServiceImpl implements CompanyService {
         if (related > 0)
             throw new GlobalException(ErrorStatus.EXTERNAL_DATA_EXISTS);
 
-        int affected = companyMapper.softDeleteById(companyId);
-        assertAffected(affected, ErrorStatus.DELETE_COMPANY_FAIL);
+        int affectedRowCount = companyMapper.softDeleteById(companyId);
+        assertAffected(affectedRowCount, ErrorStatus.DELETE_COMPANY_FAIL);
         // 해당 회사 직원들의 erp_account 도 소프트 삭제
         erpAccountMapper.softDeleteByCompanyId(companyId);
     }
 
     // 중복 검사
-    private void validateBizNo(String bizNo, Long excludeId) {
+    private void validateBizNoUnique(String bizNo, Long excludeId) {
         if (companyMapper.existsByBizNo(bizNo, excludeId))
             throw new GlobalException(ErrorStatus.DUPLICATE_BIZ_NO);
     }
 
-    private void validateName(String name, Long excludeId) {
+    private void validateNameUnique(String name, Long excludeId) {
         if (companyMapper.existsByName(name, excludeId))
             throw new GlobalException(ErrorStatus.DUPLICATE_NAME);
     }

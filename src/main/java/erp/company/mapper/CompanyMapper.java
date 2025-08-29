@@ -11,7 +11,7 @@ import java.util.List;
 public interface CompanyMapper {
     long nextId();
 
-    int create(Company company);
+    int save(Company company);
 
     int update(Company company);
 
@@ -22,7 +22,7 @@ public interface CompanyMapper {
 
     boolean existsByName(@Param("name") String name, @Param("excludeId") Long excludeId);
 
-    List<CompanyRow> findCompanyRows(
+    List<CompanyRow> findAllCompanyRow(
             @Param("name") String name,
             @Param("offset") int offset,
             @Param("size") int size

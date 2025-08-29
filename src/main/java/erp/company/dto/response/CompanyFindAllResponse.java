@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record CompanyListResponse<T>(
+public record CompanyFindAllResponse<T>(
         List<CompanyRow> companies,
         int page, // 현재 페이지 번호 (0부터 시작)
         // 아래 내용을 알려주면 프론트 구현이 쉬워짐
@@ -14,12 +14,12 @@ public record CompanyListResponse<T>(
         int totalPages, // 전체 페이지 개수
         boolean hasNext
 ) {
-    public static <T> CompanyListResponse<T> of(List<CompanyRow> companies,
-                                                int page,
-                                                long totalElements,
-                                                int totalPages,
-                                                boolean hasNext) {
-        return CompanyListResponse.<T>builder()
+    public static <T> CompanyFindAllResponse<T> of(List<CompanyRow> companies,
+                                                   int page,
+                                                   long totalElements,
+                                                   int totalPages,
+                                                   boolean hasNext) {
+        return CompanyFindAllResponse.<T>builder()
                 .companies(companies)
                 .page(page)
                 .totalElements(totalElements)

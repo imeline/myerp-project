@@ -3,7 +3,7 @@ package erp.company.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-public record ModifyCompanyRequest(
+public record CompanySaveRequest(
         @NotBlank
         String name,
         @NotBlank
@@ -15,4 +15,5 @@ public record ModifyCompanyRequest(
         @Pattern(regexp = "0\\d{1,2}-\\d{3,4}-\\d{4}")
         String phone
 ) {
+
 }

@@ -4,14 +4,14 @@ import erp.company.domain.Company;
 import lombok.Builder;
 
 @Builder
-public record CompanyInfoResponse(
+public record CompanyItemResponse(
         String name,
         String bizNo,
         String address,
         String phone
 ) {
-    public static CompanyInfoResponse from(Company company) {
-        return CompanyInfoResponse.builder()
+    public static CompanyItemResponse from(Company company) {
+        return CompanyItemResponse.builder()
                 .name(company.getName())
                 .bizNo(company.getBizNo())
                 .address(company.getAddress())
