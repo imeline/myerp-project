@@ -15,8 +15,9 @@ public enum ErrorStatus {
     NOT_FOUND("NOT_FOUND_404", "리소스를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR_500",
             "서버 내부 오류가 발생했습니다."),
-
-    // AUTH
+    NULL_TENANT_ID("TENANT001", "테넌트 ID가 설정되지 않았습니다."),
+    
+    // AUTH,
     EXIST_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
     INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103", "테넌트 ID가 설정되지 않았습니다."),
     SIGNUP_FAIL("AUTH104", "회원가입에 실패했습니다."),
@@ -29,7 +30,12 @@ public enum ErrorStatus {
     UPDATE_COMPANY_FAIL("COMP105", "회사 수정에 실패했습니다."),
     DELETE_COMPANY_FAIL("COMP106", "회사를 찾을 수 없거나 이미 삭제된 회사입니다."),
     EXTERNAL_DATA_EXISTS("COMP107", "연관된 데이터가 존재하여 삭제할 수 없습니다."),
-    ;
+    DUPLICATE_DEPARTMENT_NAME("COMP201", "이미 등록된 부서명입니다."),
+    NOT_FOUND_DEPARTMENT("COMP202", "존재하지 않는 부서입니다."),
+    CREATE_DEPARTMENT_FAIL("COMP203", "부서 등록에 실패했습니다."),
+    UPDATE_DEPARTMENT_FAIL("COMP204", "부서 수정에 실패했습니다."),
+    DELETE_DEPARTMENT_FAIL("COMP205", "부서를 찾을 수 없거나 이미 삭제된 부서입니다."),
+    NO_FOUND_PARENT_DEPARTMENT("COMP206", "유효하지 않은 상위 부서입니다.");
 
 
     private final String status;

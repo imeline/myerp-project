@@ -1,5 +1,8 @@
 package erp.global.tenant;
 
+import erp.global.exception.ErrorStatus;
+import erp.global.exception.GlobalException;
+
 // ThreadLocal을 써서 현재 스레드(=이번 HTTP 요청) 안에서만 tenantId를 저장
 // JWT 필터가 토큰에서 tenantId를 꺼내서 TenantContext.set(tenantId)로 심어줌
 // 이후 서비스/매퍼/인터셉터에서 필요할 때 TenantContext.get()으로 꺼냄
@@ -16,7 +19,11 @@ public final class TenantContext {
     }
 
     public static Long get() {
-        return TENANT.get();
+        Long tenantId = TENANT.get();
+        if (tenantId == null) {
+            throw new GlobalException(ErrorStatus.NULL_TENANT_ID);
+        }
+        return tenantId;
     }
 
     public static void clear() {
