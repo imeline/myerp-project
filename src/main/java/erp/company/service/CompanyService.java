@@ -8,7 +8,7 @@ import erp.company.dto.response.CompanyInfoResponse;
 import erp.company.dto.response.CompanyListResponse;
 
 public interface CompanyService {
-    void addCompany(AddCompanyRequest request);
+    Long addCompany(AddCompanyRequest request);
 
     CompanyInfoResponse getCompany(long companyId);
 

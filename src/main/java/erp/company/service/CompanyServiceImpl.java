@@ -23,8 +23,9 @@ public class CompanyServiceImpl implements CompanyService {
     private final CompanyMapper companyMapper;
     private final ErpAccountMapper erpAccountMapper;
 
+    @Override
     @Transactional
-    public void addCompany(AddCompanyRequest request) {
+    public Long addCompany(AddCompanyRequest request) {
         validateBizNo(request.bizNo(), null);
         validateName(request.name(), null);
 
@@ -39,8 +40,10 @@ public class CompanyServiceImpl implements CompanyService {
 
         int affected = companyMapper.create(company);
         assertAffected(affected, ErrorStatus.CREATE_COMPANY_FAIL);
+        return newId;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public CompanyInfoResponse getCompany(long companyId) {
         Company company = companyMapper.findById(companyId);
@@ -49,6 +52,7 @@ public class CompanyServiceImpl implements CompanyService {
         return CompanyInfoResponse.from(company);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public CompanyListResponse<CompanyRow> listCompany(GetCompanyListRequest request) {
         int size = request.size();
@@ -64,6 +68,7 @@ public class CompanyServiceImpl implements CompanyService {
         return CompanyListResponse.of(rows, page, total, totalPages, hasNext);
     }
 
+    @Override
     @Transactional
     public void modifyCompany(Long companyId, ModifyCompanyRequest request) {
         // 중복 여부 체크
@@ -82,6 +87,7 @@ public class CompanyServiceImpl implements CompanyService {
         assertAffected(affected, ErrorStatus.UPDATE_COMPANY_FAIL);
     }
 
+    @Override
     @Transactional
     public void deleteCompany(long companyId) {
         // todo: 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요

@@ -20,10 +20,10 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @PostMapping
-    public BaseResponse<Void> addCompany(@Valid @RequestBody AddCompanyRequest request /*@AuthenticationPrincipal UserPrincipal user*/) {
-        companyService.addCompany(request);
+    public BaseResponse<Long> addCompany(@Valid @RequestBody AddCompanyRequest request /*@AuthenticationPrincipal UserPrincipal user*/) {
+        Long addCompanyId = companyService.addCompany(request);
 
-        return BaseResponse.onSuccess(null);
+        return BaseResponse.onSuccess(addCompanyId);
     }
 
     @GetMapping("/{companyId}")
