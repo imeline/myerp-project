@@ -1,98 +1,166 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="erp.department.mapper.DepartmentMapper">
 
-    <sql id="tenantGuard">company_id = #{tenantId}</sql>
-    <sql id="tenantGuardAlias">${alias}.company_id = #{tenantId}</sql>
-
+    <!-- 신규 ID 채번 -->
     <select id="nextId" resultType="long">
-        SELECT department_seq.NEXTVAL FROM dual
+        SELECT department_seq.NEXTVAL
+        FROM dual
     </select>
 
-    <insert id="create" parameterType="map">
-        INSERT INTO DEPARTMENT (
-            department_id, company_id, parent_id, name
-        ) VALUES (
-                     #{department.departmentId},
-                     #{tenantId},
-                     #{department.parentId},
-                     #{department.name}
-                 )
+    <!-- 저장 -->
+    <insert id="save">
+        INSERT INTO DEPARTMENT (department_id, company_id, parent_id, name)
+        VALUES (#{department.departmentId},
+        #{tenantId},
+        #{department.parentId, jdbcType=NUMERIC}, <!-- null 허용 -->
+        #{department.name})
     </insert>
 
-    <update id="update" parameterType="map">
+    <!-- 수정 -->
+    <update id="update">
         UPDATE DEPARTMENT
-        SET name = #{department.name},
+        SET
+        name = #{department.name},
         parent_id = #{department.parentId}
         WHERE department_id = #{department.departmentId}
-        AND <include refid="tenantGuard"/>
+        AND
+        <include refid="frag.tenantGuard"/>
     </update>
 
-    <select id="findById" parameterType="map" resultType="erp.department.domain.Department">
-        SELECT dept.department_id AS departmentId,
-        dept.name          AS name,
-        dept.company_id    AS companyId,
-        NVL(dept.parent_id, 0) AS parentId
-        FROM DEPARTMENT dept
-        WHERE dept.department_id = #{departmentId}
-        AND <include refid="tenantGuardAlias">
-        <property name="alias" value="dept"/>
-    </include>
-    </select>
-
-    <select id="existsByName" parameterType="map" resultType="boolean">
-        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
-        FROM DEPARTMENT dept
-        WHERE <include refid="tenantGuardAlias">
-        <property name="alias" value="dept"/>
-    </include>
-        AND LOWER(dept.name) = LOWER(#{name})
-        <if test="excludeDepartmentId != null">
-            AND dept.department_id <> #{excludeDepartmentId}
-        </if>
-    </select>
-
-    <select id="existsById" parameterType="map" resultType="boolean">
-        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
-        FROM DEPARTMENT dept
-        WHERE <include refid="tenantGuardAlias">
-        <property name="alias" value="dept"/>
-    </include>
-        AND dept.department_id = #{departmentId}
-    </select>
-
-    <select id="findRows" parameterType="map" resultType="erp.department.domain.Department">
-        SELECT dept.department_id AS departmentId,
-        dept.name          AS name,
-        dept.company_id    AS companyId,
-        NVL(dept.parent_id, 0) AS parentId
-        FROM DEPARTMENT dept
-        WHERE <include refid="tenantGuardAlias">
-        <property name="alias" value="dept"/>
-    </include>
-        <if test="name != null and name != ''">
-            AND INSTR(LOWER(dept.name), LOWER(#{name})) > 0
-        </if>
-        ORDER BY dept.department_id DESC
-        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
-    </select>
-
-    <select id="countByName" parameterType="map" resultType="long">
-        SELECT COUNT(1)
-        FROM DEPARTMENT dept
-        WHERE <include refid="tenantGuardAlias">
-        <property name="alias" value="dept"/>
-    </include>
-        <if test="name != null and name != ''">
-            AND INSTR(LOWER(dept.name), LOWER(#{name})) > 0
-        </if>
-    </select>
-
-    <delete id="deleteById" parameterType="map">
-        DELETE FROM DEPARTMENT
+    <!-- 단건 조회 -->
+    <select id="findById" resultType="Department">
+        SELECT
+        department_id,
+        company_id,
+        parent_id,
+        name
+        FROM DEPARTMENT
         WHERE department_id = #{departmentId}
-        AND <include refid="tenantGuard"/>
-    </delete>
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <!-- 최상위(parent_id IS NULL) 목록 + 자식 존재 여부 -->
+    <select id="findAllTopLevelDepartmentRow" resultType="DepartmentRow">
+        SELECT
+        d.department_id AS departmentId,
+        d.name AS name,
+        <!-- 자식 여부 0, 1 리턴 -->
+        CASE WHEN EXISTS (
+        SELECT 1  <!-- 존재 여부만 확인할 거라 관례적으로 1 같은 상수 -->
+        FROM DEPARTMENT c
+        WHERE
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="c"/>
+        </include>
+        <!-- 바깥 행(d)이 부모이고, 그를 부모로 가진 자식(c)이 있는지 확인 -->
+        AND c.parent_id = d.department_id
+        ) THEN 1 ELSE 0 END AS hasChildren
+        FROM DEPARTMENT d
+        WHERE
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="d"/>
+        </include>
+        AND d.parent_id IS NULL
+        ORDER BY d.department_id
+    </select>
+
+    <!-- 특정 부모의 직계 자식 + 자식 존재 여부 -->
+    <select id="findAllDepartmentRowByParentId" resultType="DepartmentRow">
+        SELECT
+        d.department_id AS departmentId,
+        d.name AS name,
+        <!-- 자식 여부 0, 1 리턴 -->
+        CASE WHEN EXISTS (
+        SELECT 1  <!-- 존재 여부만 확인할 거라 관례적으로 1 같은 상수 -->
+        FROM DEPARTMENT c
+        WHERE
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="c"/>
+        </include>
+        <!-- 바깥 행(d)이 부모이고, 그를 부모로 가진 자식(c)이 있는지 확인 -->
+        AND c.parent_id = d.department_id
+        ) THEN 1 ELSE 0 END AS hasChildren
+        FROM DEPARTMENT d
+        WHERE
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="d"/>
+        </include>
+        AND d.parent_id = #{parentId}
+        ORDER BY d.department_id
+    </select>
+
+    <!-- 같은 부모 아래 이름 중복 확인 (수정 시 자기 자신 제외) -->
+    <select id="existsByNameAndParentId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM DEPARTMENT d
+        WHERE
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="d"/>
+        </include>
+        AND LOWER(d.name) = LOWER(#{name})
+        <if test="parentId != null">
+            AND d.parent_id = #{parentId}
+        </if>
+        <if test="parentId == null">
+            AND d.parent_id IS NULL
+        </if>
+        <if test="excludeDepartmentId != null">
+            AND d.department_id != #{excludeDepartmentId}
+        </if>
+    </select>
+
+    <!-- 존재 여부 -->
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM DEPARTMENT d
+        WHERE
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="d"/>
+        </include>
+        AND d.department_id = #{departmentId}
+    </select>
+
+    <!-- 테넌트 전체 조회(필요 시) -->
+    <select id="findAllByTenantId" resultType="Department">
+        SELECT
+        department_id,
+        name,
+        company_id,
+        parent_id
+        FROM DEPARTMENT d
+        WHERE
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="d"/>
+        </include>
+    </select>
+
+    <!-- 전체 부서 한번에 조회 (참고용: 필요 시 활성화) -->
+    <!--
+    <select id="findAllDepartmentRow" resultType="DepartmentRowResponse">
+        SELECT
+            d.department_id,
+            d.name,
+            d.parent_id,
+            NVL(cc.cnt, 0) AS children_cnt
+        FROM DEPARTMENT d
+        부모별 자식 수를 미리 집계
+        LEFT JOIN (
+            SELECT c.parent_id, COUNT(1) AS cnt
+            FROM DEPARTMENT c
+            WHERE <include refid="frag.tenantGuardAlias">
+                      <property name="alias" value="c"/>
+                  </include>
+            GROUP BY c.parent_id
+        ) cc ON cc.parent_id = d.department_id
+        WHERE <include refid="frag.tenantGuardAlias">
+                  <property name="alias" value="d"/>
+              </include>
+        부모가 NULL인 행을 먼저
+        ORDER BY NVL(d.parent_id, -1), d.department_id
+    </select>
+    -->
 
 </mapper>

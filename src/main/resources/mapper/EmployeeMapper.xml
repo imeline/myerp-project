@@ -5,8 +5,8 @@
 <mapper namespace="erp.employee.mapper.EmployeeMapper">
 
     <insert id="save" parameterType="Employee">
-        INSERT INTO employee (employeeId, empNo, name, phone, status,
-                              departmentId, positionId, companyId)
+        INSERT INTO employee (employee_id, emp_no, name, phone, status,
+                              department_id, position_id, company_id)
         VALUES (#{employeeId}, #{empNo}, #{name}, #{phone}, #{status},
                 #{departmentId}, #{positionId}, #{companyId})
     </insert>

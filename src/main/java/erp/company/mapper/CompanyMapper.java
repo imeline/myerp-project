@@ -32,7 +32,7 @@ public interface CompanyMapper {
 
     int softDeleteById(@Param("companyId") Long companyId);
 
-    boolean isActive(@Param("companyId") Long companyId);
+    Boolean isActive(@Param("companyId") Long companyId);
 
     // 연관 데이터 존재 여부
     long countEmployees(@Param("companyId") long companyId);

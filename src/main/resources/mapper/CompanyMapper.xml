@@ -18,8 +18,8 @@
         SET name    = #{name},
             biz_no  = #{bizNo},
             address = #{address},
-            phone   = #{phone},
-            WHERE company_id = #{companyId}
+            phone   = #{phone}
+        WHERE company_id = #{companyId}
     </update>
 
     <select id="findById" resultType="Company">
@@ -64,7 +64,7 @@
           AND deleted_at IS NULL
     </update>
 
-    <select id="isActive" resultType="boolean">
+    <select id="isActive" resultType="Boolean">
         SELECT CASE WHEN c.deleted_at IS NULL THEN 1 ELSE 0 END
         FROM company c
         WHERE c.company_id = #{companyId}

@@ -55,12 +55,13 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional(readOnly = true)
     public CompanyFindAllResponse<CompanyRow> findAllCompany(CompanyFindAllRequest request) {
-        int size = request.size();
-        int page = request.page();
-        String name = request.name();
+        int size = (request.size() == null || request.size() < 1) ? 20 : request.size();
+        int page = (request.page() == null || request.page() < 0) ? 0 : request.page();
         int offset = page * size;
+        String name = request.name();
+        name = (name == null || name.isBlank()) ? null : name.trim();
 
-        List<CompanyRow> rows = companyMapper.findAllCompanyRow(name, offset, request.size());
+        List<CompanyRow> rows = companyMapper.findAllCompanyRow(name, offset, size);
         long total = companyMapper.countByName(name);
         int totalPages = (int) Math.ceil(total / (double) size);
         boolean hasNext = (page + 1) < totalPages;

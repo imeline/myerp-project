@@ -1,6 +1,7 @@
 package erp.department.mapper;
 
 import erp.department.domain.Department;
+import erp.department.dto.internal.DepartmentRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,8 +11,8 @@ import java.util.List;
 public interface DepartmentMapper {
     long nextId();
 
-    int create(@Param("tenantId") Long tenantId,
-               @Param("department") Department department);
+    int save(@Param("tenantId") Long tenantId,
+             @Param("department") Department department);
 
     int update(@Param("tenantId") Long tenantId,
                @Param("department") Department department);
@@ -19,22 +20,22 @@ public interface DepartmentMapper {
     Department findById(@Param("tenantId") Long tenantId,
                         @Param("departmentId") Long departmentId);
 
-    boolean existsByName(@Param("tenantId") Long tenantId,
-                         @Param("name") String name,
-                         @Param("excludeDepartmentId") Long excludeDepartmentId);
+    List<DepartmentRow> findAllTopLevelDepartmentRow(
+            @Param("tenantId") long tenantId);
+
+    List<DepartmentRow> findAllDepartmentRowByParentId(
+            @Param("tenantId") long tenantId,
+            @Param("parentId") long parentId);
+
+    // 해당 테넌트의 모든 부서 조회
+//    List<DepartmentRowResponse> findAllDepartmentRow(@Param("tenantId") long tenantId);
+
+    // 한 부모 안에 같은 이름의 부서가 있는지 검사(수정 시 자기 자신은 제외)
+    boolean existsByNameAndParentId(@Param("tenantId") Long tenantId,
+                                    @Param("parentId") Long parentId,
+                                    @Param("name") String name,
+                                    @Param("excludeDepartmentId") Long excludeDepartmentId);
 
     boolean existsById(@Param("tenantId") Long tenantId,
                        @Param("departmentId") Long departmentId);
-
-    List<Department> findRows(@Param("tenantId") Long tenantId,
-                              @Param("name") String name,
-                              @Param("offset") int offset,
-                              @Param("size") int size);
-
-    long countByName(@Param("tenantId") Long tenantId,
-                     @Param("name") String name);
-
-    int deleteById(@Param("tenantId") Long tenantId,
-                   @Param("departmentId") Long departmentId);
-
 }
