@@ -1,6 +1,6 @@
 package erp.company.controller;
 
-import erp.company.dto.internal.CompanyRow;
+import erp.company.dto.internal.CompanyFindRow;
 import erp.company.dto.request.CompanyFindAllRequest;
 import erp.company.dto.request.CompanySaveRequest;
 import erp.company.dto.request.CompanyUpdateRequest;
@@ -32,7 +32,7 @@ public class CompanyController {
     }
 
     @GetMapping
-    public BaseResponse<CompanyFindAllResponse<CompanyRow>> findAllCompany(
+    public BaseResponse<CompanyFindAllResponse<CompanyFindRow>> findAllCompany(
             @Valid @RequestBody CompanyFindAllRequest request
     ) {
         return BaseResponse.onSuccess(companyService.findAllCompany(request));

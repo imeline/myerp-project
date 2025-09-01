@@ -2,7 +2,7 @@ package erp.company.service;
 
 import erp.auth.mapper.ErpAccountMapper;
 import erp.company.domain.Company;
-import erp.company.dto.internal.CompanyRow;
+import erp.company.dto.internal.CompanyFindRow;
 import erp.company.dto.request.CompanyFindAllRequest;
 import erp.company.dto.request.CompanySaveRequest;
 import erp.company.dto.request.CompanyUpdateRequest;
@@ -53,14 +53,14 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional(readOnly = true)
-    public CompanyFindAllResponse<CompanyRow> findAllCompany(CompanyFindAllRequest request) {
+    public CompanyFindAllResponse<CompanyFindRow> findAllCompany(CompanyFindAllRequest request) {
         int size = (request.size() == null || request.size() < 1) ? 20 : request.size();
         int page = (request.page() == null || request.page() < 0) ? 0 : request.page();
         int offset = page * size;
         String name = request.name();
         name = (name == null || name.isBlank()) ? null : name.trim();
 
-        List<CompanyRow> rows = companyMapper.findAllCompanyRow(name, offset, size);
+        List<CompanyFindRow> rows = companyMapper.findAllCompanyRow(name, offset, size);
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_COMPANY);
         }

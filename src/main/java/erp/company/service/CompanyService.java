@@ -1,6 +1,6 @@
 package erp.company.service;
 
-import erp.company.dto.internal.CompanyRow;
+import erp.company.dto.internal.CompanyFindRow;
 import erp.company.dto.request.CompanyFindAllRequest;
 import erp.company.dto.request.CompanySaveRequest;
 import erp.company.dto.request.CompanyUpdateRequest;
@@ -12,7 +12,7 @@ public interface CompanyService {
 
     CompanyItemResponse findCompany(long companyId);
 
-    CompanyFindAllResponse<CompanyRow> findAllCompany(CompanyFindAllRequest request);
+    CompanyFindAllResponse<CompanyFindRow> findAllCompany(CompanyFindAllRequest request);
 
     void updateCompany(Long companyId, CompanyUpdateRequest request);
 

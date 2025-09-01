@@ -29,7 +29,7 @@
           AND deleted_at IS NULL
     </select>
 
-    <select id="findAllCompanyRow" resultType="CompanyRow">
+    <select id="findAllCompanyRow" resultType="CompanyFindRow">
         SELECT
         company_id AS companyId,
         name AS name,

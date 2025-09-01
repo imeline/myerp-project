@@ -3,7 +3,7 @@ package erp.auth.dto.internal;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record LoginRow(
+public record LoginUserInfoRow(
         @NotBlank
         String uuid,
         @NotBlank

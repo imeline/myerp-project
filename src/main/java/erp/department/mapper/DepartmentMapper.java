@@ -1,7 +1,7 @@
 package erp.department.mapper;
 
 import erp.department.domain.Department;
-import erp.department.dto.internal.DepartmentRow;
+import erp.department.dto.internal.DepartmentFindRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,10 +21,10 @@ public interface DepartmentMapper {
     Optional<Department> findById(@Param("tenantId") Long tenantId,
                                   @Param("departmentId") Long departmentId);
 
-    List<DepartmentRow> findAllTopLevelDepartmentRow(
+    List<DepartmentFindRow> findAllTopLevelDepartmentRow(
             @Param("tenantId") long tenantId);
 
-    List<DepartmentRow> findAllDepartmentRowByParentId(
+    List<DepartmentFindRow> findAllDepartmentRowByParentId(
             @Param("tenantId") long tenantId,
             @Param("parentId") long parentId);
 

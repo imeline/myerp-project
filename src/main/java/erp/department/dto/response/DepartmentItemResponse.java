@@ -1,17 +1,17 @@
 package erp.department.dto.response;
 
-import erp.department.dto.internal.DepartmentRow;
+import erp.department.dto.internal.DepartmentFindRow;
 
 public record DepartmentItemResponse(
         long departmentId,
         String name,
         boolean hasChildren   // ▶ 표시용
 ) {
-    public static DepartmentItemResponse from(DepartmentRow departmentRow) {
+    public static DepartmentItemResponse from(DepartmentFindRow departmentFindRow) {
         return new DepartmentItemResponse(
-                departmentRow.departmentId(),
-                departmentRow.name(),
-                departmentRow.hasChildren() == 1
+                departmentFindRow.departmentId(),
+                departmentFindRow.name(),
+                departmentFindRow.hasChildren() == 1
         );
     }
 }

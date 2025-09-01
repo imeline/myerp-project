@@ -1,7 +1,7 @@
 package erp.company.mapper;
 
 import erp.company.domain.Company;
-import erp.company.dto.internal.CompanyRow;
+import erp.company.dto.internal.CompanyFindRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,7 +23,7 @@ public interface CompanyMapper {
 
     boolean existsByName(@Param("name") String name, @Param("excludeId") Long excludeId);
 
-    List<CompanyRow> findAllCompanyRow(
+    List<CompanyFindRow> findAllCompanyRow(
             @Param("name") String name,
             @Param("offset") int offset,
             @Param("size") int size

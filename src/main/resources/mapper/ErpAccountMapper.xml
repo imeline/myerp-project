@@ -23,7 +23,7 @@
         FROM erp_account
         WHERE uuid = #{uuid}
     </select>
-    
+
     <select id="existsByLoginEmail" parameterType="string" resultType="boolean">
         SELECT CASE
                    WHEN EXISTS (SELECT 1
@@ -36,7 +36,7 @@
     </select>
 
     <select id="findLoginRowByLoginEmail" parameterType="string"
-            resultType="LoginRow">
+            resultType="LoginUserInfoRow">
         SELECT a.UUID       AS uuid,
                a.ROLE       AS role,
                a.PASSWORD   AS passwordHash,

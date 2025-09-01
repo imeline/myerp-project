@@ -40,7 +40,7 @@
     </select>
 
     <!-- 최상위(parent_id IS NULL) 목록 + 자식 존재 여부 -->
-    <select id="findAllTopLevelDepartmentRow" resultType="DepartmentRow">
+    <select id="findAllTopLevelDepartmentRow" resultType="DepartmentFindRow">
         SELECT
         department_id AS departmentId,
         name AS name,
@@ -63,7 +63,7 @@
     </select>
 
     <!-- 특정 부모의 직계 자식 + 자식 존재 여부 -->
-    <select id="findAllDepartmentRowByParentId" resultType="DepartmentRow">
+    <select id="findAllDepartmentRowByParentId" resultType="DepartmentFindRow">
         SELECT
         department_id AS departmentId,
         name AS name,
