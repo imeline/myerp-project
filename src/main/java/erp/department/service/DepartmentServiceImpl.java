@@ -4,7 +4,7 @@ import erp.department.domain.Department;
 import erp.department.dto.request.ChildDepartmentSaveRequest;
 import erp.department.dto.request.DepartmentUpdateRequest;
 import erp.department.dto.request.TopDepartmentSaveRequest;
-import erp.department.dto.response.DepartmentItemResponse;
+import erp.department.dto.response.DepartmentInfoResponse;
 import erp.department.mapper.DepartmentMapper;
 import erp.employee.mapper.EmployeeMapper;
 import erp.global.exception.ErrorStatus;
@@ -72,10 +72,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     // 첫 페이지 로딩: 최상위(parent_id IS NULL)만
     @Override
     @Transactional(readOnly = true)
-    public List<DepartmentItemResponse> findAllTopLevelDepartment(long tenantId) {
-        List<DepartmentItemResponse> list =
+    public List<DepartmentInfoResponse> findAllTopLevelDepartment(long tenantId) {
+        List<DepartmentInfoResponse> list =
                 departmentMapper.findAllTopLevelDepartmentRow(tenantId)
-                        .stream().map(DepartmentItemResponse::from).toList();
+                        .stream().map(DepartmentInfoResponse::from).toList();
         if (list.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_DEPARTMENT);
         }
@@ -85,11 +85,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     // 펼침 클릭: 특정 parent의 직계 자식만
     @Override
     @Transactional(readOnly = true)
-    public List<DepartmentItemResponse> findAllByParentId(long parentId,
+    public List<DepartmentInfoResponse> findAllByParentId(long parentId,
                                                           long tenantId) {
-        List<DepartmentItemResponse> list =
+        List<DepartmentInfoResponse> list =
                 departmentMapper.findAllDepartmentRowByParentId(tenantId, parentId)
-                        .stream().map(DepartmentItemResponse::from).toList();
+                        .stream().map(DepartmentInfoResponse::from).toList();
         if (list.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_DEPARTMENT);
         }

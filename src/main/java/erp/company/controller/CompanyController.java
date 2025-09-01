@@ -4,9 +4,9 @@ import erp.company.dto.internal.CompanyFindRow;
 import erp.company.dto.request.CompanyFindAllRequest;
 import erp.company.dto.request.CompanySaveRequest;
 import erp.company.dto.request.CompanyUpdateRequest;
-import erp.company.dto.response.CompanyFindAllResponse;
-import erp.company.dto.response.CompanyItemResponse;
+import erp.company.dto.response.CompanyInfoResponse;
 import erp.company.service.CompanyService;
+import erp.global.dto.PageResponse;
 import erp.global.response.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +27,12 @@ public class CompanyController {
     }
 
     @GetMapping("/{companyId}")
-    public BaseResponse<CompanyItemResponse> findCompany(@PathVariable Long companyId) {
+    public BaseResponse<CompanyInfoResponse> findCompany(@PathVariable Long companyId) {
         return BaseResponse.onSuccess(companyService.findCompany(companyId));
     }
 
     @GetMapping
-    public BaseResponse<CompanyFindAllResponse<CompanyFindRow>> findAllCompany(
+    public BaseResponse<PageResponse<CompanyFindRow>> findAllCompany(
             @Valid @RequestBody CompanyFindAllRequest request
     ) {
         return BaseResponse.onSuccess(companyService.findAllCompany(request));

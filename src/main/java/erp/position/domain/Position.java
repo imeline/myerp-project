@@ -14,7 +14,7 @@ public class Position extends TimeStamped {
     private int levelNo;
     private long companyId;
 
-    public static Position of(Long positionId, String name, int levelNo, long companyId) {
+    public static Position register(Long positionId, String name, int levelNo, long companyId) {
         return Position.builder()
                 .positionId(positionId)
                 .name(name)

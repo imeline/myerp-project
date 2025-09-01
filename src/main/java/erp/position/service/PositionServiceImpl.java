@@ -32,7 +32,7 @@ public class PositionServiceImpl implements PositionService {
         // 직급 번호는 가장 마지막 직급 번호 + 1
         int levelNo = positionMapper.findLastLevelNo(tenantId) + 1;
 
-        Position position = Position.of(newPositionId, name, levelNo, tenantId);
+        Position position = Position.register(newPositionId, name, levelNo, tenantId);
         int affectedRowCount = positionMapper.save(tenantId, position);
         assertAffected(affectedRowCount, ErrorStatus.CREATE_POSITION_FAIL);
 

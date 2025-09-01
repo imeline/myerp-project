@@ -1,6 +1,7 @@
 package erp.item.domain;
 
 import erp.global.base.TimeStamped;
+import erp.item.enums.ItemCategory;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -16,7 +17,20 @@ public class Item extends TimeStamped {
     private String code;
     private BigDecimal price;
     private String unit;
-    private String category;
+    private ItemCategory category;
     private long companyId;
     private LocalDateTime deletedAt;
+
+    public static Item of(Long itemId, String name, String code, BigDecimal price,
+                          String unit, ItemCategory category, long companyId) {
+        return Item.builder()
+                .itemId(itemId)
+                .name(name)
+                .code(code)
+                .price(price)
+                .unit(unit)
+                .category(category)
+                .companyId(companyId)
+                .build();
+    }
 }

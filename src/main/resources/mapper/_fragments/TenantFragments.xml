@@ -19,12 +19,4 @@
         #{tenantId}
     </sql>
 
-    <!-- 소프트삭제 활성만 조회 -->
-    <sql id="activeGuard">
-        ${alias}
-        .
-        deleted_at
-        IS NULL
-    </sql>
-
 </mapper>

@@ -2,13 +2,13 @@ package erp.department.dto.response;
 
 import erp.department.dto.internal.DepartmentFindRow;
 
-public record DepartmentItemResponse(
+public record DepartmentInfoResponse(
         long departmentId,
         String name,
         boolean hasChildren   // ▶ 표시용
 ) {
-    public static DepartmentItemResponse from(DepartmentFindRow departmentFindRow) {
-        return new DepartmentItemResponse(
+    public static DepartmentInfoResponse from(DepartmentFindRow departmentFindRow) {
+        return new DepartmentInfoResponse(
                 departmentFindRow.departmentId(),
                 departmentFindRow.name(),
                 departmentFindRow.hasChildren() == 1
