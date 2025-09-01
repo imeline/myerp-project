@@ -34,7 +34,7 @@ public class CompanyActiveGuardFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
 
         Long companyId = TenantContext.get(); // JwtAuthenticationFilter에서 세팅됨
-        if (companyId != null && !companyMapper.isActive(companyId)) {
+        if (companyId != null && !companyMapper.isActiveById(companyId)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Company is deactivated.");
             return;
         }
