@@ -4,36 +4,58 @@
 
 <mapper namespace="erp.auth.mapper.ErpAccountMapper">
 
+    <select id="nextId" resultType="long">
+        SELECT erp_account_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save" parameterType="ErpAccount">
+        INSERT INTO erp_account (erp_account_id, login_email,
+                                 password, uuid, role,
+                                 employee_id, company_id)
+        VALUES (#{erpAccountId}, #{loginEmail},
+                #{password}, #{uuid}, #{role},
+                #{employeeId}, #{companyId})
+    </insert>
+
     <select id="findByUuid" parameterType="string" resultType="ErpAccount">
         SELECT *
         FROM erp_account
         WHERE uuid = #{uuid}
     </select>
 
-    <insert id="saveErpAccount" parameterType="ErpAccount">
-        INSERT INTO erp_account (erp_account_id, login_email,
-                                 password, uuid, role,
-                                 updated_at, employee_id)
-        VALUES (#{erpAccountId}, #{loginEmail},
-                #{password}, #{uuid}, #{role},
-                SYSTIMESTAMP, #{employeeId})
-    </insert>
-
-    <select id="getNextErpAccountId" resultType="Long">
-        SELECT erp_account_seq.NEXTVAL
-        FROM dual
+    <select id="existsByLoginEmail" parameterType="string" resultType="boolean">
+        SELECT CASE
+                   WHEN EXISTS (SELECT 1
+                                FROM ERP_ACCOUNT a
+                                WHERE a.LOGIN_EMAIL = #{loginEmail}
+                                  AND a.deleted_at IS NULL)
+                       THEN 1
+                   ELSE 0 END
+        FROM DUAL
     </select>
 
-    <!-- 로그인 시-->
-    <!-- *필요 데이터만 가져올 때 이점 -->
-    <!-- 1. 네트워크 부하 감소 - DB → 애플리케이션 전송 데이터가 줄어듦-->
-    <!-- 2. 성능 향상 - 필요한 데이터만 조회하여 처리 속도 개선-->
-    <!-- 3. 메모리 사용량 절약, 4. 보안 강화 -->
-    <select id="findByLoginEmail" parameterType="string"
-            resultType="ErpAccount">
-        SELECT password, uuid, role
-        FROM erp_account
-        WHERE login_email = #{loginEmail}
+    <select id="findLoginRowByLoginEmail" parameterType="string"
+            resultType="LoginUserInfoRow">
+        SELECT a.UUID       AS uuid,
+               a.ROLE       AS role,
+               a.PASSWORD   AS passwordHash,
+               e.name       AS name,
+               e.COMPANY_ID AS tenantId
+        FROM ERP_ACCOUNT a
+                 JOIN EMPLOYEE e ON e.EMPLOYEE_ID = a.EMPLOYEE_ID
+        WHERE a.LOGIN_EMAIL = #{loginEmail}
+          AND a.deleted_at IS NULL
     </select>
+
+    <update id="softDeleteByCompanyId">
+        UPDATE erp_accounts a
+        SET a.deleted_at = SYSTIMESTAMP
+        WHERE a.deleted_at IS NULL
+          AND EXISTS (SELECT 1
+                      FROM employees e
+                      WHERE e.employee_id = a.employee_id
+                        AND e.company_id = #{companyId})
+    </update>
 
 </mapper>

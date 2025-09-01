@@ -21,16 +21,16 @@ public record SignupRequest(
         String name,
 
         @NotBlank
-        String department,
-
-        @NotBlank
-        String position,
-
-        @NotBlank
         String phone,
 
         @NotNull
-        long companyId
+        Long departmentId,
+
+        @NotNull
+        Long positionId,
+
+        @NotNull
+        Long companyId
 ) {
 
 }

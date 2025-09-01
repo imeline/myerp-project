@@ -1,6 +1,7 @@
 package erp.purchase.domain;
 
 import erp.global.base.TimeStamped;
+import erp.shared.enums.DocumentStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -11,8 +12,10 @@ import java.time.LocalDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Purchase extends TimeStamped {
     private Long purchaseId;
-    private Long employeeId;
-    private String supplier;
     private String code;
+    private String supplier;
     private LocalDate purchaseDate;
+    private DocumentStatus status;
+    private long employeeId;
+    private long companyId;
 }

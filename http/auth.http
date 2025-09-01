@@ -1,20 +1,22 @@
+### 환경 변수
+@base = {{host}}/api/v1/auth
+
 ### sys 회원가입
-POST http://localhost:8080/api/v1/auth/signup/sys
+POST {{base}}/signup/sys
 Content-Type: application/json
-# Authorization: Bearer 999999
 
 {
   "loginEmail": "sys1@naver.com",
   "password": "123456",
   "empNo": "DF123",
   "name": "sys1",
-  "department": "ERP 담당부서",
-  "position": "부장",
   "phone": "010-1234-5678",
+  "departmentId": 1,
+  "positionId": 1,
   "companyId": 1
 }
 ### admin 회원가입
-POST http://localhost:8080/api/v1/auth/signup/admin
+POST {{base}}/signup/admin
 Content-Type: application/json
 
 {
@@ -22,14 +24,14 @@ Content-Type: application/json
   "password": "123456",
   "empNo": "AD123",
   "name": "admin1",
-  "department": "개발부",
-  "position": "부장",
   "phone": "010-3322-5678",
+  "departmentId": 1,
+  "positionId": 1,
   "companyId": 2
 }
 
 ### user 회원가입
-POST http://localhost:8080/api/v1/auth/signup/user
+POST {{base}}/signup/user
 Content-Type: application/json
 
 {
@@ -37,14 +39,14 @@ Content-Type: application/json
   "password": "123456",
   "empNo": "US123",
   "name": "user1",
-  "department": "개발부",
-  "position": "사원",
   "phone": "010-1122-5678",
+  "departmentId": 1,
+  "positionId": 1,
   "companyId": 2
 }
 
 ### SYS 로그인
-POST http://localhost:8080/api/v1/auth/login
+POST {{base}}/login
 Content-Type: application/json
 
 {
@@ -53,7 +55,7 @@ Content-Type: application/json
 }
 
 ### ADMIN 로그인
-POST http://localhost:8080/api/v1/auth/login
+POST {{base}}/login
 Content-Type: application/json
 
 {
@@ -62,7 +64,7 @@ Content-Type: application/json
 }
 
 ### USER 로그인
-POST http://localhost:8080/api/v1/auth/login
+POST {{base}}/login
 Content-Type: application/json
 
 {

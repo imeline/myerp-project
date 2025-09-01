@@ -2,6 +2,7 @@ package erp.order.domain;
 
 
 import erp.global.base.TimeStamped;
+import erp.shared.enums.DocumentStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,8 +13,10 @@ import java.time.LocalDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Order extends TimeStamped {
     private Long orderId;
-    private Long employeeId;
-    private String customer;
     private String code;
+    private String customer;
     private LocalDate orderDate;
+    private DocumentStatus status;
+    private long employeeId;
+    private long companyId;
 }

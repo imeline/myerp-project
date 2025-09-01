@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PurchaseItem {
     private Long purchaseItemId;
-    private Integer quantity;
-    private Long purchaseId;
-    private Long itemId;
+    private int quantity;
+    private long purchaseId;
+    private long itemId;
 }

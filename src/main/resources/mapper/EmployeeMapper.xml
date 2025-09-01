@@ -4,23 +4,32 @@
 
 <mapper namespace="erp.employee.mapper.EmployeeMapper">
 
-    <insert id="saveEmployee" parameterType="Employee">
-        INSERT INTO employee (employee_id, emp_no, name, department, position,
-                              phone, updated_at, company_id)
-        VALUES (#{employeeId}, #{empNo}, #{name}, #{department}, #{position},
-                #{phone}, SYSTIMESTAMP, #{companyId})
-    </insert>
-
-    <select id="getNextEmployeeId" resultType="Long">
+    <select id="nextId" resultType="long">
         SELECT employee_seq.NEXTVAL
         FROM dual
     </select>
 
-    <!--    <update id="updateCompany" parameterType="Company">-->
-    <!--        UPDATE company-->
-    <!--        SET name = #{name},-->
-    <!--            address = #{address},-->
-    <!--            updated_at = SYSTIMESTAMP-->
-    <!--        WHERE id = #{id}-->
-    <!--    </update>-->
+    <insert id="save" parameterType="Employee">
+        INSERT INTO employee (employee_id, emp_no, name, phone, status,
+                              department_id, position_id, company_id)
+        VALUES (#{employeeId}, #{empNo}, #{name}, #{phone}, #{status},
+                #{departmentId}, #{positionId}, #{companyId})
+    </insert>
+
+    <select id="existsByDepartmentId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE department_id = #{departmentId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByPositionId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE position_id = #{positionId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
 </mapper>
