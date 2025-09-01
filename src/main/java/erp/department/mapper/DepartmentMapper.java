@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface DepartmentMapper {
@@ -17,8 +18,8 @@ public interface DepartmentMapper {
     int updateById(@Param("tenantId") Long tenantId,
                    @Param("department") Department department);
 
-    Department findById(@Param("tenantId") Long tenantId,
-                        @Param("departmentId") Long departmentId);
+    Optional<Department> findById(@Param("tenantId") Long tenantId,
+                                  @Param("departmentId") Long departmentId);
 
     List<DepartmentRow> findAllTopLevelDepartmentRow(
             @Param("tenantId") long tenantId);

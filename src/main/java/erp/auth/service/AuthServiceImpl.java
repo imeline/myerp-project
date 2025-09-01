@@ -73,10 +73,11 @@ public class AuthServiceImpl implements AuthService {
         // 왜 비밀 번호 검증 전에 jwt를 생성하기 위한 데이터도 같이(join) 조회했는가?
         // -> 실패까지 JOIN해도 단일 인덱스+PK 조인이라 성능상 손해 거의 없음
         // -> 두 단계 분리는 실패가 매우 많을 때만 이득, 정상 로그인은 오히려 느림
-        final LoginRow row = accountMapper.findLoginRowByLoginEmail(email);
+        final LoginRow row = accountMapper.findLoginRowByLoginEmail(email)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.INVALID_LOGIN_CREDENTIALS));
 
         // 아이디 또는 비밀번호 가 잘못된 경우 예외 처리
-        if (row == null || !passwordEncoder.matches(request.password(), row.passwordHash())) {
+        if (!passwordEncoder.matches(request.password(), row.passwordHash())) {
             throw new GlobalException(ErrorStatus.INVALID_LOGIN_CREDENTIALS);
         }
 

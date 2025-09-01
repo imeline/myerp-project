@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface CompanyMapper {
@@ -15,7 +16,7 @@ public interface CompanyMapper {
 
     int updateById(Company company);
 
-    Company findById(@Param("companyId") Long companyId);
+    Optional<Company> findById(@Param("companyId") Long companyId);
 
     // excludeId는 제외하고 검사(자기 자신 제외)
     boolean existsByBizNo(@Param("bizNo") String bizNo, @Param("excludeId") Long excludeId);

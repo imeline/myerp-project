@@ -46,9 +46,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional(readOnly = true)
     public CompanyItemResponse findCompany(long companyId) {
-        Company company = companyMapper.findById(companyId);
-        if (company == null)
-            throw new GlobalException(ErrorStatus.NOT_FOUND_COMPANY);
+        Company company = companyMapper.findById(companyId)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_COMPANY));
         return CompanyItemResponse.from(company);
     }
 
@@ -62,6 +61,9 @@ public class CompanyServiceImpl implements CompanyService {
         name = (name == null || name.isBlank()) ? null : name.trim();
 
         List<CompanyRow> rows = companyMapper.findAllCompanyRow(name, offset, size);
+        if (rows.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_REGISTERED_COMPANY);
+        }
         long total = companyMapper.countByName(name);
         int totalPages = (int) Math.ceil(total / (double) size);
         boolean hasNext = (page + 1) < totalPages;

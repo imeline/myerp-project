@@ -73,8 +73,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional(readOnly = true)
     public List<DepartmentItemResponse> findAllTopLevelDepartment(long tenantId) {
-        return departmentMapper.findAllTopLevelDepartmentRow(tenantId)
-                .stream().map(DepartmentItemResponse::from).toList();
+        List<DepartmentItemResponse> list =
+                departmentMapper.findAllTopLevelDepartmentRow(tenantId)
+                        .stream().map(DepartmentItemResponse::from).toList();
+        if (list.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_REGISTERED_DEPARTMENT);
+        }
+        return list;
     }
 
     // 펼침 클릭: 특정 parent의 직계 자식만
@@ -82,8 +87,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional(readOnly = true)
     public List<DepartmentItemResponse> findAllByParentId(long parentId,
                                                           long tenantId) {
-        return departmentMapper.findAllDepartmentRowByParentId(tenantId, parentId)
-                .stream().map(DepartmentItemResponse::from).toList();
+        List<DepartmentItemResponse> list =
+                departmentMapper.findAllDepartmentRowByParentId(tenantId, parentId)
+                        .stream().map(DepartmentItemResponse::from).toList();
+        if (list.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_REGISTERED_DEPARTMENT);
+        }
+        return list;
     }
 
     @Override
@@ -92,11 +102,9 @@ public class DepartmentServiceImpl implements DepartmentService {
                                  DepartmentUpdateRequest request,
                                  long tenantId) {
 
-        Department curDepartment = departmentMapper.findById(tenantId, departmentId);
-        if (curDepartment == null)
-            throw new GlobalException(ErrorStatus.NOT_FOUND_DEPARTMENT);
+        Department curDepartment = departmentMapper.findById(tenantId, departmentId)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_DEPARTMENT));
         Long parentId = curDepartment.getParentId();
-
         String name = request.name();
         validNameInParentUnique(tenantId, parentId, name, departmentId);
 
