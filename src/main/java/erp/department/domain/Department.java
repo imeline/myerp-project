@@ -1,11 +1,7 @@
 package erp.department.domain;
 
 import erp.global.base.TimeStamped;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Builder
@@ -18,12 +14,23 @@ public class Department extends TimeStamped {
     private long companyId;
     private Long parentId; // 상위 부서 ID
 
-    public static Department of(Long departmentId, String name, long companyId, Long parentId) {
+    public static Department register(Long departmentId, String name, long companyId, Long parentId) {
         return Department.builder()
-            .departmentId(departmentId)
-            .name(name)
-            .companyId(companyId)
-            .parentId(parentId)
-            .build();
+                .departmentId(departmentId)
+                .name(name)
+                .companyId(companyId)
+                .parentId(parentId)
+                .build();
     }
+
+    public Department changeName(String newName) {
+        return Department.builder()
+                .departmentId(departmentId)
+                .name(newName)
+                .companyId(companyId)
+                .parentId(parentId)
+                .build();
+    }
+
+
 }

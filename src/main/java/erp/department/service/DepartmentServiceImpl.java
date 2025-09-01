@@ -36,7 +36,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         // 존재하는 부모 id인지 검사
         validParentIdIfPresent(requestedParentId, tenantId);
 
-        Department department = Department.of(
+        Department department = Department.register(
                 newDepartmentId, name, tenantId, requestedParentId);
 
         int affectedRowCount = departmentMapper.save(tenantId, department);
@@ -56,7 +56,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         validNameInParentUnique(tenantId, parentId, name, null);
 
-        Department department = Department.of(
+        Department department = Department.register(
                 newDepartmentId,
                 name,
                 tenantId,
@@ -104,11 +104,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         Department curDepartment = departmentMapper.findById(tenantId, departmentId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_DEPARTMENT));
-        Long parentId = curDepartment.getParentId();
-        String name = request.name();
-        validNameInParentUnique(tenantId, parentId, name, departmentId);
 
-        Department department = Department.of(departmentId, name, tenantId, parentId);
+        Long parentId = curDepartment.getParentId();
+        String newName = request.name();
+        validNameInParentUnique(tenantId, parentId, newName, departmentId);
+
+        Department department = curDepartment.changeName(newName);
         int affectedRowCount = departmentMapper.updateById(tenantId, department);
         assertAffected(affectedRowCount, ErrorStatus.UPDATE_DEPARTMENT_FAIL);
     }
