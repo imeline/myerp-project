@@ -4,6 +4,11 @@
 
 <mapper namespace="erp.employee.mapper.EmployeeMapper">
 
+    <select id="nextId" resultType="long">
+        SELECT employee_seq.NEXTVAL
+        FROM dual
+    </select>
+
     <insert id="save" parameterType="Employee">
         INSERT INTO employee (employee_id, emp_no, name, phone, status,
                               department_id, position_id, company_id)
@@ -11,9 +16,12 @@
                 #{departmentId}, #{positionId}, #{companyId})
     </insert>
 
-    <select id="nextId" resultType="long">
-        SELECT employee_seq.NEXTVAL
-        FROM dual
+    <select id="existsByDepartmentId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE department_id = #{departmentId}
+        AND
+        <include refid="frag.tenantGuard"/>
     </select>
 
 </mapper>

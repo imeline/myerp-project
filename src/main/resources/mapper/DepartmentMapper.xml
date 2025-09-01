@@ -3,13 +3,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="erp.department.mapper.DepartmentMapper">
 
-    <!-- 신규 ID 채번 -->
     <select id="nextId" resultType="long">
         SELECT department_seq.NEXTVAL
         FROM dual
     </select>
 
-    <!-- 저장 -->
     <insert id="save">
         INSERT INTO DEPARTMENT (department_id, company_id, parent_id, name)
         VALUES (#{department.departmentId},
@@ -18,8 +16,7 @@
         #{department.name})
     </insert>
 
-    <!-- 수정 -->
-    <update id="update">
+    <update id="updateById">
         UPDATE DEPARTMENT
         SET
         name = #{department.name},
@@ -27,9 +24,9 @@
         WHERE department_id = #{department.departmentId}
         AND
         <include refid="frag.tenantGuard"/>
+        <!-- 오라클은 비용 기반 최적화라서 AND 순서가 성능에 영향 없음 -->
     </update>
 
-    <!-- 단건 조회 -->
     <select id="findById" resultType="Department">
         SELECT
         department_id,
@@ -45,97 +42,95 @@
     <!-- 최상위(parent_id IS NULL) 목록 + 자식 존재 여부 -->
     <select id="findAllTopLevelDepartmentRow" resultType="DepartmentRow">
         SELECT
-        d.department_id AS departmentId,
-        d.name AS name,
+        department_id AS departmentId,
+        name AS name,
         <!-- 자식 여부 0, 1 리턴 -->
         CASE WHEN EXISTS (
         SELECT 1  <!-- 존재 여부만 확인할 거라 관례적으로 1 같은 상수 -->
         FROM DEPARTMENT c
         WHERE
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="c"/>
-        </include>
-        <!-- 바깥 행(d)이 부모이고, 그를 부모로 가진 자식(c)이 있는지 확인 -->
-        AND c.parent_id = d.department_id
+        <!-- 바깥 행(DEPARTMENT)이 부모이고, 그를 부모로 가진 자식(c)이 있는지 확인 -->
+        c.parent_id = DEPARTMENT.department_id
+        AND
+        <include refid="frag.tenantGuard"/>
         ) THEN 1 ELSE 0 END AS hasChildren
-        FROM DEPARTMENT d
+        FROM DEPARTMENT
         WHERE
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="d"/>
-        </include>
-        AND d.parent_id IS NULL
-        ORDER BY d.department_id
+        DEPARTMENT.parent_id IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+        ORDER BY DEPARTMENT.department_id
     </select>
 
     <!-- 특정 부모의 직계 자식 + 자식 존재 여부 -->
     <select id="findAllDepartmentRowByParentId" resultType="DepartmentRow">
         SELECT
-        d.department_id AS departmentId,
-        d.name AS name,
+        department_id AS departmentId,
+        name AS name,
         <!-- 자식 여부 0, 1 리턴 -->
         CASE WHEN EXISTS (
         SELECT 1  <!-- 존재 여부만 확인할 거라 관례적으로 1 같은 상수 -->
         FROM DEPARTMENT c
         WHERE
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="c"/>
-        </include>
-        <!-- 바깥 행(d)이 부모이고, 그를 부모로 가진 자식(c)이 있는지 확인 -->
-        AND c.parent_id = d.department_id
+        <!-- 바깥 행(DEPARTMENT)이 부모이고, 그를 부모로 가진 자식(c)이 있는지 확인 -->
+        c.parent_id = DEPARTMENT.department_id
+        AND
+        <include refid="frag.tenantGuard"/>
         ) THEN 1 ELSE 0 END AS hasChildren
-        FROM DEPARTMENT d
+        FROM DEPARTMENT
         WHERE
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="d"/>
-        </include>
-        AND d.parent_id = #{parentId}
-        ORDER BY d.department_id
+        DEPARTMENT.parent_id = #{parentId}
+        AND
+        <include refid="frag.tenantGuard"/>
+        ORDER BY DEPARTMENT.department_id
     </select>
+
+    <delete id="deleteById">
+        DELETE FROM DEPARTMENT
+        WHERE department_id = #{departmentId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </delete>
 
     <!-- 같은 부모 아래 이름 중복 확인 (수정 시 자기 자신 제외) -->
     <select id="existsByNameAndParentId" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
-        FROM DEPARTMENT d
+        FROM DEPARTMENT
         WHERE
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="d"/>
-        </include>
-        AND LOWER(d.name) = LOWER(#{name})
+        LOWER(name) = LOWER(#{name})
         <if test="parentId != null">
-            AND d.parent_id = #{parentId}
+            AND parent_id = #{parentId}
         </if>
         <if test="parentId == null">
-            AND d.parent_id IS NULL
+            AND parent_id IS NULL
         </if>
         <if test="excludeDepartmentId != null">
-            AND d.department_id != #{excludeDepartmentId}
+            AND department_id != #{excludeDepartmentId}
         </if>
+        AND
+        <include refid="frag.tenantGuard"/>
     </select>
 
-    <!-- 존재 여부 -->
+
     <select id="existsById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
-        FROM DEPARTMENT d
+        FROM DEPARTMENT
         WHERE
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="d"/>
-        </include>
-        AND d.department_id = #{departmentId}
+        department_id = #{departmentId}
+        AND
+        <include refid="frag.tenantGuard"/>
     </select>
 
-    <!-- 테넌트 전체 조회(필요 시) -->
-    <select id="findAllByTenantId" resultType="Department">
-        SELECT
-        department_id,
-        name,
-        company_id,
-        parent_id
-        FROM DEPARTMENT d
+    <!-- 자식 존재 여부 -->
+    <select id="existsChildById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM DEPARTMENT
         WHERE
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="d"/>
-        </include>
+        parent_id = #{departmentId}
+        AND
+        <include refid="frag.tenantGuard"/>
     </select>
+
 
     <!-- 전체 부서 한번에 조회 (참고용: 필요 시 활성화) -->
     <!--

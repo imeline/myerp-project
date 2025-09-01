@@ -6,6 +6,7 @@ import erp.department.dto.request.DepartmentUpdateRequest;
 import erp.department.dto.request.TopDepartmentSaveRequest;
 import erp.department.dto.response.DepartmentItemResponse;
 import erp.department.mapper.DepartmentMapper;
+import erp.employee.mapper.EmployeeMapper;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.List;
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentMapper departmentMapper;
+    private final EmployeeMapper EmployeeMapper;
 
     @Override
     @Transactional
@@ -99,8 +101,18 @@ public class DepartmentServiceImpl implements DepartmentService {
         validNameInParentUnique(tenantId, parentId, name, departmentId);
 
         Department department = Department.of(departmentId, name, tenantId, parentId);
-        int affectedRowCount = departmentMapper.update(tenantId, department);
+        int affectedRowCount = departmentMapper.updateById(tenantId, department);
         assertAffected(affectedRowCount, ErrorStatus.UPDATE_DEPARTMENT_FAIL);
+    }
+
+    @Override
+    @Transactional
+    public void deleteDepartment(Long departmentId, long tenantId) {
+        validChildIfPresent(departmentId, tenantId);
+        validEmployeeInDepartmentIfPresent(departmentId, tenantId);
+
+        int affectedRowCount = departmentMapper.deleteById(tenantId, departmentId);
+        assertAffected(affectedRowCount, ErrorStatus.DELETE_DEPARTMENT_FAIL);
     }
 
     // 중복 이름 검사
@@ -117,6 +129,20 @@ public class DepartmentServiceImpl implements DepartmentService {
         if (parentId != null && !departmentMapper.existsById(tenantId,
                 parentId)) {
             throw new GlobalException(ErrorStatus.NO_FOUND_PARENT_DEPARTMENT);
+        }
+    }
+
+    // 하위 부서가 있는지 검사
+    private void validChildIfPresent(Long departmentId, long tenantId) {
+        if (departmentMapper.existsChildById(tenantId, departmentId)) {
+            throw new GlobalException(ErrorStatus.EXIST_CHILD_DEPARTMENT);
+        }
+    }
+
+    // 해당 부서에 속한 직원이 있는지 검사
+    private void validEmployeeInDepartmentIfPresent(Long departmentId, long tenantId) {
+        if (EmployeeMapper.existsByDepartmentId(tenantId, departmentId)) {
+            throw new GlobalException(ErrorStatus.EXIST_EMPLOYEE_IN_DEPARTMENT);
         }
     }
 

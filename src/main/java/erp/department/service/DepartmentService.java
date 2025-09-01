@@ -21,4 +21,6 @@ public interface DepartmentService {
     void updateDepartment(Long departmentId,
                           DepartmentUpdateRequest request, long tenantId);
 
+    void deleteDepartment(Long departmentId, long tenantId);
+
 }

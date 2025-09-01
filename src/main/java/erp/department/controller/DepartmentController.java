@@ -61,4 +61,11 @@ public class DepartmentController {
         departmentService.updateDepartment(departmentId, request, tenantId);
         return BaseResponse.onSuccess(null);
     }
+
+    @DeleteMapping("/{departmentId}")
+    public BaseResponse<Void> deleteDepartment(@PathVariable Long departmentId) {
+        long tenantId = TenantContext.get();
+        departmentService.deleteDepartment(departmentId, tenantId);
+        return BaseResponse.onSuccess(null);
+    }
 }

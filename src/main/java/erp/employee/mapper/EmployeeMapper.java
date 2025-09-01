@@ -2,10 +2,14 @@ package erp.employee.mapper;
 
 import erp.employee.domain.Employee;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface EmployeeMapper {
+    long nextId();
+
     int save(Employee employee);
 
-    long nextId();
+    boolean existsByDepartmentId(@Param("tenantId") Long tenantId,
+                                 @Param("departmentId") Long departmentId);
 }

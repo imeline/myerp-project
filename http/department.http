@@ -1,10 +1,10 @@
 ### 환경 변수 (필요하면 값만 바꿔)
 @base = {{host}}/api/v1/admin/department
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyZDhlYjc4NzI1Yjk0MzNmOGY4MTI2MTc0YjczYTI2OCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU2NDYzOTI3LCJleHAiOjE3NTY0OTk5MjcsInRlbmFudF9pZCI6Mn0.oBE8DnMi4MtHMO_dfxWkN3BS26OdudmcOtn8YzbqIK8
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyZDhlYjc4NzI1Yjk0MzNmOGY4MTI2MTc0YjczYTI2OCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU2NjkwMTAxLCJleHAiOjE3NTY3MjYxMDEsInRlbmFudF9pZCI6Mn0.Kjf2PzGsX-VTmeUgnClCFjS7Xug-XSKa7CrHIyfRJ4Q
 @rootId = 3
-@childId = 4
+@childId = 6
 
-### 또 다른 루트 부서 생성 (예시 데이터)
+### 또 다른 루트 부서 생성
 POST {{base}}/top
 Authorization: {{token}}
 Content-Type: application/json
@@ -15,7 +15,7 @@ Accept: application/json
 }
 
 
-### 자식 부서 생성 (예시: 기획팀 → @rootId 아래로)
+### 자식 부서 생성
 POST {{base}}/child
 Authorization: {{token}}
 Content-Type: application/json
@@ -40,7 +40,7 @@ Content-Type: application/json
 Accept: application/json
 
 
-### 부서 이름 수정 (예시: @childId 대상)
+### 부서 이름 수정
 PUT {{base}}/{{childId}}
 Authorization: {{token}}
 Content-Type: application/json
@@ -49,3 +49,9 @@ Accept: application/json
 {
   "name": "전략기획팀"
 }
+
+### 부서 삭제
+DELETE {{base}}/{{childId}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
