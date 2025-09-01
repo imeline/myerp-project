@@ -4,10 +4,9 @@
 
 <mapper namespace="erp.auth.mapper.ErpAccountMapper">
 
-    <select id="findByUuid" parameterType="string" resultType="ErpAccount">
-        SELECT *
-        FROM erp_account
-        WHERE uuid = #{uuid}
+    <select id="nextId" resultType="long">
+        SELECT erp_account_seq.NEXTVAL
+        FROM dual
     </select>
 
     <insert id="save" parameterType="ErpAccount">
@@ -19,11 +18,12 @@
                 #{employeeId}, #{companyId})
     </insert>
 
-    <select id="nextId" resultType="long">
-        SELECT erp_account_seq.NEXTVAL
-        FROM dual
+    <select id="findByUuid" parameterType="string" resultType="ErpAccount">
+        SELECT *
+        FROM erp_account
+        WHERE uuid = #{uuid}
     </select>
-
+    
     <select id="existsByLoginEmail" parameterType="string" resultType="boolean">
         SELECT CASE
                    WHEN EXISTS (SELECT 1

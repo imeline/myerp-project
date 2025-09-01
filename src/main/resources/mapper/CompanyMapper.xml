@@ -13,7 +13,7 @@
         VALUES (#{companyId}, #{name}, #{bizNo}, #{address}, #{phone})
     </insert>
 
-    <update id="update" parameterType="Company">
+    <update id="updateById" parameterType="Company">
         UPDATE company
         SET name    = #{name},
             biz_no  = #{bizNo},
@@ -24,37 +24,37 @@
 
     <select id="findById" resultType="Company">
         SELECT *
-        FROM company c
-        WHERE c.company_id = #{companyId}
+        FROM company
+        WHERE company_id = #{companyId}
           AND deleted_at IS NULL
     </select>
 
     <select id="findAllCompanyRow" resultType="CompanyRow">
         SELECT
-        c.company_id AS companyId,
-        c.name AS name,
-        c.biz_no AS bizNo,
-        c.address AS address,
-        c.phone AS phone,
-        TO_CHAR(c.created_at, 'YYYY.MM.DD') AS createdAt
-        FROM company c
+        company_id AS companyId,
+        name AS name,
+        biz_no AS bizNo,
+        address AS address,
+        phone AS phone,
+        TO_CHAR(created_at, 'YYYY.MM.DD') AS createdAt
+        FROM company
         WHERE 1=1
         <if test="name != null and name != ''">
-            AND INSTR(LOWER(c.name), LOWER(#{name})) > 0
+            AND INSTR(LOWER(name), LOWER(#{name})) > 0
         </if>
-        AND c.deleted_at IS NULL
-        ORDER BY c.created_at DESC, c.company_id DESC
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC, company_id DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
     <select id="countByName" resultType="long">
         SELECT COUNT(*)
-        FROM company c
+        FROM company
         WHERE 1=1
         <if test="name != null and name != ''">
-            AND INSTR(LOWER(c.name), LOWER(#{name})) > 0
+            AND INSTR(LOWER(name), LOWER(#{name})) > 0
         </if>
-        AND c.deleted_at IS NULL
+        AND deleted_at IS NULL
     </select>
 
     <update id="softDeleteById">
@@ -64,15 +64,15 @@
           AND deleted_at IS NULL
     </update>
 
-    <select id="isActive" resultType="Boolean">
-        SELECT CASE WHEN c.deleted_at IS NULL THEN 1 ELSE 0 END
-        FROM company c
-        WHERE c.company_id = #{companyId}
+    <select id="isActiveById" resultType="boolean">
+        SELECT CASE WHEN deleted_at IS NULL THEN 1 ELSE 0 END
+        FROM company
+        WHERE company_id = #{companyId}
     </select>
 
     <!-- 중복 검사 -->
     <select id="existsByBizNo" resultType="boolean">
-        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END AS exists_flag
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM COMPANY
         WHERE biz_no = #{bizNo}
         <if test="excludeId != null">
@@ -82,31 +82,13 @@
     </select>
 
     <select id="existsByName" resultType="boolean">
-        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END AS exists_flag
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM COMPANY
         WHERE LOWER(name) = LOWER(#{name})
         <if test="excludeId != null">
             AND company_id != #{excludeId}
         </if>
         AND deleted_at IS NULL
-    </select>
-
-    <!-- 연관 존재 여부 -->
-    <select id="countEmployees" resultType="long">
-        SELECT COUNT(*)
-        FROM employee
-        WHERE company_id = #{companyId}
-          AND status = 'ACTIVE'
-    </select>
-    <select id="countOrders" resultType="long">
-        SELECT COUNT(*)
-        FROM orders
-        WHERE company_id = #{companyId}
-    </select>
-    <select id="countOutbounds" resultType="long">
-        SELECT COUNT(*)
-        FROM outbound
-        WHERE company_id = #{companyId}
     </select>
 
 </mapper>

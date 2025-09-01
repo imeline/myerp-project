@@ -84,7 +84,7 @@ public class CompanyServiceImpl implements CompanyService {
                 request.phone()
         );
 
-        int affectedRowCount = companyMapper.update(company);
+        int affectedRowCount = companyMapper.updateById(company);
         assertAffected(affectedRowCount, ErrorStatus.UPDATE_COMPANY_FAIL);
     }
 
@@ -92,11 +92,11 @@ public class CompanyServiceImpl implements CompanyService {
     @Transactional
     public void softDeleteCompany(long companyId) {
         // todo: 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
-        long related = companyMapper.countEmployees(companyId)
-                + companyMapper.countOrders(companyId)
-                + companyMapper.countOutbounds(companyId);
-        if (related > 0)
-            throw new GlobalException(ErrorStatus.EXTERNAL_DATA_EXISTS);
+//        long related = companyMapper.countEmployees(companyId)
+//                + companyMapper.countOrders(companyId)
+//                + companyMapper.countOutbounds(companyId);
+//        if (related > 0)
+//            throw new GlobalException(ErrorStatus.EXTERNAL_DATA_EXISTS);
 
         int affectedRowCount = companyMapper.softDeleteById(companyId);
         assertAffected(affectedRowCount, ErrorStatus.DELETE_COMPANY_FAIL);

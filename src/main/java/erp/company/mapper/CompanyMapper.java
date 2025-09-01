@@ -13,7 +13,7 @@ public interface CompanyMapper {
 
     int save(Company company);
 
-    int update(Company company);
+    int updateById(Company company);
 
     Company findById(@Param("companyId") Long companyId);
 
@@ -32,12 +32,5 @@ public interface CompanyMapper {
 
     int softDeleteById(@Param("companyId") Long companyId);
 
-    Boolean isActive(@Param("companyId") Long companyId);
-
-    // 연관 데이터 존재 여부
-    long countEmployees(@Param("companyId") long companyId);
-
-    long countOrders(@Param("companyId") long companyId);
-
-    long countOutbounds(@Param("companyId") long companyId);
+    boolean isActiveById(@Param("companyId") Long companyId);
 }
