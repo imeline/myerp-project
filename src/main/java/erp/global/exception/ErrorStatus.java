@@ -38,10 +38,18 @@ public enum ErrorStatus {
     CREATE_DEPARTMENT_FAIL("DPT203", "부서 등록에 실패했습니다."),
     UPDATE_DEPARTMENT_FAIL("DPT204", "부서 수정에 실패했습니다."),
     DELETE_DEPARTMENT_FAIL("DPT205", "부서를 찾을 수 없거나 이미 삭제된 부서입니다."),
-    NO_FOUND_PARENT_DEPARTMENT("DPT206", "유효하지 않은 상위 부서입니다."), EXIST_EMPLOYEE_IN_DEPARTMENT("DPT207", "해당 부서에 속한 직원이 존재하여 삭제할 수 없습니다."),
+    NO_FOUND_PARENT_DEPARTMENT("DPT206", "유효하지 않은 상위 부서입니다."), EXIST_EMPLOYEE_IN_DEPARTMENT("DPT207", "해당 부서에 속한 직원이 존재합니다."),
     EXIST_CHILD_DEPARTMENT("DPT208", "하위 부서가 존재하여 삭제할 수 없습니다."),
     NOT_REGISTERED_DEPARTMENT("DPT209", "등록된 부서가 없습니다."),
 
+    // POSITION
+    DUPLICATE_POSITION_NAME("POS301", "이미 등록된 직급명입니다."),
+    NOT_FOUND_POSITION("POS302", "존재하지 않는 직급입니다."),
+    CREATE_POSITION_FAIL("POS303", "직급 등록에 실패했습니다."),
+    UPDATE_POSITION_FAIL("POS304", "직급 수정에 실패했습니다."),
+    DELETE_POSITION_FAIL("POS305", "직급을 찾을 수 없거나 이미 삭제된 직급입니다."),
+    EXIST_EMPLOYEE_IN_POSITION("POS306", "해당 직급에 속한 직원이 존재합니다."),
+    NOT_REGISTERED_POSITION("POS307", "등록된 직급이 없습니다."),
     ;
 
     private final String status;

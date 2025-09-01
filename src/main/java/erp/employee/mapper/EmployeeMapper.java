@@ -12,4 +12,7 @@ public interface EmployeeMapper {
 
     boolean existsByDepartmentId(@Param("tenantId") Long tenantId,
                                  @Param("departmentId") Long departmentId);
+
+    boolean existsByPositionId(@Param("tenantId") Long tenantId,
+                               @Param("positionId") Long positionId);
 }

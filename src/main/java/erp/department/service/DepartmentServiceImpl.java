@@ -149,6 +149,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     // 해당 부서에 속한 직원이 있는지 검사
+    // 부서 삭제 규칙이니 여기 둠
+    // -> EmployeeService에 두면 EmployeeService의 의존성까지 두게 됨
     private void validEmployeeInDepartmentIfPresent(Long departmentId, long tenantId) {
         if (EmployeeMapper.existsByDepartmentId(tenantId, departmentId)) {
             throw new GlobalException(ErrorStatus.EXIST_EMPLOYEE_IN_DEPARTMENT);
