@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="erp.auth.mapper.ErpAccountMapper">
+<mapper namespace="erp.account.mapper.ErpAccountMapper">
 
     <select id="nextId" resultType="long">
         SELECT erp_account_seq.NEXTVAL
@@ -17,6 +17,12 @@
                 #{password}, #{uuid}, #{role},
                 #{employeeId}, #{companyId})
     </insert>
+
+    <select id="findCompanyIdByUuid" resultType="Long">
+        SELECT company_id
+        FROM erp_account
+        WHERE uuid = #{uuid}
+    </select>
 
     <select id="findByUuid" parameterType="string" resultType="ErpAccount">
         SELECT *

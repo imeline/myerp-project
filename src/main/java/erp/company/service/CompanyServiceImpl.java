@@ -1,6 +1,6 @@
 package erp.company.service;
 
-import erp.auth.mapper.ErpAccountMapper;
+import erp.account.mapper.ErpAccountMapper;
 import erp.company.domain.Company;
 import erp.company.dto.internal.CompanyFindRow;
 import erp.company.dto.request.CompanyFindAllRequest;
@@ -8,9 +8,9 @@ import erp.company.dto.request.CompanySaveRequest;
 import erp.company.dto.request.CompanyUpdateRequest;
 import erp.company.dto.response.CompanyInfoResponse;
 import erp.company.mapper.CompanyMapper;
-import erp.global.dto.PageResponse;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.global.shared.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

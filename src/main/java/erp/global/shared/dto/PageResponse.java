@@ -1,4 +1,4 @@
-package erp.global.dto;
+package erp.global.shared.dto;
 
 import java.util.List;
 

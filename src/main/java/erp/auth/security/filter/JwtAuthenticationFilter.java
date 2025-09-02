@@ -1,6 +1,7 @@
-package erp.auth.security.jwt;
+package erp.auth.security.filter;
 
-import erp.auth.security.UserPrincipal;
+import erp.auth.security.jwt.JwtTokenProvider;
+import erp.auth.security.model.UserPrincipal;
 import erp.global.tenant.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,6 +21,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+/** Authorization 헤더의 JWT를 검증하고, UserPrincipal를 생성해 SecurityContext에 저장 */
 // OncePerRequestFilter → 모든 요청마다 단 한 번만 실행되는 필터로 만든다는 의미
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

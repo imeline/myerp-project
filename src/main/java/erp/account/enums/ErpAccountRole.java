@@ -1,4 +1,4 @@
-package erp.auth.enums;
+package erp.account.enums;
 
 public enum ErpAccountRole {
     SYS,

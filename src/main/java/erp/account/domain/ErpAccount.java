@@ -1,6 +1,6 @@
-package erp.auth.domain;
+package erp.account.domain;
 
-import erp.auth.enums.ErpAccountRole;
+import erp.account.enums.ErpAccountRole;
 import erp.global.base.TimeStamped;
 import lombok.*;
 
