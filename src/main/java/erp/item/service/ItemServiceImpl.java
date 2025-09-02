@@ -1,8 +1,8 @@
 package erp.item.service;
 
-import erp.global.dto.PageResponse;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.global.shared.dto.PageResponse;
 import erp.item.domain.Item;
 import erp.item.dto.internal.ItemFindRow;
 import erp.item.dto.request.ItemFindAllRequest;

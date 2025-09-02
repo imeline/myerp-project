@@ -1,7 +1,7 @@
 package erp.inbound.domain;
 
 import erp.global.base.TimeStamped;
-import erp.global.enums.FulfillmentStatus;
+import erp.global.shared.enums.FulfillmentStatus;
 import lombok.*;
 
 import java.time.LocalDate;

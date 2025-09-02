@@ -1,6 +1,6 @@
 package erp.item.service;
 
-import erp.global.dto.PageResponse;
+import erp.global.shared.dto.PageResponse;
 import erp.item.dto.internal.ItemFindRow;
 import erp.item.dto.request.ItemFindAllRequest;
 import erp.item.dto.request.ItemSaveRequest;

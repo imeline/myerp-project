@@ -1,7 +1,7 @@
 package erp.item.controller;
 
-import erp.global.dto.PageResponse;
 import erp.global.response.BaseResponse;
+import erp.global.shared.dto.PageResponse;
 import erp.global.tenant.TenantContext;
 import erp.item.dto.internal.ItemFindRow;
 import erp.item.dto.request.ItemFindAllRequest;
