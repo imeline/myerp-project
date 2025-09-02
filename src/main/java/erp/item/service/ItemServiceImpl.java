@@ -81,6 +81,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void updateItem(long itemId, ItemUpdateRequest request, long tenantId) {
+        // todo: 입고, 출고, 주문, 판매, 재고 등 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
         String name = normalizeOrNull(request.name());
         String code = normalizeOrNull(request.code());
         ItemCategory category = request.category();

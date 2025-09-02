@@ -2,7 +2,7 @@ package erp.order.domain;
 
 
 import erp.global.base.TimeStamped;
-import erp.global.shared.enums.FulfillmentStatus;
+import erp.order.enums.OrderStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ public class Order extends TimeStamped {
     private LocalDate orderDate;
     private Integer totalQuantity;
     private Integer totalAmount;
-    private FulfillmentStatus status;
+    private OrderStatus status;
     private long employeeId;
     private long companyId;
 }

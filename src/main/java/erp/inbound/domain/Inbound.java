@@ -1,7 +1,7 @@
 package erp.inbound.domain;
 
 import erp.global.base.TimeStamped;
-import erp.global.shared.enums.FulfillmentStatus;
+import erp.inbound.enums.InboundStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,7 +14,7 @@ public class Inbound extends TimeStamped {
     private Long inboundId;
     private String code;
     private LocalDate inboundDate;
-    private FulfillmentStatus status;
+    private InboundStatus status;
     private long employeeId;
     private long purchaseId;
     private long companyId;
