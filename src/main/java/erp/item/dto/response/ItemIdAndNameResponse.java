@@ -6,12 +6,12 @@ import lombok.Builder;
 @Builder
 public record ItemIdAndNameResponse(
         long itemId,
-        String itemName
+        String name
 ) {
     public static ItemIdAndNameResponse from(ItemIdAndNameRow row) {
         return ItemIdAndNameResponse.builder()
                 .itemId(row.itemId())
-                .itemName(row.itemName())
+                .name(row.name())
                 .build();
     }
 }

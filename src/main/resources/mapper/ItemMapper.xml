@@ -74,14 +74,15 @@
 
     <update id="updateById">
         UPDATE item
-        SET name     = #{item.name},
-            code     = #{item.code},
-            price    = #{item.price},
-            unit     = #{item.unit},
-            category = #{item.category}
+        SET name = #{item.name},
+        code = #{item.code},
+        price = #{item.price},
+        unit = #{item.unit},
+        category = #{item.category}
         WHERE item_id = #{item.itemId}
-          AND company_id = #{item.companyId}
-          AND deleted_at IS NULL
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
     </update>
 
     <update id="softDeleteById">
