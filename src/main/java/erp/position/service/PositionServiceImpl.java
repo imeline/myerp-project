@@ -94,7 +94,7 @@ public class PositionServiceImpl implements PositionService {
         positionMapper.shiftDownRange(tenantId, oldLevelNo, Integer.MAX_VALUE);
     }
 
-    private void validNameUnique(String name, Long excludePositionId, Long tenantId) {
+    private void validNameUnique(String name, Long excludePositionId, long tenantId) {
         if (positionMapper.existsByName(tenantId, name, excludePositionId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_POSITION_NAME);
         }

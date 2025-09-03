@@ -82,10 +82,18 @@
     <select id="existsByName" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM position
-        WHERE name = #{name}
+        WHERE LOWER(name) = LOWER(#{name})
         <if test="excludePositionId != null">
             AND position_id != #{excludePositionId}
         </if>
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM position
+        WHERE position_id = #{positionId}
         AND
         <include refid="frag.tenantGuard"/>
     </select>

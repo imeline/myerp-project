@@ -14,11 +14,20 @@ public interface EmployeeMapper {
     int save(Employee employee);
 
     List<EmployeeIdAndNameRow> findAllIdAndNameByTenantId(
-            @Param("tenantId") Long tenantId);
+            @Param("tenantId") long tenantId);
 
-    boolean existsByDepartmentId(@Param("tenantId") Long tenantId,
-                                 @Param("departmentId") Long departmentId);
+    boolean existsByDepartmentId(@Param("tenantId") long tenantId,
+                                 @Param("departmentId") long departmentId);
 
-    boolean existsByPositionId(@Param("tenantId") Long tenantId,
-                               @Param("positionId") Long positionId);
+    boolean existsByPositionId(@Param("tenantId") long tenantId,
+                               @Param("positionId") long positionId);
+
+    boolean existsById(@Param("tenantId") long tenantId,
+                       @Param("employeeId") long employeeId);
+
+    boolean existsByEmpNo(@Param("tenantId") long tenantId,
+                          @Param("empNo") String empNo);
+
+    boolean existsByPhone(@Param("tenantId") long tenantId,
+                          @Param("phone") String phone);
 }

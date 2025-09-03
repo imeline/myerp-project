@@ -26,7 +26,7 @@
 //        StatementHandler handler = (StatementHandler) unwrap(invocation.getTarget());
 //        BoundSql boundSql = handler.getBoundSql();
 //        String sql = boundSql.getSql();
-//        Long tenantId = TenantContext.get();
+//        long tenantId = TenantContext.get();
 //
 //        if (tenantId != null && needsTenantInjection(sql)) {
 //            String newSql = injectTenant(sql);
@@ -135,7 +135,7 @@
 //    }
 //
 //    /** 바인딩 파라미터에 __tenantId 주입 */
-//    private void injectParam(BoundSql boundSql, Long tenantId) {
+//    private void injectParam(BoundSql boundSql, long tenantId) {
 //        // 파라미터 오브젝트가 Map/DTO 등 무엇이든 MetaObject로 주입
 //        Object paramObj = boundSql.getParameterObject();
 //        MetaObject paramMeta = SystemMetaObject.forObject(paramObj);

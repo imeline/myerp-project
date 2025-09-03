@@ -22,7 +22,8 @@ import static erp.global.util.RowCountGuards.requireOneRowAffected;
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentMapper departmentMapper;
-    private final EmployeeMapper EmployeeMapper;
+    private final EmployeeMapper employeeMapper;
+
 
     @Override
     @Transactional
@@ -36,7 +37,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         // 중복 이름 검사
         validNameInParentUnique(tenantId, requestedParentId, name, null);
         // 존재하는 부모 id인지 검사
-        validParentIdIfPresent(requestedParentId, tenantId);
+        validIdIfPresent(requestedParentId, tenantId);
 
         Department department = Department.register(
                 newDepartmentId, name, tenantId, requestedParentId);
@@ -126,20 +127,19 @@ public class DepartmentServiceImpl implements DepartmentService {
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_DEPARTMENT_FAIL);
     }
 
+    private void validIdIfPresent(Long departmentId, long tenantId) {
+        if (departmentId != null && !departmentMapper.existsById(tenantId,
+                departmentId)) {
+            throw new GlobalException(ErrorStatus.NOT_FOUND_DEPARTMENT);
+        }
+    }
+
     // 중복 이름 검사
     private void validNameInParentUnique(long tenantId, Long parentId,
                                          String name, Long excludeDepartmentId) {
         if (name != null && departmentMapper.existsByNameAndParentId(
                 tenantId, parentId, name, excludeDepartmentId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_DEPARTMENT_NAME);
-        }
-    }
-
-    // 존재하는 부모 id인지 검사
-    private void validParentIdIfPresent(Long parentId, long tenantId) {
-        if (parentId != null && !departmentMapper.existsById(tenantId,
-                parentId)) {
-            throw new GlobalException(ErrorStatus.NO_FOUND_PARENT_DEPARTMENT);
         }
     }
 
@@ -151,10 +151,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     // 해당 부서에 속한 직원이 있는지 검사
-    // 부서 삭제 규칙이니 여기 둠
-    // -> EmployeeService에 두면 EmployeeService의 의존성까지 두게 됨
     private void validEmployeeInDepartmentIfPresent(Long departmentId, long tenantId) {
-        if (EmployeeMapper.existsByDepartmentId(tenantId, departmentId)) {
+        if (employeeMapper.existsByDepartmentId(tenantId, departmentId)) {
             throw new GlobalException(ErrorStatus.EXIST_EMPLOYEE_IN_DEPARTMENT);
         }
     }

@@ -46,4 +46,8 @@ public interface PositionMapper {
     boolean existsByName(@Param("tenantId") long tenantId,
                          @Param("name") String name,
                          @Param("excludePositionId") Long excludePositionId);
+
+    boolean existsById(@Param("tenantId") long tenantId,
+                       @Param("positionId") long positionId);
+
 }

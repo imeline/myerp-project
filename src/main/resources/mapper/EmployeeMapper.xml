@@ -41,4 +41,20 @@
         <include refid="frag.tenantGuard"/>
     </select>
 
+    <select id="existsByEmpNo" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE emp_no = #{empNo}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByPhone" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE phone = #{phone}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
 </mapper>

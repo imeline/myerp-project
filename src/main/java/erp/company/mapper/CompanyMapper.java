@@ -34,4 +34,6 @@ public interface CompanyMapper {
     int softDeleteById(@Param("companyId") Long companyId);
 
     boolean isActiveById(@Param("companyId") Long companyId);
+
+    boolean existsActiveCompanyById(@Param("companyId") Long companyId);
 }
