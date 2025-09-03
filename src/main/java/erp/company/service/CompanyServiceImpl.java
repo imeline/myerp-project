@@ -6,6 +6,7 @@ import erp.company.dto.internal.CompanyFindRow;
 import erp.company.dto.request.CompanyFindAllRequest;
 import erp.company.dto.request.CompanySaveRequest;
 import erp.company.dto.request.CompanyUpdateRequest;
+import erp.company.dto.response.CompanyFindResponse;
 import erp.company.dto.response.CompanyInfoResponse;
 import erp.company.mapper.CompanyMapper;
 import erp.global.exception.ErrorStatus;
@@ -53,7 +54,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<CompanyFindRow> findAllCompany(CompanyFindAllRequest request) {
+    public PageResponse<CompanyFindResponse> findAllCompany(CompanyFindAllRequest request) {
         int size = (request.size() == null || request.size() < 1) ? 20 : request.size();
         int page = (request.page() == null || request.page() < 0) ? 0 : request.page();
         int offset = page * size;
@@ -65,9 +66,12 @@ public class CompanyServiceImpl implements CompanyService {
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_COMPANY);
         }
+        List<CompanyFindResponse> responses = rows.stream()
+                .map(CompanyFindResponse::from)
+                .toList();
 
         long total = companyMapper.countByName(name);
-        return PageResponse.of(rows, page, total, size);
+        return PageResponse.of(responses, page, total, size);
     }
 
     @Override

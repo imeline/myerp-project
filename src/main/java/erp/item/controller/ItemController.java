@@ -3,10 +3,10 @@ package erp.item.controller;
 import erp.global.response.BaseResponse;
 import erp.global.shared.dto.PageResponse;
 import erp.global.tenant.TenantContext;
-import erp.item.dto.internal.ItemFindRow;
 import erp.item.dto.request.ItemFindAllRequest;
 import erp.item.dto.request.ItemSaveRequest;
 import erp.item.dto.request.ItemUpdateRequest;
+import erp.item.dto.response.ItemFindResponse;
 import erp.item.dto.response.ItemInfoResponse;
 import erp.item.service.ItemService;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public BaseResponse<PageResponse<ItemFindRow>> findAllItem(
+    public BaseResponse<PageResponse<ItemFindResponse>> findAllItem(
             @Valid @RequestBody ItemFindAllRequest request) {
         long tenantId = TenantContext.get();
         return BaseResponse.onSuccess(itemService.findAllItems(request, tenantId));

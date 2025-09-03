@@ -8,6 +8,7 @@ import erp.item.dto.internal.ItemFindRow;
 import erp.item.dto.request.ItemFindAllRequest;
 import erp.item.dto.request.ItemSaveRequest;
 import erp.item.dto.request.ItemUpdateRequest;
+import erp.item.dto.response.ItemFindResponse;
 import erp.item.dto.response.ItemInfoResponse;
 import erp.item.enums.ItemCategory;
 import erp.item.mapper.ItemMapper;
@@ -61,7 +62,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<ItemFindRow> findAllItems(ItemFindAllRequest request, long tenantId) {
+    public PageResponse<ItemFindResponse> findAllItems(ItemFindAllRequest request, long tenantId) {
         int size = (request.size() == null || request.size() < 1) ? 20 : request.size();
         int page = (request.page() == null || request.page() < 0) ? 0 : request.page();
         int offset = page * size;
@@ -74,8 +75,12 @@ public class ItemServiceImpl implements ItemService {
         if (rows.isEmpty())
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_ITEM);
 
+        List<ItemFindResponse> responses = rows.stream()
+                .map(ItemFindResponse::from)
+                .toList();
+
         long total = itemMapper.countByNameAndCategory(tenantId, name, category);
-        return PageResponse.of(rows, page, total, size);
+        return PageResponse.of(responses, page, total, size);
     }
 
     @Override

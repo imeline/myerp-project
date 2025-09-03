@@ -1,10 +1,10 @@
 package erp.item.service;
 
 import erp.global.shared.dto.PageResponse;
-import erp.item.dto.internal.ItemFindRow;
 import erp.item.dto.request.ItemFindAllRequest;
 import erp.item.dto.request.ItemSaveRequest;
 import erp.item.dto.request.ItemUpdateRequest;
+import erp.item.dto.response.ItemFindResponse;
 import erp.item.dto.response.ItemInfoResponse;
 
 public interface ItemService {
@@ -12,7 +12,7 @@ public interface ItemService {
 
     ItemInfoResponse findItem(long itemId, long tenantId);
 
-    PageResponse<ItemFindRow> findAllItems(ItemFindAllRequest request, long tenantId);
+    PageResponse<ItemFindResponse> findAllItems(ItemFindAllRequest request, long tenantId);
 
     void updateItem(long itemId, ItemUpdateRequest request, long tenantId);
 
