@@ -21,6 +21,7 @@ public enum ErrorStatus {
     EXIST_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
     INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103", "테넌트 ID가 설정되지 않았습니다."),
     SIGNUP_FAIL("AUTH104", "회원가입에 실패했습니다."),
+    NOT_FOUND_ERP_ACCOUNT("AUTH105", "계정을 찾을 수 없습니다."),
 
     // COMPANY,
     DUPLICATE_BIZ_NO("COMP101", "이미 등록된 사업자등록번호입니다."),
@@ -50,7 +51,17 @@ public enum ErrorStatus {
     DELETE_POSITION_FAIL("POS305", "직급을 찾을 수 없거나 이미 삭제된 직급입니다."),
     EXIST_EMPLOYEE_IN_POSITION("POS306", "해당 직급에 속한 직원이 존재합니다."),
     NOT_REGISTERED_POSITION("POS307", "등록된 직급이 없습니다."),
+
+    // ITEM
+    CREATE_ITEM_FAIL("ITEM401", "품목 등록에 실패했습니다."),
+    NOT_FOUND_ITEM("ITEM402", "존재하지 않는 품목입니다."),
+    UPDATE_ITEM_FAIL("ITEM403", "품목 수정에 실패했습니다."),
+    DELETE_ITEM_FAIL("ITEM404", "품목을 찾을 수 없거나 이미 삭제된 품목입니다."),
+    DUPLICATE_ITEM_NAME("ITEM405", "이미 등록된 품목명입니다."),
+    DUPLICATE_ITEM_CODE("ITEM406", "이미 등록된 품목 코드입니다."),
+    NOT_REGISTERED_ITEM("ITEM407", "등록된 품목이 없습니다."),
     ;
+
 
     private final String status;
     private final String message;

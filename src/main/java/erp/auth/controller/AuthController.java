@@ -1,9 +1,9 @@
 package erp.auth.controller;
 
+import erp.account.enums.ErpAccountRole;
 import erp.auth.dto.request.LoginRequest;
 import erp.auth.dto.request.SignupRequest;
 import erp.auth.dto.response.LoginResponse;
-import erp.auth.enums.ErpAccountRole;
 import erp.auth.service.AuthService;
 import erp.global.response.BaseResponse;
 import jakarta.validation.Valid;

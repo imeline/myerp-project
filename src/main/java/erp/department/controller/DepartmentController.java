@@ -3,7 +3,7 @@ package erp.department.controller;
 import erp.department.dto.request.ChildDepartmentSaveRequest;
 import erp.department.dto.request.DepartmentUpdateRequest;
 import erp.department.dto.request.TopDepartmentSaveRequest;
-import erp.department.dto.response.DepartmentItemResponse;
+import erp.department.dto.response.DepartmentInfoResponse;
 import erp.department.service.DepartmentService;
 import erp.global.response.BaseResponse;
 import erp.global.tenant.TenantContext;
@@ -37,21 +37,21 @@ public class DepartmentController {
 
     // 최상위(parent_id IS NULL)만
     @GetMapping("/top")
-    public BaseResponse<List<DepartmentItemResponse>> findAllTopDepartment() {
+    public BaseResponse<List<DepartmentInfoResponse>> findAllTopDepartment() {
         long tenantId = TenantContext.get();
-        List<DepartmentItemResponse> departmentItemResponse =
+        List<DepartmentInfoResponse> departmentInfoResponse =
                 departmentService.findAllTopLevelDepartment(tenantId);
-        return BaseResponse.onSuccess(departmentItemResponse);
+        return BaseResponse.onSuccess(departmentInfoResponse);
     }
 
     // 특정 부모의 직계 자식
     @GetMapping("/child/{parentId}")
-    public BaseResponse<List<DepartmentItemResponse>> findChildrenDepartment(
+    public BaseResponse<List<DepartmentInfoResponse>> findChildrenDepartment(
             @PathVariable long parentId) {
         long tenantId = TenantContext.get();
-        List<DepartmentItemResponse> departmentItemResponse =
+        List<DepartmentInfoResponse> departmentInfoResponse =
                 departmentService.findAllByParentId(parentId, tenantId);
-        return BaseResponse.onSuccess(departmentItemResponse);
+        return BaseResponse.onSuccess(departmentInfoResponse);
     }
 
     @PutMapping("/{departmentId}")

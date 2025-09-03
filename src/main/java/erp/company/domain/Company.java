@@ -18,6 +18,7 @@ public class Company extends TimeStamped {
     // 삭제 이외의 회원가입 등에선 삭제와 무관한 정보 이므로, mapper에서만 null 처리
     private LocalDateTime deletedAt;
 
+    // register 이랑 update 메소드 필드가 똑같아서 of로 통일
     public static Company of(Long companyId, String name, String bizNo,
                              String address, String phone) {
         return Company.builder()

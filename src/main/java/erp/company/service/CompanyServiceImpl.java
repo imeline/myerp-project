@@ -1,16 +1,17 @@
 package erp.company.service;
 
-import erp.auth.mapper.ErpAccountMapper;
+import erp.account.mapper.ErpAccountMapper;
 import erp.company.domain.Company;
 import erp.company.dto.internal.CompanyFindRow;
 import erp.company.dto.request.CompanyFindAllRequest;
 import erp.company.dto.request.CompanySaveRequest;
 import erp.company.dto.request.CompanyUpdateRequest;
-import erp.company.dto.response.CompanyFindAllResponse;
-import erp.company.dto.response.CompanyItemResponse;
+import erp.company.dto.response.CompanyFindResponse;
+import erp.company.dto.response.CompanyInfoResponse;
 import erp.company.mapper.CompanyMapper;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.global.shared.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,18 +46,19 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional(readOnly = true)
-    public CompanyItemResponse findCompany(long companyId) {
+    public CompanyInfoResponse findCompany(long companyId) {
         Company company = companyMapper.findById(companyId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_COMPANY));
-        return CompanyItemResponse.from(company);
+        return CompanyInfoResponse.from(company);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CompanyFindAllResponse<CompanyFindRow> findAllCompany(CompanyFindAllRequest request) {
+    public PageResponse<CompanyFindResponse> findAllCompany(CompanyFindAllRequest request) {
         int size = (request.size() == null || request.size() < 1) ? 20 : request.size();
         int page = (request.page() == null || request.page() < 0) ? 0 : request.page();
         int offset = page * size;
+
         String name = request.name();
         name = (name == null || name.isBlank()) ? null : name.trim();
 
@@ -64,11 +66,12 @@ public class CompanyServiceImpl implements CompanyService {
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_COMPANY);
         }
-        long total = companyMapper.countByName(name);
-        int totalPages = (int) Math.ceil(total / (double) size);
-        boolean hasNext = (page + 1) < totalPages;
+        List<CompanyFindResponse> responses = rows.stream()
+                .map(CompanyFindResponse::from)
+                .toList();
 
-        return CompanyFindAllResponse.of(rows, page, total, totalPages, hasNext);
+        long total = companyMapper.countByName(name);
+        return PageResponse.of(responses, page, total, size);
     }
 
     @Override

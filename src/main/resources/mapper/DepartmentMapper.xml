@@ -8,6 +8,8 @@
         FROM dual
     </select>
 
+    <!-- insert 시 tenant_id 검증은 삽입할 도메인에
+    jwt 토큰에서 추출한 tenant_id를 넣어주므로 별도 검증 없음 -->
     <insert id="save">
         INSERT INTO DEPARTMENT (department_id, company_id, parent_id, name)
         VALUES (#{department.departmentId},

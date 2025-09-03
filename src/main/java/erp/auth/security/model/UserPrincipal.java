@@ -1,4 +1,4 @@
-package erp.auth.security;
+package erp.auth.security.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;

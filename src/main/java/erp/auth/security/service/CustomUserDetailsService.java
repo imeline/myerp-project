@@ -1,7 +1,7 @@
 //package erp.auth.security;
 //
-//import erp.auth.domain.ErpAccount;
-//import erp.auth.mapper.ErpAccountMapper;
+//import erp.account.domain.ErpAccount;
+//import erp.account.mapper.ErpAccountMapper;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.core.userdetails.UserDetailsService;

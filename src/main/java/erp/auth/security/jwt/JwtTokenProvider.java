@@ -1,6 +1,6 @@
 package erp.auth.security.jwt;
 
-import erp.auth.security.UserPrincipal;
+import erp.auth.security.model.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
