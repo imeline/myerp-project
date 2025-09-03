@@ -2,6 +2,7 @@ package erp.item.mapper;
 
 import erp.item.domain.Item;
 import erp.item.dto.internal.ItemFindRow;
+import erp.item.dto.internal.ItemIdAndNameRow;
 import erp.item.enums.ItemCategory;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,6 +25,8 @@ public interface ItemMapper {
                                          @Param("category") ItemCategory category,
                                          @Param("offset") int offset,
                                          @Param("size") int size);
+
+    List<ItemIdAndNameRow> findAllIdAndNameByTenantId(@Param("tenantId") long tenantId);
 
     int updateById(@Param("tenantId") long tenantId,
                    @Param("item") Item item);

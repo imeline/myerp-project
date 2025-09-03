@@ -48,6 +48,15 @@
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
+    <select id="findAllIdAndNameByTenantId" resultType="ItemIdAndNameRow">
+        SELECT item_id, name
+        FROM item
+        WHERE
+        <include refid="frag.tenantGuard"/>
+        AND deleted_at IS NULL
+        ORDER BY name
+    </select>
+
     <select id="countByNameAndCategory" resultType="long">
         SELECT COUNT(*)
         FROM item

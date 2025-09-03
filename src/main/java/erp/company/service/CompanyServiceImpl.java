@@ -11,12 +11,16 @@ import erp.company.dto.response.CompanyInfoResponse;
 import erp.company.mapper.CompanyMapper;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
-import erp.global.shared.dto.PageResponse;
+import erp.global.response.PageResponse;
+import erp.global.util.PageParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+import static erp.global.util.Strings.normalizeOrNull;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +44,7 @@ public class CompanyServiceImpl implements CompanyService {
         );
 
         int affectedRowCount = companyMapper.save(company);
-        assertAffected(affectedRowCount, ErrorStatus.CREATE_COMPANY_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_COMPANY_FAIL);
         return newId;
     }
 
@@ -55,23 +59,19 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<CompanyFindResponse> findAllCompany(CompanyFindAllRequest request) {
-        int size = (request.size() == null || request.size() < 1) ? 20 : request.size();
-        int page = (request.page() == null || request.page() < 0) ? 0 : request.page();
-        int offset = page * size;
+        PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
+        String name = normalizeOrNull(request.name());
 
-        String name = request.name();
-        name = (name == null || name.isBlank()) ? null : name.trim();
-
-        List<CompanyFindRow> rows = companyMapper.findAllCompanyRow(name, offset, size);
-        if (rows.isEmpty()) {
+        List<CompanyFindRow> rows = companyMapper.findAllCompanyRow(name, pageParam.offset(), pageParam.size());
+        if (rows.isEmpty())
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_COMPANY);
-        }
+
         List<CompanyFindResponse> responses = rows.stream()
                 .map(CompanyFindResponse::from)
                 .toList();
 
         long total = companyMapper.countByName(name);
-        return PageResponse.of(responses, page, total, size);
+        return PageResponse.of(responses, pageParam.page(), total, pageParam.size());
     }
 
     @Override
@@ -90,7 +90,7 @@ public class CompanyServiceImpl implements CompanyService {
         );
 
         int affectedRowCount = companyMapper.updateById(company);
-        assertAffected(affectedRowCount, ErrorStatus.UPDATE_COMPANY_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_COMPANY_FAIL);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class CompanyServiceImpl implements CompanyService {
 //            throw new GlobalException(ErrorStatus.EXTERNAL_DATA_EXISTS);
 
         int affectedRowCount = companyMapper.softDeleteById(companyId);
-        assertAffected(affectedRowCount, ErrorStatus.DELETE_COMPANY_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_COMPANY_FAIL);
         // 해당 회사 직원들의 erp_account 도 소프트 삭제
         erpAccountMapper.softDeleteByCompanyId(companyId);
     }
@@ -118,12 +118,5 @@ public class CompanyServiceImpl implements CompanyService {
     private void validateNameUnique(String name, Long excludeId) {
         if (companyMapper.existsByName(name, excludeId))
             throw new GlobalException(ErrorStatus.DUPLICATE_NAME);
-    }
-
-    // create, update, delete SQL 실패 검사
-    private void assertAffected(int affected, ErrorStatus status) {
-        if (affected != 1) {
-            throw new GlobalException(status);
-        }
     }
 }

@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+
 @Service
 @RequiredArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
@@ -40,7 +42,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 newDepartmentId, name, tenantId, requestedParentId);
 
         int affectedRowCount = departmentMapper.save(tenantId, department);
-        assertAffected(affectedRowCount, ErrorStatus.CREATE_DEPARTMENT_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_DEPARTMENT_FAIL);
         return newDepartmentId;
     }
 
@@ -64,7 +66,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         );
 
         int affectedRowCount = departmentMapper.save(tenantId, department);
-        assertAffected(affectedRowCount, ErrorStatus.CREATE_DEPARTMENT_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_DEPARTMENT_FAIL);
 
         return newDepartmentId;
     }
@@ -111,7 +113,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         Department department = curDepartment.changeName(newName);
         int affectedRowCount = departmentMapper.updateById(tenantId, department);
-        assertAffected(affectedRowCount, ErrorStatus.UPDATE_DEPARTMENT_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_DEPARTMENT_FAIL);
     }
 
     @Override
@@ -121,7 +123,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         validEmployeeInDepartmentIfPresent(departmentId, tenantId);
 
         int affectedRowCount = departmentMapper.deleteById(tenantId, departmentId);
-        assertAffected(affectedRowCount, ErrorStatus.DELETE_DEPARTMENT_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_DEPARTMENT_FAIL);
     }
 
     // 중복 이름 검사
@@ -154,12 +156,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     private void validEmployeeInDepartmentIfPresent(Long departmentId, long tenantId) {
         if (EmployeeMapper.existsByDepartmentId(tenantId, departmentId)) {
             throw new GlobalException(ErrorStatus.EXIST_EMPLOYEE_IN_DEPARTMENT);
-        }
-    }
-
-    private void assertAffected(int affected, ErrorStatus status) {
-        if (affected != 1) {
-            throw new GlobalException(status);
         }
     }
 }

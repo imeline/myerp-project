@@ -16,6 +16,15 @@
                 #{departmentId}, #{positionId}, #{companyId})
     </insert>
 
+    <select id="findAllIdAndNameByTenantId" resultType="EmployeeIdAndNameRow">
+        SELECT employee_id, name
+        FROM employee
+        WHERE
+        <include refid="frag.tenantGuard"/>
+        AND status = 'ACTIVE'
+        ORDER BY name
+    </select>
+
     <select id="existsByDepartmentId" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee

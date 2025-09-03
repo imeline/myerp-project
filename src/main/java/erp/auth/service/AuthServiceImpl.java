@@ -20,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -49,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
         );
 
         int affectedRowCount = employeeMapper.save(employee);
-        assertAffected(affectedRowCount, ErrorStatus.SIGNUP_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.SIGNUP_FAIL);
 
         // ErpAccount 생성
         long erpAccountId = erpAccountMapper.nextId();
@@ -64,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
         );
 
         affectedRowCount = erpAccountMapper.save(account);
-        assertAffected(affectedRowCount, ErrorStatus.SIGNUP_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.SIGNUP_FAIL);
     }
 
     @Override
@@ -93,13 +95,6 @@ public class AuthServiceImpl implements AuthService {
         // -> 응답(LoginResponse)은 DB 조회 결과(row) 기준으로 채워야 책임이 명확함
         // -> UserPrincipal은 인증 컨텍스트 전용이므로 API 응답에 끌고 오면 역할이 섞임
         return LoginResponse.of(token, row.uuid(), row.role(), row.name());
-    }
-
-    // create, update, delete SQL 실패 검사
-    private void assertAffected(int affected, ErrorStatus status) {
-        if (affected != 1) {
-            throw new GlobalException(status);
-        }
     }
 
     // 로그인 이메일 중복 검사
