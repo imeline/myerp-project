@@ -1,7 +1,7 @@
 package erp.global.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.global.response.BaseResponse;
+import erp.global.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException)
             throws IOException {
-        BaseResponse<?> body = BaseResponse.onFailure(ErrorStatus.UNAUTHORIZED,
+        ApiResponse<?> body = ApiResponse.onFailure(ErrorStatus.UNAUTHORIZED,
                 authException.getMessage());
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401

@@ -1,7 +1,7 @@
 package erp.item.controller;
 
-import erp.global.response.BaseResponse;
-import erp.global.shared.dto.PageResponse;
+import erp.global.response.ApiResponse;
+import erp.global.response.PageResponse;
 import erp.global.tenant.TenantContext;
 import erp.item.dto.request.ItemFindAllRequest;
 import erp.item.dto.request.ItemSaveRequest;
@@ -21,36 +21,36 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public BaseResponse<Long> saveItem(@Valid @RequestBody ItemSaveRequest request) {
+    public ApiResponse<Long> saveItem(@Valid @RequestBody ItemSaveRequest request) {
         long tenantId = TenantContext.get();
-        return BaseResponse.onSuccess(itemService.saveItem(request, tenantId));
+        return ApiResponse.onSuccess(itemService.saveItem(request, tenantId));
     }
 
     @GetMapping("/{itemId}")
-    public BaseResponse<ItemInfoResponse> findItem(@PathVariable long itemId) {
+    public ApiResponse<ItemInfoResponse> findItem(@PathVariable long itemId) {
         long tenantId = TenantContext.get();
-        return BaseResponse.onSuccess(itemService.findItem(itemId, tenantId));
+        return ApiResponse.onSuccess(itemService.findItem(itemId, tenantId));
     }
 
     @GetMapping
-    public BaseResponse<PageResponse<ItemFindResponse>> findAllItem(
+    public ApiResponse<PageResponse<ItemFindResponse>> findAllItem(
             @Valid @RequestBody ItemFindAllRequest request) {
         long tenantId = TenantContext.get();
-        return BaseResponse.onSuccess(itemService.findAllItems(request, tenantId));
+        return ApiResponse.onSuccess(itemService.findAllItems(request, tenantId));
     }
 
     @PutMapping("/{itemId}")
-    public BaseResponse<Void> updateItem(@PathVariable long itemId,
-                                         @Valid @RequestBody ItemUpdateRequest request) {
+    public ApiResponse<Void> updateItem(@PathVariable long itemId,
+                                        @Valid @RequestBody ItemUpdateRequest request) {
         long tenantId = TenantContext.get();
         itemService.updateItem(itemId, request, tenantId);
-        return BaseResponse.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 
     @DeleteMapping("/{itemId}")
-    public BaseResponse<Void> softDeleteItem(@PathVariable long itemId) {
+    public ApiResponse<Void> softDeleteItem(@PathVariable long itemId) {
         long tenantId = TenantContext.get();
         itemService.softDeleteItem(itemId, tenantId);
-        return BaseResponse.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 }

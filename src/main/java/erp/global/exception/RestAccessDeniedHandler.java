@@ -1,7 +1,7 @@
 package erp.global.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.global.response.BaseResponse;
+import erp.global.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
             throws IOException {
         log.warn("403 Forbidden - uri: {}, reason: {}", request.getRequestURI(), ex.getMessage());
 
-        BaseResponse<?> body = BaseResponse.onFailure(ErrorStatus.FORBIDDEN, ex.getMessage());
+        ApiResponse<?> body = ApiResponse.onFailure(ErrorStatus.FORBIDDEN, ex.getMessage());
 
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
         response.setCharacterEncoding("UTF-8");

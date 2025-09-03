@@ -1,6 +1,6 @@
 package erp.global.exception;
 
-import erp.global.response.BaseResponse;
+import erp.global.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,54 +26,54 @@ public class GlobalExceptionHandler {
      * 비즈니스 예외 처리
      */
     @ExceptionHandler(GlobalException.class)
-    protected BaseResponse<?> handleGlobalException(GlobalException ex, HttpServletRequest request) {
+    protected ApiResponse<?> handleGlobalException(GlobalException ex, HttpServletRequest request) {
         log.error("errorStatus: {}, url: {}, message: {}", ex.getStatus(), request.getRequestURI(), ex.getMessage());
-        return BaseResponse.onFailure(ex.getStatus(), ex.getMessage());
+        return ApiResponse.onFailure(ex.getStatus(), ex.getMessage());
     }
 
     /**
      * @Valid @RequestBody 검증 실패
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public BaseResponse<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ApiResponse<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
         log.warn("400 BadRequest(MethodArgumentNotValid) url: {}, detail: {}", request.getRequestURI(), ex.getMessage());
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .collect(Collectors.joining(", "));
-        return BaseResponse.onFailure(ErrorStatus.BAD_REQUEST, message);
+        return ApiResponse.onFailure(ErrorStatus.BAD_REQUEST, message);
     }
 
     /**
      * @Valid @ModelAttribute, @RequestParam 검증 실패
      */
     @ExceptionHandler(BindException.class)
-    public BaseResponse<?> handleBindException(BindException ex, HttpServletRequest request) {
+    public ApiResponse<?> handleBindException(BindException ex, HttpServletRequest request) {
         log.warn("400 BadRequest(BindException) url: {}, detail: {}", request.getRequestURI(), ex.getMessage());
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .collect(Collectors.joining(", "));
-        return BaseResponse.onFailure(ErrorStatus.BAD_REQUEST, message);
+        return ApiResponse.onFailure(ErrorStatus.BAD_REQUEST, message);
     }
 
     /**
      * JSON 파싱 실패 / 요청 본문 읽기 실패
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public BaseResponse<?> handleNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
+    public ApiResponse<?> handleNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
         log.warn("400 BadRequest(NotReadable) url: {}, detail: {}", request.getRequestURI(), ex.getMessage());
-        return BaseResponse.onFailure(ErrorStatus.NOT_READABLE);
+        return ApiResponse.onFailure(ErrorStatus.NOT_READABLE);
     }
 
     /**
      * 예상치 못한 모든 런타임 예외 처리 (내부 메시지 숨김)
      */
     @ExceptionHandler(RuntimeException.class)
-    protected BaseResponse<?> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
+    protected ApiResponse<?> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
         log.error("500 InternalServerError url: {}, detail: ", request.getRequestURI(), ex);
         // prod 환경에서는 상세 메시지 숨김
         boolean isProd = "prod".equalsIgnoreCase(activeProfile);
         return isProd
-                ? BaseResponse.onFailure(ErrorStatus.INTERNAL_SERVER_ERROR)
-                : BaseResponse.onFailure(ErrorStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+                ? ApiResponse.onFailure(ErrorStatus.INTERNAL_SERVER_ERROR)
+                : ApiResponse.onFailure(ErrorStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 }
