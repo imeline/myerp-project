@@ -71,6 +71,16 @@ public enum ErrorStatus {
     DUPLICATE_ITEM_CODE("ITEM706", "이미 등록된 품목 코드입니다."),
     NOT_REGISTERED_ITEM("ITEM707", "등록된 품목이 없습니다."),
     DUPLICATE_ITEM("ITEM708", "중복된 품목이 있습니다."),
+
+    // STOCK
+
+
+    // PURCHASE
+    CREATE_PURCHASE_FAIL("PUR901", "발주 생성에 실패했습니다."),
+    CREATE_PURCHASE_ITEM_FAIL("PUR902", "발주 품목 생성에 실패했습니다."),
+    NOT_FOUND_PURCHASE("PUR903", "존재하지 않는 발주입니다."),
+    INVALID_PURCHASE_STATUS("PUR904", "유효하지 않은 발주 상태입니다."),
+    NOT_REGISTERED_PURCHASE("PUR905", "등록된 발주가 없습니다."),
     ;
 
 

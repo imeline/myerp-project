@@ -3,6 +3,7 @@ package erp.item.mapper;
 import erp.item.domain.Item;
 import erp.item.dto.internal.ItemFindRow;
 import erp.item.dto.internal.ItemIdAndNameRow;
+import erp.item.dto.internal.ItemPriceRow;
 import erp.item.enums.ItemCategory;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,6 +29,8 @@ public interface ItemMapper {
 
     List<ItemIdAndNameRow> findAllIdAndNameByTenantId(@Param("tenantId") long tenantId);
 
+    List<ItemPriceRow> findAllPriceByIds(long tenantId, List<Long> itemIds);
+
     int updateById(@Param("tenantId") long tenantId,
                    @Param("item") Item item);
 
@@ -45,4 +48,7 @@ public interface ItemMapper {
     boolean existsByCode(@Param("tenantId") long tenantId,
                          @Param("code") String code,
                          @Param("excludeId") Long excludeId);
+
+    boolean existsByIds(@Param("tenantId") long tenantId,
+                        @Param("itemIds") List<Long> itemIds);
 }

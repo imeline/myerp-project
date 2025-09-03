@@ -91,7 +91,7 @@
         AND deleted_at IS NULL
     </select>
 
-    <select id="existsActiveCompanyById" resultType="boolean">
+    <select id="existsCompanyById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM COMPANY
         WHERE company_id = #{companyId}

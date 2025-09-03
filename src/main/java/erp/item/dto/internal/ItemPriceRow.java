@@ -1,12 +1,11 @@
 package erp.item.dto.internal;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record ItemIdAndNameRow(
+public record ItemPriceRow(
         @NotNull
         Long itemId,
-        @NotBlank
-        String name
+        @NotNull
+        Integer price
 ) {
 }

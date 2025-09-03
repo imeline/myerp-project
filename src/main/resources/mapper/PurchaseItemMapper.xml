@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.purchase.mapper.PurchaseItemMapper">
+    <select id="nextId" resultType="long">
+        SELECT purchase_item_seq.NEXTVAL
+        FROM dual
+    </select>
+    
+    <insert id="saveAll">
+        INSERT ALL
+        <foreach collection="items" item="it">
+            INTO purchase_item (
+            purchase_item_id,
+            purchase_id,
+            item_id,
+            quantity
+            ) VALUES (
+            #{it.purchaseItemId},
+            #{it.purchaseId},
+            #{it.itemId},
+            #{it.quantity}
+            )
+        </foreach>
+        SELECT 1 FROM dual
+    </insert>
+
+</mapper>

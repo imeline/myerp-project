@@ -35,5 +35,5 @@ public interface CompanyMapper {
 
     boolean isActiveById(@Param("companyId") Long companyId);
 
-    boolean existsActiveCompanyById(@Param("companyId") Long companyId);
+    boolean existsCompanyById(@Param("companyId") Long companyId);
 }

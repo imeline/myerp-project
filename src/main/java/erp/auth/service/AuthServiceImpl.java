@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void signup(SignupRequest request, ErpAccountRole role) {
         // 회원가입이 아닌 경우는 security 에서 검사하니까 회원가입 때만 따로 검사
-        validCompanyIdIfPresentAndActive(request.companyId());
+        validCompanyIdIfPresent(request.companyId());
 
         // Employee 생성
         EmployeeSaveRequest employeeSaveRequest =
@@ -91,8 +91,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     // companyId가 존재하고, 활성화된 회사인지 검사
-    private void validCompanyIdIfPresentAndActive(Long companyId) {
-        if (companyId != null && !companyMapper.existsActiveCompanyById(companyId)) {
+    private void validCompanyIdIfPresent(Long companyId) {
+        if (companyId != null && !companyMapper.existsCompanyById(companyId)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_COMPANY);
         }
     }
