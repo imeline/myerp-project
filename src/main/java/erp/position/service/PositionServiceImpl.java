@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+import static erp.global.util.Strings.normalizeOrNull;
+
 @Service
 @RequiredArgsConstructor
 public class PositionServiceImpl implements PositionService {
@@ -26,7 +29,7 @@ public class PositionServiceImpl implements PositionService {
     public long savePosition(PositionNameRequest request, long tenantId) {
         long newPositionId = positionMapper.nextId();
 
-        String name = request.name();
+        String name = normalizeOrNull(request.name());
         validNameUnique(name, null, tenantId);
 
         // 직급 번호는 가장 마지막 직급 번호 + 1
@@ -34,7 +37,7 @@ public class PositionServiceImpl implements PositionService {
 
         Position position = Position.register(newPositionId, name, levelNo, tenantId);
         int affectedRowCount = positionMapper.save(tenantId, position);
-        assertAffected(affectedRowCount, ErrorStatus.CREATE_POSITION_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_POSITION_FAIL);
 
         return newPositionId;
     }
@@ -58,7 +61,7 @@ public class PositionServiceImpl implements PositionService {
         validNameUnique(newName, positionId, tenantId);
 
         int affectedRowCount = positionMapper.updateNameById(tenantId, positionId, newName);
-        assertAffected(affectedRowCount, ErrorStatus.UPDATE_POSITION_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_POSITION_FAIL);
     }
 
     @Override
@@ -74,7 +77,7 @@ public class PositionServiceImpl implements PositionService {
             positionMapper.shiftDownRange(tenantId, oldLevelNo, newLevelNo);
 
         int affectedRowCount = positionMapper.updateLevelNoById(tenantId, positionId, newLevelNo);
-        assertAffected(affectedRowCount, ErrorStatus.UPDATE_POSITION_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_POSITION_FAIL);
     }
 
     @Override
@@ -86,12 +89,12 @@ public class PositionServiceImpl implements PositionService {
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_POSITION));
         // 직급 삭제
         int affectedRowCount = positionMapper.deleteById(tenantId, positionId);
-        assertAffected(affectedRowCount, ErrorStatus.DELETE_POSITION_FAIL);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_POSITION_FAIL);
         // 삭제된 직급보다 낮은 직급들의 levelNo -1
         positionMapper.shiftDownRange(tenantId, oldLevelNo, Integer.MAX_VALUE);
     }
 
-    private void validNameUnique(String name, Long excludePositionId, Long tenantId) {
+    private void validNameUnique(String name, Long excludePositionId, long tenantId) {
         if (positionMapper.existsByName(tenantId, name, excludePositionId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_POSITION_NAME);
         }
@@ -101,12 +104,6 @@ public class PositionServiceImpl implements PositionService {
     private void validEmployeeInPositionIfPresent(long positionId, long tenantId) {
         if (employeeMapper.existsByPositionId(tenantId, positionId)) {
             throw new GlobalException(ErrorStatus.EXIST_EMPLOYEE_IN_POSITION);
-        }
-    }
-
-    private void assertAffected(int affected, ErrorStatus status) {
-        if (affected != 1) {
-            throw new GlobalException(status);
         }
     }
 }

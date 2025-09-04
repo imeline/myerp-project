@@ -12,13 +12,13 @@ import java.util.Optional;
 public interface DepartmentMapper {
     long nextId();
 
-    int save(@Param("tenantId") Long tenantId,
+    int save(@Param("tenantId") long tenantId,
              @Param("department") Department department);
 
-    int updateById(@Param("tenantId") Long tenantId,
+    int updateById(@Param("tenantId") long tenantId,
                    @Param("department") Department department);
 
-    Optional<Department> findById(@Param("tenantId") Long tenantId,
+    Optional<Department> findById(@Param("tenantId") long tenantId,
                                   @Param("departmentId") Long departmentId);
 
     List<DepartmentFindRow> findAllTopLevelDepartmentRow(
@@ -29,19 +29,19 @@ public interface DepartmentMapper {
             @Param("parentId") long parentId);
 
 
-    int deleteById(@Param("tenantId") Long tenantId,
+    int deleteById(@Param("tenantId") long tenantId,
                    @Param("departmentId") Long departmentId);
 
-    boolean existsByNameAndParentId(@Param("tenantId") Long tenantId,
+    boolean existsByNameAndParentId(@Param("tenantId") long tenantId,
                                     // 한 부모 안에 같은 이름의 부서가 있는지 검사(수정 시 자기 자신은 제외)
                                     @Param("parentId") Long parentId,
                                     @Param("name") String name,
                                     @Param("excludeDepartmentId") Long excludeDepartmentId);
 
-    boolean existsById(@Param("tenantId") Long tenantId,
+    boolean existsById(@Param("tenantId") long tenantId,
                        @Param("departmentId") Long departmentId);
 
-    boolean existsChildById(@Param("tenantId") Long tenantId,
+    boolean existsChildById(@Param("tenantId") long tenantId,
                             @Param("departmentId") Long departmentId);
     // 해당 테넌트의 모든 부서 조회
 //    List<DepartmentRowResponse> findAllDepartmentRow(@Param("tenantId") long tenantId);

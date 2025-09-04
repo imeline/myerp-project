@@ -17,49 +17,74 @@ public enum ErrorStatus {
             "서버 내부 오류가 발생했습니다."),
     NULL_TENANT_ID("TENANT001", "테넌트 ID가 설정되지 않았습니다."),
 
-    // AUTH,
-    EXIST_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
+    // AUTH
+    DUPLICATE_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
     INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103", "테넌트 ID가 설정되지 않았습니다."),
     SIGNUP_FAIL("AUTH104", "회원가입에 실패했습니다."),
     NOT_FOUND_ERP_ACCOUNT("AUTH105", "계정을 찾을 수 없습니다."),
 
-    // COMPANY,
-    DUPLICATE_BIZ_NO("COMP101", "이미 등록된 사업자등록번호입니다."),
-    DUPLICATE_NAME("COMP102", "이미 등록된 회사명입니다."),
-    NOT_FOUND_COMPANY("COMP103", "존재하지 않는 회사입니다."),
-    CREATE_COMPANY_FAIL("COMP104", "회사 등록에 실패했습니다."),
-    UPDATE_COMPANY_FAIL("COMP105", "회사 수정에 실패했습니다."),
-    DELETE_COMPANY_FAIL("COMP106", "회사를 찾을 수 없거나 이미 삭제된 회사입니다."),
-    EXTERNAL_DATA_EXISTS("COMP107", "연관된 데이터가 존재하여 삭제할 수 없습니다."),
-    NOT_REGISTERED_COMPANY("COMP209", "등록된 회사가 없습니다."),
+    // ERP ACCOUNT
+    CREATE_ERP_ACCOUNT_FAIL("ERP201", "계정 생성에 실패했습니다."),
+
+    // EMPLOYEE
+    NOT_REGISTERED_EMPLOYEE("EMP301", "등록된 직원이 없습니다."),
+    DUPLICATE_EMP_NO("EMP302", "이미 등록된 사번입니다."),
+    DUPLICATE_PHONE("EMP303", "이미 등록된 전화번호입니다."),
+    CREATE_EMPLOYEE_FAIL("EMP304", "직원 생성에 실패했습니다."),
+    NOT_FOUND_EMPLOYEE("EMP305", "존재하지 않는 직원입니다."),
+
+    // COMPANY
+    DUPLICATE_BIZ_NO("COMP401", "이미 등록된 사업자등록번호입니다."),
+    DUPLICATE_NAME("COMP402", "이미 등록된 회사명입니다."),
+    NOT_FOUND_COMPANY("COMP403", "존재하지 않는 회사입니다."),
+    CREATE_COMPANY_FAIL("COMP404", "회사 생성에 실패했습니다."),
+    UPDATE_COMPANY_FAIL("COMP405", "회사 수정에 실패했습니다."),
+    DELETE_COMPANY_FAIL("COMP406", "회사를 찾을 수 없거나 이미 삭제된 회사입니다."),
+    EXTERNAL_DATA_EXISTS("COMP407", "연관된 데이터가 존재하여 삭제할 수 없습니다."),
+    NOT_REGISTERED_COMPANY("COMP408", "등록된 회사가 없습니다."),
 
     // DEPARTMENT
-    DUPLICATE_DEPARTMENT_NAME("DPT201", "이미 등록된 부서명입니다."),
-    NOT_FOUND_DEPARTMENT("DPT202", "존재하지 않는 부서입니다."),
-    CREATE_DEPARTMENT_FAIL("DPT203", "부서 등록에 실패했습니다."),
-    UPDATE_DEPARTMENT_FAIL("DPT204", "부서 수정에 실패했습니다."),
-    DELETE_DEPARTMENT_FAIL("DPT205", "부서를 찾을 수 없거나 이미 삭제된 부서입니다."),
-    NO_FOUND_PARENT_DEPARTMENT("DPT206", "유효하지 않은 상위 부서입니다."), EXIST_EMPLOYEE_IN_DEPARTMENT("DPT207", "해당 부서에 속한 직원이 존재합니다."),
-    EXIST_CHILD_DEPARTMENT("DPT208", "하위 부서가 존재하여 삭제할 수 없습니다."),
-    NOT_REGISTERED_DEPARTMENT("DPT209", "등록된 부서가 없습니다."),
+    DUPLICATE_DEPARTMENT_NAME("DPT501", "이미 등록된 부서명입니다."),
+    NOT_FOUND_DEPARTMENT("DPT502", "존재하지 않는 부서입니다."),
+    CREATE_DEPARTMENT_FAIL("DPT503", "부서 생성에 실패했습니다."),
+    UPDATE_DEPARTMENT_FAIL("DPT504", "부서 수정에 실패했습니다."),
+    DELETE_DEPARTMENT_FAIL("DPT505", "부서를 찾을 수 없거나 이미 삭제된 부서입니다."),
+    NO_FOUND_PARENT_DEPARTMENT("DPT506", "유효하지 않은 상위 부서입니다."), EXIST_EMPLOYEE_IN_DEPARTMENT("DPT507", "해당 부서에 속한 직원이 존재합니다."),
+    EXIST_CHILD_DEPARTMENT("DPT508", "하위 부서가 존재하여 삭제할 수 없습니다."),
+    NOT_REGISTERED_DEPARTMENT("DPT509", "등록된 부서가 없습니다."),
 
     // POSITION
-    DUPLICATE_POSITION_NAME("POS301", "이미 등록된 직급명입니다."),
-    NOT_FOUND_POSITION("POS302", "존재하지 않는 직급입니다."),
-    CREATE_POSITION_FAIL("POS303", "직급 등록에 실패했습니다."),
-    UPDATE_POSITION_FAIL("POS304", "직급 수정에 실패했습니다."),
-    DELETE_POSITION_FAIL("POS305", "직급을 찾을 수 없거나 이미 삭제된 직급입니다."),
-    EXIST_EMPLOYEE_IN_POSITION("POS306", "해당 직급에 속한 직원이 존재합니다."),
-    NOT_REGISTERED_POSITION("POS307", "등록된 직급이 없습니다."),
+    DUPLICATE_POSITION_NAME("POS601", "이미 등록된 직급명입니다."),
+    NOT_FOUND_POSITION("POS602", "존재하지 않는 직급입니다."),
+    CREATE_POSITION_FAIL("POS603", "직급 생성에 실패했습니다."),
+    UPDATE_POSITION_FAIL("POS604", "직급 수정에 실패했습니다."),
+    DELETE_POSITION_FAIL("POS605", "직급을 찾을 수 없거나 이미 삭제된 직급입니다."),
+    EXIST_EMPLOYEE_IN_POSITION("POS606", "해당 직급에 속한 직원이 존재합니다."),
+    NOT_REGISTERED_POSITION("POS607", "등록된 직급이 없습니다."),
 
     // ITEM
-    CREATE_ITEM_FAIL("ITEM401", "품목 등록에 실패했습니다."),
-    NOT_FOUND_ITEM("ITEM402", "존재하지 않는 품목입니다."),
-    UPDATE_ITEM_FAIL("ITEM403", "품목 수정에 실패했습니다."),
-    DELETE_ITEM_FAIL("ITEM404", "품목을 찾을 수 없거나 이미 삭제된 품목입니다."),
-    DUPLICATE_ITEM_NAME("ITEM405", "이미 등록된 품목명입니다."),
-    DUPLICATE_ITEM_CODE("ITEM406", "이미 등록된 품목 코드입니다."),
-    NOT_REGISTERED_ITEM("ITEM407", "등록된 품목이 없습니다."),
+    CREATE_ITEM_FAIL("ITEM701", "품목 생성에 실패했습니다."),
+    NOT_FOUND_ITEM("ITEM702", "존재하지 않는 품목입니다."),
+    UPDATE_ITEM_FAIL("ITEM703", "품목 수정에 실패했습니다."),
+    DELETE_ITEM_FAIL("ITEM704", "품목을 찾을 수 없거나 이미 삭제된 품목입니다."),
+    DUPLICATE_ITEM_NAME("ITEM705", "이미 등록된 품목명입니다."),
+    DUPLICATE_ITEM_CODE("ITEM706", "이미 등록된 품목 코드입니다."),
+    NOT_REGISTERED_ITEM("ITEM707", "등록된 품목이 없습니다."),
+    DUPLICATE_ITEM("ITEM708", "중복된 품목이 있습니다."),
+
+    // STOCK
+
+
+    // PURCHASE
+    CREATE_PURCHASE_FAIL("PUR901", "발주 생성에 실패했습니다."),
+    CREATE_PURCHASE_ITEM_FAIL("PUR902", "발주 품목 생성에 실패했습니다."),
+    NOT_FOUND_PURCHASE("PUR903", "존재하지 않는 발주입니다."),
+    INVALID_PURCHASE_STATUS("PUR904", "유효하지 않은 발주 상태입니다."),
+    NOT_REGISTERED_PURCHASE("PUR905", "등록된 발주가 없습니다."),
+    NOT_FOUND_PURCHASE_ITEM("PUR906", "존재하지 않는 발주 품목입니다."),
+    CANNOT_CANCEL_SHIPPED_PURCHASE("PUR907", "입고된 발주는 취소할 수 없습니다."),
+    CANCEL_PURCHASE_FAIL("PUR908", "발주 취소에 실패했습니다."),
+    NOT_REGISTERED_PURCHASE_ITEM("PUR909", "등록된 발주 품목이 없습니다."),
     ;
 
 

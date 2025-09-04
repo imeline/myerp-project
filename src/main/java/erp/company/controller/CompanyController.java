@@ -6,8 +6,8 @@ import erp.company.dto.request.CompanyUpdateRequest;
 import erp.company.dto.response.CompanyFindResponse;
 import erp.company.dto.response.CompanyInfoResponse;
 import erp.company.service.CompanyService;
-import erp.global.response.BaseResponse;
-import erp.global.shared.dto.PageResponse;
+import erp.global.response.ApiResponse;
+import erp.global.response.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,33 +20,33 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @PostMapping
-    public BaseResponse<Long> saveCompany(@Valid @RequestBody CompanySaveRequest request /*@AuthenticationPrincipal UserPrincipal user*/) {
+    public ApiResponse<Long> saveCompany(@Valid @RequestBody CompanySaveRequest request /*@AuthenticationPrincipal UserPrincipal user*/) {
         Long addCompanyId = companyService.saveCompany(request);
 
-        return BaseResponse.onSuccess(addCompanyId);
+        return ApiResponse.onSuccess(addCompanyId);
     }
 
     @GetMapping("/{companyId}")
-    public BaseResponse<CompanyInfoResponse> findCompany(@PathVariable Long companyId) {
-        return BaseResponse.onSuccess(companyService.findCompany(companyId));
+    public ApiResponse<CompanyInfoResponse> findCompany(@PathVariable Long companyId) {
+        return ApiResponse.onSuccess(companyService.findCompany(companyId));
     }
 
     @GetMapping
-    public BaseResponse<PageResponse<CompanyFindResponse>> findAllCompany(
+    public ApiResponse<PageResponse<CompanyFindResponse>> findAllCompany(
             @Valid @RequestBody CompanyFindAllRequest request
     ) {
-        return BaseResponse.onSuccess(companyService.findAllCompany(request));
+        return ApiResponse.onSuccess(companyService.findAllCompany(request));
     }
 
     @PutMapping("/{companyId}")
-    public BaseResponse<Void> updateCompany(@PathVariable Long companyId, @Valid @RequestBody CompanyUpdateRequest request) {
+    public ApiResponse<Void> updateCompany(@PathVariable Long companyId, @Valid @RequestBody CompanyUpdateRequest request) {
         companyService.updateCompany(companyId, request);
-        return BaseResponse.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 
     @DeleteMapping("/{companyId}")
-    public BaseResponse<Void> softDeleteCompany(@PathVariable Long companyId) {
+    public ApiResponse<Void> softDeleteCompany(@PathVariable Long companyId) {
         companyService.softDeleteCompany(companyId);
-        return BaseResponse.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 }

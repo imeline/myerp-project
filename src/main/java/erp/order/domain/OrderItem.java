@@ -11,4 +11,5 @@ public class OrderItem {
     private int quantity;
     private long orderId;
     private long itemId;
+    private long companyId;
 }

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.purchase.mapper.PurchaseMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT purchase_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO purchase (purchase_id,
+                              code,
+                              supplier,
+                              purchase_date,
+                              total_quantity,
+                              total_amount,
+                              status,
+                              employee_id,
+                              company_id)
+        VALUES (#{purchase.purchaseId},
+                #{purchase.code},
+                #{purchase.supplier},
+                #{purchase.purchaseDate},
+                #{purchase.totalQuantity},
+                #{purchase.totalAmount},
+                #{purchase.status},
+                #{purchase.employeeId},
+                #{tenantId})
+    </insert>
+
+    <!-- 목록 조회: 삭제 제외, 기간/상태/코드 필터, 페이징 -->
+    <select id="findAllPurchaseFindRow" resultType="PurchaseFindRow">
+        SELECT
+        p.purchase_id AS purchaseId,
+        p.code AS code,
+        p.supplier AS supplier,
+        p.total_quantity AS totalQuantity,
+        p.total_amount AS totalAmount,
+        p.purchase_date AS purchaseDate,
+        p.status AS status,
+        e.name AS employeeName
+        <!-- 담당 직원 이름 조회 -->
+        FROM purchase p
+        JOIN employee e
+        ON e.employee_id = p.employee_id
+        WHERE 1=1
+        <if test="startDate != null">
+            AND p.purchase_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= p.purchase_date
+        </if>
+        <if test="code != null">
+            AND p.code LIKE '%' || #{code} || '%'
+        </if>
+        <if test="status != null">
+            AND p.status = #{status}
+        </if>
+        AND p.status != 'CANCELLED'
+        <!-- 다중 테이블이므로 둘 다 테넌트 가드 -->
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+
+        ORDER BY p.purchase_date DESC, p.purchase_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="findAllCodeAndSupplier" resultType="PurchaseCodeAndSupplierRow">
+        SELECT
+        code,
+        supplier
+        FROM purchase
+        WHERE status = 'CONFIRMED'
+        AND
+        <include refid="frag.tenantGuard"/>
+        ORDER BY purchase_id DESC
+    </select>
+
+    <select id="findPurchaseDetailRow" resultType="PurchaseDetailRow">
+        SELECT
+        p.code,
+        p.supplier,
+        p.purchase_date AS purchaseDate,
+        p.status,
+        e.name AS employeeName,
+        /* 총 품목 수: purchase_item 기준 */
+        (SELECT COUNT(1)
+        FROM purchase_item pi
+        WHERE pi.purchase_id = p.purchase_id
+        AND pi.company_id = #{tenantId}
+        ) AS totalItemCount,
+        /* 총 수량: purchase_item.quantity 합계 (NULL 방지 NVL) */
+        (SELECT NVL(SUM(pi.quantity), 0)
+        FROM purchase_item pi
+        WHERE pi.purchase_id = p.purchase_id
+        AND pi.company_id = #{tenantId}
+        ) AS totalQuantity,
+        /* 총 금액은 purchase.total_amount 사용 */
+        p.total_amount AS totalAmount
+        FROM purchase p
+        JOIN employee e
+        ON e.employee_id = p.employee_id
+        WHERE p.purchase_id = #{purchaseId}
+        AND p.status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+    </select>
+
+    <!-- SHIPPED 가 아닌 경우에만 CANCELLED 로 변경 (조건부 UPDATE 먼저 시도) -->
+    <update id="updateStatusToCancelledIfNotShipped">
+        UPDATE purchase
+        SET status = 'CANCELLED'
+        WHERE purchase_id = #{purchaseId}
+        AND status != 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <select id="countByPeriodAndCodeAndStatus" resultType="long">
+        SELECT COUNT(1)
+        FROM purchase
+        WHERE 1=1
+        <if test="startDate != null">
+            AND purchase_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= purchase_date
+        </if>
+        <if test="code != null">
+            AND code LIKE '%' || #{code} || '%'
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        AND status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM purchase
+        WHERE purchase_id = #{purchaseId}
+        AND status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsShippedById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM purchase
+        WHERE purchase_id = #{purchaseId}
+        AND status = 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+</mapper>

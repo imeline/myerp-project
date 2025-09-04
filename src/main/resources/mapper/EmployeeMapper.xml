@@ -16,10 +16,21 @@
                 #{departmentId}, #{positionId}, #{companyId})
     </insert>
 
+    <select id="findAllIdAndNameByTenantId" resultType="EmployeeIdAndNameRow">
+        SELECT employee_id, name
+        FROM employee
+        WHERE
+        <include refid="frag.tenantGuard"/>
+        AND status = 'ACTIVE'
+        ORDER BY name
+    </select>
+
     <select id="existsByDepartmentId" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE department_id = #{departmentId}
+        AND
+        status = 'ACTIVE'
         AND
         <include refid="frag.tenantGuard"/>
     </select>
@@ -28,6 +39,38 @@
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE position_id = #{positionId}
+        AND
+        status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByEmpNo" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE emp_no = #{empNo}
+        AND
+        status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByPhone" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE phone = #{phone}
+        AND
+        status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE employee_id = #{employeeId}
+        AND
+        status = 'ACTIVE'
         AND
         <include refid="frag.tenantGuard"/>
     </select>

@@ -1,17 +1,18 @@
 package erp.auth.service;
 
-import erp.account.domain.ErpAccount;
+import erp.account.dto.request.ErpAccountSaveRequest;
 import erp.account.enums.ErpAccountRole;
 import erp.account.mapper.ErpAccountMapper;
+import erp.account.service.ErpAccountService;
 import erp.auth.dto.internal.LoginUserInfoRow;
 import erp.auth.dto.request.LoginRequest;
 import erp.auth.dto.request.SignupRequest;
 import erp.auth.dto.response.LoginResponse;
 import erp.auth.security.jwt.JwtTokenProvider;
 import erp.auth.security.model.UserPrincipal;
-import erp.employee.domain.Employee;
-import erp.employee.enums.EmployeeStatus;
-import erp.employee.mapper.EmployeeMapper;
+import erp.company.mapper.CompanyMapper;
+import erp.employee.dto.request.EmployeeSaveRequest;
+import erp.employee.service.EmployeeService;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -24,50 +25,44 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final EmployeeService employeeService;
+    private final ErpAccountService erpAccountService;
     private final ErpAccountMapper erpAccountMapper;
-    private final EmployeeMapper employeeMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final CompanyMapper companyMapper;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     @Override
+    @Transactional
     public void signup(SignupRequest request, ErpAccountRole role) {
-        validateLoginEmailUnique(request.loginEmail());
+        // 회원가입이 아닌 경우는 security 에서 검사하니까 회원가입 때만 따로 검사
+        validCompanyIdIfPresent(request.companyId());
 
         // Employee 생성
-        long employeeId = employeeMapper.nextId();
-
-        Employee employee = Employee.register(
-                employeeId,
-                request.empNo(),
-                request.name(),
-                request.phone(),
-                EmployeeStatus.ACTIVE,
-                request.departmentId(),
-                request.positionId(),
-                request.companyId()
-        );
-
-        int affectedRowCount = employeeMapper.save(employee);
-        assertAffected(affectedRowCount, ErrorStatus.SIGNUP_FAIL);
+        EmployeeSaveRequest employeeSaveRequest =
+                EmployeeSaveRequest.of(
+                        request.empNo(),
+                        request.name(),
+                        request.phone(),
+                        request.departmentId(),
+                        request.positionId()
+                );
+        long employeeId = employeeService.saveEmployee(
+                employeeSaveRequest, request.companyId());
 
         // ErpAccount 생성
-        long erpAccountId = erpAccountMapper.nextId();
-
-        ErpAccount account = ErpAccount.register(
-                erpAccountId,
-                employee.getEmployeeId(),
-                request.loginEmail(),
-                passwordEncoder.encode(request.password()),
-                role,
-                request.companyId()
-        );
-
-        affectedRowCount = erpAccountMapper.save(account);
-        assertAffected(affectedRowCount, ErrorStatus.SIGNUP_FAIL);
+        ErpAccountSaveRequest erpAccountSaveRequest =
+                ErpAccountSaveRequest.of(
+                        employeeId,
+                        request.loginEmail(),
+                        request.password(),
+                        role
+                );
+        erpAccountService.saveErpAccount(erpAccountSaveRequest, request.companyId());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
         final String email = request.loginEmail().trim().toLowerCase();
         // 왜 비밀 번호 검증 전에 jwt를 생성하기 위한 데이터도 같이(join) 조회했는가?
@@ -95,17 +90,10 @@ public class AuthServiceImpl implements AuthService {
         return LoginResponse.of(token, row.uuid(), row.role(), row.name());
     }
 
-    // create, update, delete SQL 실패 검사
-    private void assertAffected(int affected, ErrorStatus status) {
-        if (affected != 1) {
-            throw new GlobalException(status);
-        }
-    }
-
-    // 로그인 이메일 중복 검사
-    private void validateLoginEmailUnique(String loginEmail) {
-        if (erpAccountMapper.existsByLoginEmail(loginEmail)) {
-            throw new GlobalException(ErrorStatus.EXIST_LOGIN_EMAIL);
+    // companyId가 존재하고, 활성화된 회사인지 검사
+    private void validCompanyIdIfPresent(Long companyId) {
+        if (companyId != null && !companyMapper.existsCompanyById(companyId)) {
+            throw new GlobalException(ErrorStatus.NOT_FOUND_COMPANY);
         }
     }
 }

@@ -1,8 +1,11 @@
 package erp.employee.mapper;
 
 import erp.employee.domain.Employee;
+import erp.employee.dto.internal.EmployeeIdAndNameRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface EmployeeMapper {
@@ -10,9 +13,21 @@ public interface EmployeeMapper {
 
     int save(Employee employee);
 
-    boolean existsByDepartmentId(@Param("tenantId") Long tenantId,
-                                 @Param("departmentId") Long departmentId);
+    List<EmployeeIdAndNameRow> findAllIdAndNameByTenantId(
+            @Param("tenantId") long tenantId);
 
-    boolean existsByPositionId(@Param("tenantId") Long tenantId,
-                               @Param("positionId") Long positionId);
+    boolean existsByDepartmentId(@Param("tenantId") long tenantId,
+                                 @Param("departmentId") long departmentId);
+
+    boolean existsByPositionId(@Param("tenantId") long tenantId,
+                               @Param("positionId") long positionId);
+
+    boolean existsById(@Param("tenantId") long tenantId,
+                       @Param("employeeId") long employeeId);
+
+    boolean existsByEmpNo(@Param("tenantId") long tenantId,
+                          @Param("empNo") String empNo);
+
+    boolean existsByPhone(@Param("tenantId") long tenantId,
+                          @Param("phone") String phone);
 }

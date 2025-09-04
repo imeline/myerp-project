@@ -1,7 +1,7 @@
 ### 환경 변수
 @base = {{host}}/api/v1/auth
 
-### sys 회원가입
+### SYS 회원가입
 POST {{base}}/signup/sys
 Content-Type: application/json
 
@@ -15,7 +15,7 @@ Content-Type: application/json
   "positionId": 2,
   "companyId": 1
 }
-### admin 회원가입
+### ADMIN 회원가입
 POST {{base}}/signup/admin
 Content-Type: application/json
 
@@ -30,7 +30,7 @@ Content-Type: application/json
   "companyId": 2
 }
 
-### user 회원가입
+### USER 회원가입
 POST {{base}}/signup/user
 Content-Type: application/json
 

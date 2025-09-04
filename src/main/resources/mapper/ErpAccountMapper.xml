@@ -55,11 +55,11 @@
     </select>
 
     <update id="softDeleteByCompanyId">
-        UPDATE erp_accounts a
+        UPDATE erp_account a
         SET a.deleted_at = SYSTIMESTAMP
         WHERE a.deleted_at IS NULL
           AND EXISTS (SELECT 1
-                      FROM employees e
+                      FROM employee e
                       WHERE e.employee_id = a.employee_id
                         AND e.company_id = #{companyId})
     </update>

@@ -1,6 +1,6 @@
 package erp.position.controller;
 
-import erp.global.response.BaseResponse;
+import erp.global.response.ApiResponse;
 import erp.global.tenant.TenantContext;
 import erp.position.dto.request.PositionLevelNoRequest;
 import erp.position.dto.request.PositionNameRequest;
@@ -20,37 +20,37 @@ public class PositionController {
     private final PositionService positionService;
 
     @PostMapping
-    public BaseResponse<Long> savePosition(@Valid @RequestBody PositionNameRequest request) {
+    public ApiResponse<Long> savePosition(@Valid @RequestBody PositionNameRequest request) {
         long tenantId = TenantContext.get();
-        return BaseResponse.onSuccess(positionService.savePosition(request, tenantId));
+        return ApiResponse.onSuccess(positionService.savePosition(request, tenantId));
     }
 
     @GetMapping
-    public BaseResponse<List<PositionFindAllResponse>> findAllPosition() {
+    public ApiResponse<List<PositionFindAllResponse>> findAllPosition() {
         long tenantId = TenantContext.get();
-        return BaseResponse.onSuccess(positionService.findAllPosition(tenantId));
+        return ApiResponse.onSuccess(positionService.findAllPosition(tenantId));
     }
 
     @PutMapping("/{positionId}/name")
-    public BaseResponse<Void> updatePositionName(@PathVariable Long positionId,
-                                                 @Valid @RequestBody PositionNameRequest request) {
+    public ApiResponse<Void> updatePositionName(@PathVariable Long positionId,
+                                                @Valid @RequestBody PositionNameRequest request) {
         long tenantId = TenantContext.get();
         positionService.updatePositionName(positionId, request, tenantId);
-        return BaseResponse.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 
     @PutMapping("/{positionId}/level-no")
-    public BaseResponse<Void> updatePositionLevelNo(@PathVariable Long positionId,
-                                                    @Valid @RequestBody PositionLevelNoRequest request) {
+    public ApiResponse<Void> updatePositionLevelNo(@PathVariable Long positionId,
+                                                   @Valid @RequestBody PositionLevelNoRequest request) {
         long tenantId = TenantContext.get();
         positionService.updatePositionLevelNo(positionId, request, tenantId);
-        return BaseResponse.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 
     @DeleteMapping("/{positionId}")
-    public BaseResponse<Void> deletePosition(@PathVariable Long positionId) {
+    public ApiResponse<Void> deletePosition(@PathVariable Long positionId) {
         long tenantId = TenantContext.get();
         positionService.deletePosition(positionId, tenantId);
-        return BaseResponse.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 }
