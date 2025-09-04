@@ -1,6 +1,7 @@
 package erp.account.dto.request;
 
 import erp.account.enums.ErpAccountRole;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -10,6 +11,7 @@ public record ErpAccountSaveRequest(
         @NotNull
         Long employeeId,
         @NotBlank
+        @Email
         String loginEmail,
         @NotBlank
         String rawPassword,

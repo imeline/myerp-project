@@ -1,7 +1,9 @@
 package erp.purchase.mapper;
 
 import erp.purchase.domain.PurchaseItem;
+import erp.purchase.dto.internal.PurchaseItemFindRow;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -9,5 +11,10 @@ import java.util.List;
 public interface PurchaseItemMapper {
     long nextId();
 
-    int saveAll(List<PurchaseItem> items);
+    int saveAll(@Param("items") List<PurchaseItem> items);
+
+    List<PurchaseItemFindRow> findAllPurchaseItemFindRow(
+            @Param("tenantId") long tenantId,
+            @Param("purchaseId") long purchaseId
+    );
 }

@@ -81,6 +81,7 @@ public enum ErrorStatus {
     NOT_FOUND_PURCHASE("PUR903", "존재하지 않는 발주입니다."),
     INVALID_PURCHASE_STATUS("PUR904", "유효하지 않은 발주 상태입니다."),
     NOT_REGISTERED_PURCHASE("PUR905", "등록된 발주가 없습니다."),
+    NOT_FOUND_PURCHASE_ITEM("PUR906", "존재하지 않는 발주 품목입니다."),
     ;
 
 

@@ -3,14 +3,25 @@ package erp.purchase.service;
 import erp.employee.mapper.EmployeeMapper;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.global.response.PageResponse;
+import erp.global.util.PageParam;
 import erp.global.util.Strings;
+import erp.global.util.time.DatePeriod;
+import erp.global.util.time.DateRange;
+import erp.global.util.time.Periods;
 import erp.item.dto.internal.ItemPriceRow;
 import erp.item.mapper.ItemMapper;
 import erp.purchase.domain.Purchase;
 import erp.purchase.domain.PurchaseItem;
+import erp.purchase.dto.internal.PurchaseFindRow;
+import erp.purchase.dto.internal.PurchaseItemFindRow;
 import erp.purchase.dto.internal.Totals;
+import erp.purchase.dto.request.PurchaseFindAllRequest;
+import erp.purchase.dto.request.PurchaseItemFindAllRequest;
 import erp.purchase.dto.request.PurchaseItemSaveRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
+import erp.purchase.dto.response.PurchaseFindResponse;
+import erp.purchase.dto.response.PurchaseItemFindResponse;
 import erp.purchase.enums.PurchaseStatus;
 import erp.purchase.mapper.PurchaseItemMapper;
 import erp.purchase.mapper.PurchaseMapper;
@@ -112,6 +123,69 @@ public class PurchaseServiceImpl implements PurchaseService {
         throw new GlobalException(ErrorStatus.CREATE_PURCHASE_FAIL);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<PurchaseFindResponse> findAllPurchase(PurchaseFindAllRequest request, long tenantId) {
+        PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
+
+        DatePeriod datePeriod = request.period();
+        DateRange dateRange = Periods.resolve(datePeriod, LocalDate.now());
+        LocalDate startDate = dateRange.startDate();
+        LocalDate endDate = dateRange.endDate();
+        String code = Strings.normalizeOrNull(request.code());
+        PurchaseStatus status = request.status();
+
+        // 4) 목록 조회 (삭제 제외, tenantGuard는 XML에서 WHERE 마지막)
+        List<PurchaseFindRow> rows = purchaseMapper.findAllPurchaseFindRow(
+                tenantId,
+                startDate,
+                endDate,
+                code,
+                status,
+                pageParam.offset(),
+                pageParam.size()
+        );
+        if (rows.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE);
+        }
+
+        List<PurchaseFindResponse> responses = rows.stream()
+                .map(PurchaseFindResponse::from)
+                .toList();
+
+        long total = purchaseMapper.countByPeriodAndCodeAndStatus(
+                tenantId,
+                startDate,
+                endDate,
+                code,
+                status
+        );
+
+        return PageResponse.of(
+                responses,
+                pageParam.page(),
+                total,
+                pageParam.size()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PurchaseItemFindResponse> findAllPurchaseItems(PurchaseItemFindAllRequest request, long tenantId) {
+        Long purchaseId = request.purchaseId();
+        validPurchaseIdIfPresent(purchaseId, tenantId);
+
+        List<PurchaseItemFindRow> rows = purchaseItemMapper.findAllPurchaseItemFindRow(tenantId, purchaseId);
+        if (rows.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE_ITEM);
+        }
+
+        return rows.stream()
+                .map(PurchaseItemFindResponse::from)
+                .toList();
+    }
+
     // Purchase 저장
     private long savePurchase(String purchaseCode,
                               String supplier,
@@ -174,6 +248,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         // existsByIds: 모든 ID가 활성(삭제 아님)으로 존재하면 true를 반환하도록 Mapper 구현
         if (!itemMapper.existsByIds(tenantId, itemIds)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM);
+        }
+    }
+
+    private void validPurchaseIdIfPresent(Long purchaseId, long tenantId) {
+        if (purchaseId == null || !purchaseMapper.existsById(tenantId, purchaseId)) {
+            throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE);
         }
     }
 
