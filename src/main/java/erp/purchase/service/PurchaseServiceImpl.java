@@ -6,6 +6,7 @@ import erp.global.exception.GlobalException;
 import erp.global.response.PageResponse;
 import erp.global.util.PageParam;
 import erp.global.util.Strings;
+import erp.global.util.Totals;
 import erp.global.util.time.DatePeriod;
 import erp.global.util.time.DateRange;
 import erp.global.util.time.Periods;
@@ -13,13 +14,13 @@ import erp.item.dto.internal.ItemPriceRow;
 import erp.item.mapper.ItemMapper;
 import erp.purchase.domain.Purchase;
 import erp.purchase.domain.PurchaseItem;
+import erp.purchase.dto.internal.PurchaseCodeAndSupplierRow;
 import erp.purchase.dto.internal.PurchaseFindRow;
 import erp.purchase.dto.internal.PurchaseItemFindRow;
-import erp.purchase.dto.internal.Totals;
 import erp.purchase.dto.request.PurchaseFindAllRequest;
-import erp.purchase.dto.request.PurchaseItemFindAllRequest;
 import erp.purchase.dto.request.PurchaseItemSaveRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
+import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
 import erp.purchase.dto.response.PurchaseFindResponse;
 import erp.purchase.dto.response.PurchaseItemFindResponse;
 import erp.purchase.enums.PurchaseStatus;
@@ -106,7 +107,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 );
 
                 // 6-2) PurchaseItem 배치 저장
-                savePurchaseItems(newPurchaseId, requestItems);
+                savePurchaseItems(newPurchaseId, requestItems, tenantId);
 
                 // 7) 성공: 생성된 purchase_id 반환
                 return newPurchaseId;
@@ -147,7 +148,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 pageParam.size()
         );
         if (rows.isEmpty()) {
-            throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE);
+            throw new GlobalException(ErrorStatus.NOT_REGISTERED_PURCHASE);
         }
 
         List<PurchaseFindResponse> responses = rows.stream()
@@ -172,18 +173,55 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PurchaseItemFindResponse> findAllPurchaseItems(PurchaseItemFindAllRequest request, long tenantId) {
-        Long purchaseId = request.purchaseId();
+    public List<PurchaseItemFindResponse> findAllPurchaseItems(long purchaseId, long tenantId) {
         validPurchaseIdIfPresent(purchaseId, tenantId);
 
         List<PurchaseItemFindRow> rows = purchaseItemMapper.findAllPurchaseItemFindRow(tenantId, purchaseId);
         if (rows.isEmpty()) {
-            throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE_ITEM);
+            throw new GlobalException(ErrorStatus.NOT_REGISTERED_PURCHASE_ITEM);
         }
 
         return rows.stream()
                 .map(PurchaseItemFindResponse::from)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PurchaseCodeAndSupplierResponse> findAllPurchaseCodeAndSupplier(long tenantId) {
+        List<PurchaseCodeAndSupplierRow> rows =
+                purchaseMapper.findAllCodeAndSupplier(tenantId);
+
+        if (rows.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_REGISTERED_PURCHASE);
+        }
+
+        return rows.stream()
+                .map(PurchaseCodeAndSupplierResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    @Override
+    public void cancelPurchase(long purchaseId, long tenantId) {
+        // 1) 존재/활성(삭제 제외) 선검증
+        validPurchaseIdIfPresent(purchaseId, tenantId);
+
+        // 2) 조건부 업데이트: SHIPPED가 아니면 CANCELLED로 변경
+        int affectedRowCount = purchaseMapper.updateStatusToCancelledIfNotShipped(tenantId, purchaseId);
+
+        // 3) 성공 시 즉시 종료 (추가 조회 불필요)
+        if (affectedRowCount == 1) {
+            return;
+        }
+
+        // 4) 실패 사유 판정: SHIPPED 여부만 확인
+        if (purchaseMapper.existsShippedById(tenantId, purchaseId)) {
+            throw new GlobalException(ErrorStatus.CANNOT_CANCEL_SHIPPED_PURCHASE);
+        }
+
+        // 5) 그 외(이미 CANCELLED 등) 일반 실패
+        throw new GlobalException(ErrorStatus.CANCEL_PURCHASE_FAIL);
     }
 
     // Purchase 저장
@@ -212,15 +250,18 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     // PurchaseItem 배치 저장
-    private void savePurchaseItems(long newPurchaseId, List<PurchaseItemSaveRequest> requestItems) {
+    private void savePurchaseItems(long newPurchaseId,
+                                   List<PurchaseItemSaveRequest> requestItems,
+                                   long tenantId) {
         List<PurchaseItem> items = new ArrayList<>(requestItems.size());
         for (PurchaseItemSaveRequest itemSaveRequest : requestItems) {
             long newPurchaseItemId = purchaseItemMapper.nextId();
             items.add(PurchaseItem.register(
-                    newPurchaseItemId, newPurchaseId, itemSaveRequest.itemId(), itemSaveRequest.quantity()
+                    newPurchaseItemId, newPurchaseId,
+                    itemSaveRequest.itemId(), itemSaveRequest.quantity(), tenantId
             ));
         }
-        int affectedItems = purchaseItemMapper.saveAll(items);
+        int affectedItems = purchaseItemMapper.saveAll(tenantId, items);
         if (affectedItems != items.size()) {
             throw new GlobalException(ErrorStatus.CREATE_PURCHASE_ITEM_FAIL);
         }
@@ -239,7 +280,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     // 직원 존재, 활성 유효성 검사 (회사 스코프 내)
     private void validEmployeeIdIfPresent(Long employeeId, long tenantId) {
         if (employeeId != null && !employeeMapper.existsById(tenantId, employeeId)) {
-            throw new GlobalException(ErrorStatus.EMPLOYEE_NOT_FOUND);
+            throw new GlobalException(ErrorStatus.NOT_FOUND_EMPLOYEE);
         }
     }
 
