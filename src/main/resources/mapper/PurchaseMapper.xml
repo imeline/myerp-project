@@ -58,8 +58,7 @@
         <if test="status != null">
             AND p.status = #{status}
         </if>
-        AND e.deleted_at IS NULL
-        AND p.deleted_at IS NULL
+        AND p.status != 'CANCELLED'
         <!-- 다중 테이블이므로 둘 다 테넌트 가드 -->
         AND
         <include refid="frag.tenantGuardAlias">
@@ -73,6 +72,27 @@
         ORDER BY p.purchase_date DESC, p.purchase_id DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
+
+    <select id="findAllCodeAndSupplier" resultType="PurchaseCodeAndSupplierRow">
+        SELECT
+        code,
+        supplier
+        FROM purchase
+        WHERE status = 'CONFIRMED'
+        AND
+        <include refid="frag.tenantGuard"/>
+        ORDER BY purchase_id DESC
+    </select>
+
+    <!-- SHIPPED 가 아닌 경우에만 CANCELLED 로 변경 (조건부 UPDATE 먼저 시도) -->
+    <update id="updateStatusToCancelledIfNotShipped">
+        UPDATE purchase
+        SET status = 'CANCELLED'
+        WHERE purchase_id = #{purchaseId}
+        AND status != 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
 
     <select id="countByPeriodAndCodeAndStatus" resultType="long">
         SELECT COUNT(1)
@@ -90,7 +110,7 @@
         <if test="status != null">
             AND status = #{status}
         </if>
-        AND deleted_at IS NULL
+        AND status != 'CANCELLED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>
@@ -99,7 +119,16 @@
         SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
         FROM purchase
         WHERE purchase_id = #{purchaseId}
-        AND deleted_at IS NULL
+        AND status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsShippedById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM purchase
+        WHERE purchase_id = #{purchaseId}
+        AND status = 'SHIPPED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>

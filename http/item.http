@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/user/item
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTY3MTk1MTEsImV4cCI6MTc1Njc1NTUxMSwidGVuYW50X2lkIjoyfQ.NFg7YajJYF5skzTHT-4djAWhe6k2TfXGMmCVT5GsWDM
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyZDhlYjc4NzI1Yjk0MzNmOGY4MTI2MTc0YjczYTI2OCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU2OTc3NjcyLCJleHAiOjE3NTcwMTM2NzIsInRlbmFudF9pZCI6Mn0.be0NjKc-CytVgLT6CvJZToUrfE-VPiPeYxXe9MEpElA
 
 ### 품목 등록
 POST {{base}}
@@ -9,9 +9,9 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "노트북",
-  "code": "ITM-0002",
-  "price": 120000,
+  "name": "책상",
+  "code": "ITM-0003",
+  "price": 320000,
   "unit": "개",
   "category": "MERCHANDISE"
 }

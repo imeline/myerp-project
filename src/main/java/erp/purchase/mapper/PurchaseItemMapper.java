@@ -11,7 +11,8 @@ import java.util.List;
 public interface PurchaseItemMapper {
     long nextId();
 
-    int saveAll(@Param("items") List<PurchaseItem> items);
+    int saveAll(@Param("tenantId") long tenantId,
+                @Param("items") List<PurchaseItem> items);
 
     List<PurchaseItemFindRow> findAllPurchaseItemFindRow(
             @Param("tenantId") long tenantId,

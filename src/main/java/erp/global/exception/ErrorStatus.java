@@ -31,7 +31,7 @@ public enum ErrorStatus {
     DUPLICATE_EMP_NO("EMP302", "이미 등록된 사번입니다."),
     DUPLICATE_PHONE("EMP303", "이미 등록된 전화번호입니다."),
     CREATE_EMPLOYEE_FAIL("EMP304", "직원 생성에 실패했습니다."),
-    EMPLOYEE_NOT_FOUND("EMP305", "존재하지 않는 직원입니다."),
+    NOT_FOUND_EMPLOYEE("EMP305", "존재하지 않는 직원입니다."),
 
     // COMPANY
     DUPLICATE_BIZ_NO("COMP401", "이미 등록된 사업자등록번호입니다."),
@@ -82,6 +82,9 @@ public enum ErrorStatus {
     INVALID_PURCHASE_STATUS("PUR904", "유효하지 않은 발주 상태입니다."),
     NOT_REGISTERED_PURCHASE("PUR905", "등록된 발주가 없습니다."),
     NOT_FOUND_PURCHASE_ITEM("PUR906", "존재하지 않는 발주 품목입니다."),
+    CANNOT_CANCEL_SHIPPED_PURCHASE("PUR907", "입고된 발주는 취소할 수 없습니다."),
+    CANCEL_PURCHASE_FAIL("PUR908", "발주 취소에 실패했습니다."),
+    NOT_REGISTERED_PURCHASE_ITEM("PUR909", "등록된 발주 품목이 없습니다."),
     ;
 
 

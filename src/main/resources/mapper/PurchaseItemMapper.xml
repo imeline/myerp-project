@@ -3,7 +3,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="erp.purchase.mapper.PurchaseItemMapper">
-    <select id="nextId" resultType="long">
+    <select id="nextId" resultType="long"
+            useCache="false" flushCache="true">
         SELECT purchase_item_seq.NEXTVAL
         FROM dual
     </select>
@@ -15,12 +16,14 @@
             purchase_item_id,
             purchase_id,
             item_id,
-            quantity
+            quantity,
+            company_id
             ) VALUES (
             #{it.purchaseItemId},
             #{it.purchaseId},
             #{it.itemId},
-            #{it.quantity}
+            #{it.quantity},
+            #{tenantId}
             )
         </foreach>
         SELECT 1 FROM dual
@@ -31,7 +34,7 @@
         SELECT
         i.code AS code,
         i.name AS name,
-        pi.quantity AS quantity
+        pi.quantity AS quantity,
         i.price AS unitPrice,
         (pi.quantity * i.price) AS subtotal
         FROM purchase_item pi
@@ -42,8 +45,7 @@
         WHERE pi.purchase_id = #{purchaseId}
 
         AND i.deleted_at IS NULL
-        AND p.deleted_at IS NULL
-
+        AND p.status != 'CANCELLED'
         AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="p"/>

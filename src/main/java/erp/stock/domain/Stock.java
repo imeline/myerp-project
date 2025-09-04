@@ -13,4 +13,5 @@ public class Stock extends TimeStamped {
     private int currentQuantity;
     private int reservedQuantity;
     private long itemId;
+    private long companyId;
 }

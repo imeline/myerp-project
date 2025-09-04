@@ -10,17 +10,13 @@ import java.math.BigDecimal;
 public record ItemUpdateRequest(
         @NotBlank
         String name,
-
         @NotBlank
         String code,
-
         @NotNull
         @Positive
         BigDecimal price,
-
         @NotBlank
         String unit,
-
         @NotNull
         ItemCategory category
 ) {

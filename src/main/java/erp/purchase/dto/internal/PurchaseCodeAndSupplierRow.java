@@ -2,10 +2,10 @@ package erp.purchase.dto.internal;
 
 import jakarta.validation.constraints.NotNull;
 
-public record Totals(
+public record PurchaseCodeAndSupplierRow(
         @NotNull
-        Integer totalQuantity,
+        String code,
         @NotNull
-        Integer totalAmount
+        String supplier
 ) {
 }

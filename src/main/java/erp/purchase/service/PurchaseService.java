@@ -2,8 +2,8 @@ package erp.purchase.service;
 
 import erp.global.response.PageResponse;
 import erp.purchase.dto.request.PurchaseFindAllRequest;
-import erp.purchase.dto.request.PurchaseItemFindAllRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
+import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
 import erp.purchase.dto.response.PurchaseFindResponse;
 import erp.purchase.dto.response.PurchaseItemFindResponse;
 
@@ -17,5 +17,10 @@ public interface PurchaseService {
             PurchaseFindAllRequest request, long tenantId);
 
     List<PurchaseItemFindResponse> findAllPurchaseItems(
-            PurchaseItemFindAllRequest request, long tenantId);
+            long purchaseId, long tenantId);
+
+    List<PurchaseCodeAndSupplierResponse> findAllPurchaseCodeAndSupplier(
+            long tenantId);
+
+    void cancelPurchase(long purchaseId, long tenantId);
 }
