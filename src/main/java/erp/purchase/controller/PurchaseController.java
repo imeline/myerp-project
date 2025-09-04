@@ -6,6 +6,7 @@ import erp.global.tenant.TenantContext;
 import erp.purchase.dto.request.PurchaseFindAllRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
 import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
+import erp.purchase.dto.response.PurchaseDetailResponse;
 import erp.purchase.dto.response.PurchaseFindResponse;
 import erp.purchase.dto.response.PurchaseItemFindResponse;
 import erp.purchase.service.PurchaseService;
@@ -64,6 +65,16 @@ public class PurchaseController {
         long tenantId = TenantContext.get();
         List<PurchaseCodeAndSupplierResponse> responses = purchaseService.findAllPurchaseCodeAndSupplier(tenantId);
         return ApiResponse.onSuccess(responses);
+    }
+
+    /**
+     * 발주 상세 조회
+     */
+    @GetMapping("/{purchaseId}")
+    public ApiResponse<PurchaseDetailResponse> findPurchaseDetail(@PathVariable long purchaseId) {
+        long tenantId = TenantContext.get();
+        PurchaseDetailResponse response = purchaseService.findPurchaseDetail(purchaseId, tenantId);
+        return ApiResponse.onSuccess(response);
     }
 
     /**

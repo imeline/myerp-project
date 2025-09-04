@@ -84,6 +84,42 @@
         ORDER BY purchase_id DESC
     </select>
 
+    <select id="findPurchaseDetailRow" resultType="PurchaseDetailRow">
+        SELECT
+        p.code,
+        p.supplier,
+        p.purchase_date AS purchaseDate,
+        p.status,
+        e.name AS employeeName,
+        /* 총 품목 수: purchase_item 기준 */
+        (SELECT COUNT(1)
+        FROM purchase_item pi
+        WHERE pi.purchase_id = p.purchase_id
+        AND pi.company_id = #{tenantId}
+        ) AS totalItemCount,
+        /* 총 수량: purchase_item.quantity 합계 (NULL 방지 NVL) */
+        (SELECT NVL(SUM(pi.quantity), 0)
+        FROM purchase_item pi
+        WHERE pi.purchase_id = p.purchase_id
+        AND pi.company_id = #{tenantId}
+        ) AS totalQuantity,
+        /* 총 금액은 purchase.total_amount 사용 */
+        p.total_amount AS totalAmount
+        FROM purchase p
+        JOIN employee e
+        ON e.employee_id = p.employee_id
+        WHERE p.purchase_id = #{purchaseId}
+        AND p.status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+    </select>
+
     <!-- SHIPPED 가 아닌 경우에만 CANCELLED 로 변경 (조건부 UPDATE 먼저 시도) -->
     <update id="updateStatusToCancelledIfNotShipped">
         UPDATE purchase

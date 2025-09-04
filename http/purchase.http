@@ -72,6 +72,11 @@ GET {{base}}/code-suppliers
 Authorization: {{token}}
 Accept: application/json
 
+### 특정 발주 상세 조회
+GET {{base}}/34
+Authorization: {{token}}
+Accept: application/json
+
 
 ### 발주 취소(삭제) — status를 CANCELLED로 변경 (아래 1을 실제 purchase_id로 교체)
 DELETE {{base}}/34

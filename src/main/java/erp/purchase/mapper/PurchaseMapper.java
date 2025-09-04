@@ -2,6 +2,7 @@ package erp.purchase.mapper;
 
 import erp.purchase.domain.Purchase;
 import erp.purchase.dto.internal.PurchaseCodeAndSupplierRow;
+import erp.purchase.dto.internal.PurchaseDetailRow;
 import erp.purchase.dto.internal.PurchaseFindRow;
 import erp.purchase.enums.PurchaseStatus;
 import org.apache.ibatis.annotations.Mapper;
@@ -9,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface PurchaseMapper {
@@ -47,4 +49,8 @@ public interface PurchaseMapper {
 
     boolean existsShippedById(@Param("tenantId") long tenantId,
                               @Param("purchaseId") long purchaseId);
+
+    Optional<PurchaseDetailRow> findPurchaseDetailRow(
+            @Param("tenantId") long tenantId,
+            @Param("purchaseId") long purchaseId);
 }

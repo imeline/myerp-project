@@ -14,13 +14,12 @@ import erp.item.dto.internal.ItemPriceRow;
 import erp.item.mapper.ItemMapper;
 import erp.purchase.domain.Purchase;
 import erp.purchase.domain.PurchaseItem;
-import erp.purchase.dto.internal.PurchaseCodeAndSupplierRow;
-import erp.purchase.dto.internal.PurchaseFindRow;
-import erp.purchase.dto.internal.PurchaseItemFindRow;
+import erp.purchase.dto.internal.*;
 import erp.purchase.dto.request.PurchaseFindAllRequest;
 import erp.purchase.dto.request.PurchaseItemSaveRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
 import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
+import erp.purchase.dto.response.PurchaseDetailResponse;
 import erp.purchase.dto.response.PurchaseFindResponse;
 import erp.purchase.dto.response.PurchaseItemFindResponse;
 import erp.purchase.enums.PurchaseStatus;
@@ -178,7 +177,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         List<PurchaseItemFindRow> rows = purchaseItemMapper.findAllPurchaseItemFindRow(tenantId, purchaseId);
         if (rows.isEmpty()) {
-            throw new GlobalException(ErrorStatus.NOT_REGISTERED_PURCHASE_ITEM);
+            throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE_ITEM);
         }
 
         return rows.stream()
@@ -199,6 +198,23 @@ public class PurchaseServiceImpl implements PurchaseService {
         return rows.stream()
                 .map(PurchaseCodeAndSupplierResponse::from)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PurchaseDetailResponse findPurchaseDetail(long purchaseId, long tenantId) {
+        validPurchaseIdIfPresent(purchaseId, tenantId);
+
+        PurchaseDetailRow header = purchaseMapper.findPurchaseDetailRow(tenantId, purchaseId)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE));
+
+        List<PurchaseItemDetailRow> itemRows =
+                purchaseItemMapper.findAllPurchaseItemDetailRow(tenantId, purchaseId);
+        if (itemRows.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE_ITEM);
+        }
+        
+        return PurchaseDetailResponse.of(header, itemRows);
     }
 
     @Transactional
