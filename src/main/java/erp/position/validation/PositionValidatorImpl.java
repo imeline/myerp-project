@@ -20,8 +20,8 @@ public class PositionValidatorImpl implements PositionValidator {
     }
 
     @Override
-    public void validNameUnique(String name, Long excludePositionId, long tenantId) {
-        if (name != null && positionMapper.existsByName(tenantId, name, excludePositionId)) {
+    public void validNameUnique(String name, Long excludeId, long tenantId) {
+        if (name != null && positionMapper.existsByName(tenantId, name, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_POSITION_NAME);
         }
     }

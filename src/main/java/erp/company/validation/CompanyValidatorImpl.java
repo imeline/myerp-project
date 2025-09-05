@@ -21,15 +21,15 @@ public class CompanyValidatorImpl implements CompanyValidator {
     }
 
     @Override
-    public void validBizNoUnique(String bizNo, Long excludeCompanyId) {
-        if (bizNo != null && companyMapper.existsByBizNo(bizNo, excludeCompanyId)) {
+    public void validBizNoUnique(String bizNo, Long excludeId) {
+        if (bizNo != null && companyMapper.existsByBizNo(bizNo, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_BIZ_NO);
         }
     }
 
     @Override
-    public void validNameUnique(String name, Long excludeCompanyId) {
-        if (name != null && companyMapper.existsByName(name, excludeCompanyId)) {
+    public void validNameUnique(String name, Long excludeId) {
+        if (name != null && companyMapper.existsByName(name, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_NAME);
         }
     }

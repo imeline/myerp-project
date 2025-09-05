@@ -3,14 +3,21 @@ package erp.employee.service;
 
 import erp.department.validation.DepartmentValidator;
 import erp.employee.domain.Employee;
+import erp.employee.dto.internal.EmployeeFindAllRow;
 import erp.employee.dto.internal.EmployeeIdAndNameRow;
+import erp.employee.dto.request.EmployeeFindAllRequest;
 import erp.employee.dto.request.EmployeeSaveRequest;
+import erp.employee.dto.request.EmployeeUpdateRequest;
+import erp.employee.dto.response.EmployeeFindAllResponse;
+import erp.employee.dto.response.EmployeeFindResponse;
 import erp.employee.dto.response.EmployeeIdAndNameResponse;
 import erp.employee.enums.EmployeeStatus;
 import erp.employee.mapper.EmployeeMapper;
 import erp.employee.validation.EmployeeValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.global.response.PageResponse;
+import erp.global.util.PageParam;
 import erp.position.validation.PositionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static erp.global.util.RowCountGuards.requireOneRowAffected;
+import static erp.global.util.Strings.normalizeOrNull;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +41,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public Long saveEmployee(EmployeeSaveRequest request, long companyId) {
-        employeeValidator.validEmpNoUnique(request.empNo(), companyId);
-        employeeValidator.validPhoneUnique(request.phone(), companyId);
+        employeeValidator.validEmpNoUnique(request.empNo(), companyId, null);
+        employeeValidator.validPhoneUnique(request.phone(), companyId, null);
         departmentValidator.validDepartmentIdIfPresent(request.departmentId(), companyId);
         positionValidator.validPositionIdIfPresent(request.positionId(), companyId);
 
@@ -60,9 +68,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EmployeeIdAndNameResponse> findAllIdAndNameByCompanyId(long tenantId) {
+    public List<EmployeeIdAndNameResponse> findAllIdAndName(long tenantId) {
         List<EmployeeIdAndNameRow> employeeIdAndNameRows =
-                employeeMapper.findAllIdAndNameByTenantId(tenantId);
+                employeeMapper.findAllIdAndName(tenantId);
 
         if (employeeIdAndNameRows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_EMPLOYEE);
@@ -71,5 +79,67 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeIdAndNameRows.stream()
                 .map(EmployeeIdAndNameResponse::from)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<EmployeeFindAllResponse> findAllEmployees(EmployeeFindAllRequest request, long tenantId) {
+        PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
+
+        Long departmentId = request.departmentId();
+        Long positionId = request.positionId();
+        String name = normalizeOrNull(request.name());
+
+        List<EmployeeFindAllRow> rows = employeeMapper.findAllEmployeeFindRow(
+                tenantId, departmentId, positionId, name, pageParam.offset(), pageParam.size());
+
+        if (rows.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_REGISTERED_EMPLOYEE);
+        }
+
+        List<EmployeeFindAllResponse> responses = rows.stream()
+                .map(EmployeeFindAllResponse::from)
+                .toList();
+
+        long total = employeeMapper.countByFilters(tenantId, departmentId, positionId, name);
+
+        return PageResponse.of(responses, pageParam.page(), total, pageParam.size());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public EmployeeFindResponse findEmployee(long employeeId, long tenantId) {
+        return employeeMapper.findEmployeeFindRowById(tenantId, employeeId)
+                .map(EmployeeFindResponse::from)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_EMPLOYEE));
+    }
+
+    @Override
+    @Transactional
+    public void updateEmployee(long employeeId, EmployeeUpdateRequest request,
+                               long tenantId) {
+        String name = normalizeOrNull(request.name());
+        String empNo = normalizeOrNull(request.empNo());
+        String phone = normalizeOrNull(request.phone());
+        Long departmentId = request.departmentId();
+        Long positionId = request.positionId();
+
+        departmentValidator.validDepartmentIdIfPresent(departmentId, tenantId);
+        positionValidator.validPositionIdIfPresent(positionId, tenantId);
+        employeeValidator.validEmpNoUnique(empNo, tenantId, employeeId);
+        employeeValidator.validPhoneUnique(phone, tenantId, employeeId);
+
+        Employee employee = Employee.update(
+                employeeId,
+                empNo,
+                name,
+                phone,
+                request.departmentId(),
+                request.positionId(),
+                tenantId
+        );
+
+        int affectedRowCount = employeeMapper.updateById(tenantId, employee);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_EMPLOYEE_FAIL);
     }
 }

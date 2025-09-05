@@ -21,8 +21,8 @@ public class DepartmentValidatorImpl implements DepartmentValidator {
     }
 
     @Override
-    public void validNameInParentUnique(long tenantId, Long parentId, String name, Long excludeDepartmentId) {
-        if (name != null && departmentMapper.existsByNameAndParentId(tenantId, parentId, name, excludeDepartmentId)) {
+    public void validNameInParentUnique(long tenantId, Long parentId, String name, Long excludeId) {
+        if (name != null && departmentMapper.existsByNameAndParentId(tenantId, parentId, name, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_DEPARTMENT_NAME);
         }
     }

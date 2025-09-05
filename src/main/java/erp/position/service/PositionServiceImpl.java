@@ -99,7 +99,7 @@ public class PositionServiceImpl implements PositionService {
     }
 
     // 원래 네이밍/흐름 유지
-    private void validNameUnique(String name, Long excludePositionId, long tenantId) {
-        positionValidator.validNameUnique(name, excludePositionId, tenantId);
+    private void validNameUnique(String name, Long excludeId, long tenantId) {
+        positionValidator.validNameUnique(name, excludeId, tenantId);
     }
 }

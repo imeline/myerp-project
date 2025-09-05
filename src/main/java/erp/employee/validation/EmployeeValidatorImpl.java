@@ -21,15 +21,16 @@ public class EmployeeValidatorImpl implements EmployeeValidator {
     }
 
     @Override
-    public void validEmpNoUnique(String empNo, long tenantId) {
-        if (empNo != null && employeeMapper.existsByEmpNo(tenantId, empNo)) {
+    public void validEmpNoUnique(String empNo,
+                                 long tenantId, Long excludeId) {
+        if (empNo != null && employeeMapper.existsByEmpNo(tenantId, empNo, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_EMP_NO);
         }
     }
 
     @Override
-    public void validPhoneUnique(String phone, long tenantId) {
-        if (phone != null && employeeMapper.existsByPhone(tenantId, phone)) {
+    public void validPhoneUnique(String phone, long tenantId, Long excludeId) {
+        if (phone != null && employeeMapper.existsByPhone(tenantId, phone, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_PHONE);
         }
     }

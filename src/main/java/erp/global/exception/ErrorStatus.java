@@ -32,7 +32,7 @@ public enum ErrorStatus {
     DUPLICATE_PHONE("EMP303", "이미 등록된 전화번호입니다."),
     CREATE_EMPLOYEE_FAIL("EMP304", "직원 생성에 실패했습니다."),
     NOT_FOUND_EMPLOYEE("EMP305", "존재하지 않는 직원입니다."),
-
+    UPDATE_EMPLOYEE_FAIL("EMP306", "직원 수정에 실패했습니다."),
     // COMPANY
     DUPLICATE_BIZ_NO("COMP401", "이미 등록된 사업자등록번호입니다."),
     DUPLICATE_NAME("COMP402", "이미 등록된 회사명입니다."),

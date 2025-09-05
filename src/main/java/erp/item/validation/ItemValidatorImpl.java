@@ -15,15 +15,15 @@ public class ItemValidatorImpl implements ItemValidator {
     private final ItemMapper itemMapper;
 
     @Override
-    public void validNameUnique(String name, Long excludeItemId, long tenantId) {
-        if (name != null && itemMapper.existsByName(tenantId, name, excludeItemId)) {
+    public void validNameUnique(String name, Long excludeId, long tenantId) {
+        if (name != null && itemMapper.existsByName(tenantId, name, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_ITEM_NAME);
         }
     }
 
     @Override
-    public void validCodeUnique(String code, Long excludeItemId, long tenantId) {
-        if (code != null && itemMapper.existsByCode(tenantId, code, excludeItemId)) {
+    public void validCodeUnique(String code, Long excludeId, long tenantId) {
+        if (code != null && itemMapper.existsByCode(tenantId, code, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_ITEM_CODE);
         }
     }

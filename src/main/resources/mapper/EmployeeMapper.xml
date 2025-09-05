@@ -16,13 +16,99 @@
                 #{departmentId}, #{positionId}, #{companyId})
     </insert>
 
-    <select id="findAllIdAndNameByTenantId" resultType="EmployeeIdAndNameRow">
+    <select id="findAllIdAndName" resultType="EmployeeIdAndNameRow">
         SELECT employee_id, name
         FROM employee
         WHERE
         <include refid="frag.tenantGuard"/>
-        AND status = 'ACTIVE'
+        AND status != 'RETIRED'
         ORDER BY name
+    </select>
+
+    <select id="findAllEmployeeFindRow" resultType="EmployeeFindAllRow">
+        SELECT
+        e.employee_id AS employeeId,
+        e.emp_no AS empNo,
+        e.name AS name,
+        d.name AS departmentName,
+        p.name AS positionName,
+        e.phone AS phone,
+        e.email AS email,
+        e.created_at AS createdAt
+        FROM employee e
+        LEFT JOIN department d
+        ON d.department_id = e.department_id
+        AND d.company_id = e.company_id
+        LEFT JOIN position p
+        ON p.position_id = e.position_id
+        AND p.company_id = e.company_id
+        WHERE e.status != 'RETIRED'
+        <if test="departmentId != null">
+            AND e.department_id = #{departmentId}
+        </if>
+        <if test="positionId != null">
+            AND e.position_id = #{positionId}
+        </if>
+        <if test="name != null">
+            AND e.name LIKE '%' || #{name} || '%'
+        </if>
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        ORDER BY e.created_at DESC, e.employee_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="findEmployeeFindRowById" resultType="EmployeeFindRow">
+        SELECT
+        e.employee_id AS employeeId,
+        e.emp_no AS empNo,
+        e.name AS name,
+        d.name AS departmentName,
+        p.name AS positionName,
+        e.phone AS phone,
+        e.email AS email,
+        e.created_at AS createdAt
+        FROM employee e
+        LEFT JOIN department d
+        ON d.department_id = e.department_id
+        AND d.company_id = e.company_id
+        LEFT JOIN position p
+        ON p.position_id = e.position_id
+        AND p.company_id = e.company_id
+        WHERE e.employee_id = #{employeeId}
+        AND e.status != 'RETIRED'
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+    </select>
+
+    <update id="updateById">
+        UPDATE employee
+        SET emp_no        = #{employee.empNo},
+            name          = #{employee.name},
+            phone         = #{employee.phone},
+            department_id = #{employee.departmentId},
+            position_id   = #{employee.positionId}
+        WHERE employee_id = #{employee.employeeId}
+          AND status != 'RETIRED'
+      AND company_id = #{tenantId}
+    </update>
+
+    <select id="countByFilters" resultType="long">
+        SELECT COUNT(1)
+        FROM employee
+        WHERE status != 'RETIRED'
+        <if test="departmentId != null">
+            AND department_id = #{departmentId}
+        </if>
+        <if test="positionId != null">
+            AND position_id = #{positionId}
+        </if>
+        <if test="name != null">
+            AND name LIKE '%' || #{name} || '%'
+        </if>
+        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsByDepartmentId" resultType="boolean">
@@ -30,7 +116,7 @@
         FROM employee
         WHERE department_id = #{departmentId}
         AND
-        status = 'ACTIVE'
+        status != 'RETIRED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>
@@ -40,7 +126,7 @@
         FROM employee
         WHERE position_id = #{positionId}
         AND
-        status = 'ACTIVE'
+        status != 'RETIRED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>
@@ -49,8 +135,11 @@
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE emp_no = #{empNo}
+        <if test="excludeId != null">
+            AND employee_id != #{excludeId}
+        </if>
         AND
-        status = 'ACTIVE'
+        status != 'RETIRED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>
@@ -59,8 +148,11 @@
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE phone = #{phone}
+        <if test="excludeId != null">
+            AND employee_id != #{excludeId}
+        </if>
         AND
-        status = 'ACTIVE'
+        status != 'RETIRED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>
@@ -70,7 +162,7 @@
         FROM employee
         WHERE employee_id = #{employeeId}
         AND
-        status = 'ACTIVE'
+        status != 'RETIRED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>
