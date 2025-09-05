@@ -18,4 +18,24 @@ public class Inbound extends TimeStamped {
     private long employeeId;
     private long purchaseId;
     private long companyId;
+
+    public static Inbound register(
+            long inboundId,
+            String code,
+            LocalDate inboundDate,
+            InboundStatus status,
+            long employeeId,
+            long purchaseId,
+            long companyId
+    ) {
+        return Inbound.builder()
+                .inboundId(inboundId)
+                .code(code)
+                .inboundDate(inboundDate)
+                .status(status)
+                .employeeId(employeeId)
+                .purchaseId(purchaseId)
+                .companyId(companyId)
+                .build();
+    }
 }

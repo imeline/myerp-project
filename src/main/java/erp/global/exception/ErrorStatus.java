@@ -71,6 +71,7 @@ public enum ErrorStatus {
     DUPLICATE_ITEM_CODE("ITEM706", "이미 등록된 품목 코드입니다."),
     NOT_REGISTERED_ITEM("ITEM707", "등록된 품목이 없습니다."),
     DUPLICATE_ITEM("ITEM708", "중복된 품목이 있습니다."),
+    NOT_FOUND_ITEM_PRICE("ITEM709", "품목에 대한 가격 정보가 없습니다."),
 
     // STOCK
 
@@ -85,9 +86,9 @@ public enum ErrorStatus {
     CANNOT_CANCEL_SHIPPED_PURCHASE("PUR907", "입고된 발주는 취소할 수 없습니다."),
     CANCEL_PURCHASE_FAIL("PUR908", "발주 취소에 실패했습니다."),
     NOT_REGISTERED_PURCHASE_ITEM("PUR909", "등록된 발주 품목이 없습니다."),
+
+
     ;
-
-
     private final String status;
     private final String message;
 }

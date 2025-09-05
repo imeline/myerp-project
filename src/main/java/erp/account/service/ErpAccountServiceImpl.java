@@ -1,8 +1,10 @@
 package erp.account.service;
 
 import erp.account.domain.ErpAccount;
+import erp.account.dto.internal.LoginUserInfoRow;
 import erp.account.dto.request.ErpAccountSaveRequest;
 import erp.account.mapper.ErpAccountMapper;
+import erp.account.validation.ErpAccountValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import erp.global.util.Strings;
@@ -19,17 +21,17 @@ public class ErpAccountServiceImpl implements ErpAccountService {
 
     private final ErpAccountMapper erpAccountMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ErpAccountValidator erpAccountValidator;
 
     @Override
     @Transactional
     public Long saveErpAccount(ErpAccountSaveRequest request, long companyId) {
         String loginEmail = Strings.normalizeOrNull(request.loginEmail());
-        validateLoginEmailUnique(loginEmail);
+        erpAccountValidator.validLoginEmailUnique(loginEmail);
 
         long erpAccountId = erpAccountMapper.nextId();
         String hashPassword = passwordEncoder.encode(request.rawPassword());
 
-        // 3) 도메인 생성 및 저장
         ErpAccount account = ErpAccount.register(
                 erpAccountId,
                 request.employeeId(),
@@ -46,15 +48,16 @@ public class ErpAccountServiceImpl implements ErpAccountService {
 
     @Override
     @Transactional(readOnly = true)
+    public LoginUserInfoRow findLoginRowByLoginEmail(String loginEmail) {
+        String email = Strings.normalizeOrNull(loginEmail);
+        return erpAccountMapper.findLoginRowByLoginEmail(email)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.INVALID_LOGIN_CREDENTIALS));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public long findCompanyIdByUuid(String uuid) {
         return erpAccountMapper.findCompanyIdByUuid(uuid)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ERP_ACCOUNT));
-    }
-
-    // 로그인 이메일 중복 검사
-    private void validateLoginEmailUnique(String loginEmail) {
-        if (erpAccountMapper.existsByLoginEmail(loginEmail)) {
-            throw new GlobalException(ErrorStatus.DUPLICATE_LOGIN_EMAIL);
-        }
     }
 }

@@ -1,6 +1,7 @@
+// PurchaseServiceImpl.java
 package erp.purchase.service;
 
-import erp.employee.mapper.EmployeeMapper;
+import erp.employee.validation.EmployeeValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import erp.global.response.PageResponse;
@@ -11,7 +12,8 @@ import erp.global.util.time.DatePeriod;
 import erp.global.util.time.DateRange;
 import erp.global.util.time.Periods;
 import erp.item.dto.internal.ItemPriceRow;
-import erp.item.mapper.ItemMapper;
+import erp.item.service.ItemService;
+import erp.item.validation.ItemValidator;
 import erp.purchase.domain.Purchase;
 import erp.purchase.domain.PurchaseItem;
 import erp.purchase.dto.internal.*;
@@ -25,6 +27,7 @@ import erp.purchase.dto.response.PurchaseItemFindResponse;
 import erp.purchase.enums.PurchaseStatus;
 import erp.purchase.mapper.PurchaseItemMapper;
 import erp.purchase.mapper.PurchaseMapper;
+import erp.purchase.validation.PurchaseValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -43,8 +46,12 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     private final PurchaseMapper purchaseMapper;
     private final PurchaseItemMapper purchaseItemMapper;
-    private final EmployeeMapper employeeMapper;
-    private final ItemMapper itemMapper;
+
+    private final ItemService itemService;
+
+    private final EmployeeValidator employeeValidator;
+    private final ItemValidator itemValidator;
+    private final PurchaseValidator purchaseValidator;
 
     private static final String ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int TOKEN_LEN = 8;
@@ -64,16 +71,16 @@ public class PurchaseServiceImpl implements PurchaseService {
         validItemIdsUniqueInRequest(requestItems);
 
         // 2) 직원 존재, 활성 유효성 검사 (회사 스코프 내)
-        validEmployeeIdIfPresent(employeeId, tenantId);
+        employeeValidator.validEmployeeIdIfPresent(employeeId, tenantId);
 
         // 3) 아이템 단가 일괄 조회 (N+1 제거)
         List<Long> itemIds = requestItems.stream()
                 .map(PurchaseItemSaveRequest::itemId)
                 .toList();
         // 아이템 존재/활성 일괄 검증
-        validItemIdsIfPresent(itemIds, tenantId);
+        itemValidator.validItemIdsExist(itemIds, tenantId);
 
-        List<ItemPriceRow> priceRows = itemMapper.findAllPriceByIds(tenantId, itemIds);
+        List<ItemPriceRow> priceRows = itemService.findAllItemPriceByIds(itemIds, tenantId);
 
         // 4) 조회 결과를 Map<Long itemId, Integer price>로 변환
         Map<Long, Integer> priceMap = priceRows.stream()
@@ -173,7 +180,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     @Transactional(readOnly = true)
     public List<PurchaseItemFindResponse> findAllPurchaseItems(long purchaseId, long tenantId) {
-        validPurchaseIdIfPresent(purchaseId, tenantId);
+        purchaseValidator.validPurchaseId(purchaseId, tenantId);
 
         List<PurchaseItemFindRow> rows = purchaseItemMapper.findAllPurchaseItemFindRow(tenantId, purchaseId);
         if (rows.isEmpty()) {
@@ -203,7 +210,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     @Transactional(readOnly = true)
     public PurchaseDetailResponse findPurchaseDetail(long purchaseId, long tenantId) {
-        validPurchaseIdIfPresent(purchaseId, tenantId);
+        purchaseValidator.validPurchaseId(purchaseId, tenantId);
 
         PurchaseDetailRow header = purchaseMapper.findPurchaseDetailRow(tenantId, purchaseId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE));
@@ -213,7 +220,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         if (itemRows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE_ITEM);
         }
-        
+
         return PurchaseDetailResponse.of(header, itemRows);
     }
 
@@ -221,7 +228,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public void cancelPurchase(long purchaseId, long tenantId) {
         // 1) 존재/활성(삭제 제외) 선검증
-        validPurchaseIdIfPresent(purchaseId, tenantId);
+        purchaseValidator.validPurchaseId(purchaseId, tenantId);
 
         // 2) 조건부 업데이트: SHIPPED가 아니면 CANCELLED로 변경
         int affectedRowCount = purchaseMapper.updateStatusToCancelledIfNotShipped(tenantId, purchaseId);
@@ -293,27 +300,6 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
 
-    // 직원 존재, 활성 유효성 검사 (회사 스코프 내)
-    private void validEmployeeIdIfPresent(Long employeeId, long tenantId) {
-        if (employeeId != null && !employeeMapper.existsById(tenantId, employeeId)) {
-            throw new GlobalException(ErrorStatus.NOT_FOUND_EMPLOYEE);
-        }
-    }
-
-    // itmes 존재/활성 일괄 검증
-    private void validItemIdsIfPresent(List<Long> itemIds, long tenantId) {
-        // existsByIds: 모든 ID가 활성(삭제 아님)으로 존재하면 true를 반환하도록 Mapper 구현
-        if (!itemMapper.existsByIds(tenantId, itemIds)) {
-            throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM);
-        }
-    }
-
-    private void validPurchaseIdIfPresent(Long purchaseId, long tenantId) {
-        if (purchaseId == null || !purchaseMapper.existsById(tenantId, purchaseId)) {
-            throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE);
-        }
-    }
-
     // 합계 계산(총수량, 총금액)
     private Totals computeTotals(List<PurchaseItemSaveRequest> requestItems, Map<Long, Integer> priceMap) {
         int totalQuantity = 0;
@@ -330,7 +316,6 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
         return new Totals(totalQuantity, totalAmount);
     }
-
 
     private String buildPurchaseCode(int year) {
         return "PO-" + year + "-" + randomToken();

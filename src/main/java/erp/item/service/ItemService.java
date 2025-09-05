@@ -1,6 +1,7 @@
 package erp.item.service;
 
 import erp.global.response.PageResponse;
+import erp.item.dto.internal.ItemPriceRow;
 import erp.item.dto.request.ItemFindAllRequest;
 import erp.item.dto.request.ItemSaveRequest;
 import erp.item.dto.request.ItemUpdateRequest;
@@ -18,6 +19,9 @@ public interface ItemService {
     PageResponse<ItemFindResponse> findAllItems(ItemFindAllRequest request, long tenantId);
 
     List<ItemIdAndNameResponse> findAllItemIdAndName(long tenantId);
+
+    List<ItemPriceRow> findAllItemPriceByIds(
+            List<Long> itemIds, long tenantId);
 
     void updateItem(long itemId, ItemUpdateRequest request, long tenantId);
 

@@ -1,3 +1,4 @@
+// ItemServiceImpl.java
 package erp.item.service;
 
 import erp.global.exception.ErrorStatus;
@@ -7,6 +8,7 @@ import erp.global.util.PageParam;
 import erp.item.domain.Item;
 import erp.item.dto.internal.ItemFindRow;
 import erp.item.dto.internal.ItemIdAndNameRow;
+import erp.item.dto.internal.ItemPriceRow;
 import erp.item.dto.request.ItemFindAllRequest;
 import erp.item.dto.request.ItemSaveRequest;
 import erp.item.dto.request.ItemUpdateRequest;
@@ -15,6 +17,7 @@ import erp.item.dto.response.ItemIdAndNameResponse;
 import erp.item.dto.response.ItemInfoResponse;
 import erp.item.enums.ItemCategory;
 import erp.item.mapper.ItemMapper;
+import erp.item.validation.ItemValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,7 @@ import static erp.global.util.Strings.normalizeOrNull;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemMapper itemMapper;
+    private final ItemValidator itemValidator;
 
     @Override
     @Transactional
@@ -37,8 +41,8 @@ public class ItemServiceImpl implements ItemService {
         String code = normalizeOrNull(request.code());
         ItemCategory category = request.category();
 
-        validateNameUnique(name, null, tenantId);
-        validateCodeUnique(code, null, tenantId);
+        itemValidator.validNameUnique(name, null, tenantId);
+        itemValidator.validCodeUnique(code, null, tenantId);
 
         long newId = itemMapper.nextId();
 
@@ -99,6 +103,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ItemPriceRow> findAllItemPriceByIds(List<Long> itemIds, long tenantId) {
+        List<ItemPriceRow> priceRows = itemMapper.findAllPriceByIds(tenantId, itemIds);
+        if (priceRows.isEmpty())
+            throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM_PRICE);
+        return priceRows;
+    }
+
+    @Override
     @Transactional
     public void updateItem(long itemId, ItemUpdateRequest request, long tenantId) {
         // todo: 입고, 출고, 주문, 판매, 재고 등 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
@@ -106,8 +119,8 @@ public class ItemServiceImpl implements ItemService {
         String code = normalizeOrNull(request.code());
         ItemCategory category = request.category();
 
-        validateNameUnique(name, itemId, tenantId);
-        validateCodeUnique(code, itemId, tenantId);
+        itemValidator.validNameUnique(name, itemId, tenantId);
+        itemValidator.validCodeUnique(code, itemId, tenantId);
 
         Item item = Item.of(
                 itemId,
@@ -130,15 +143,5 @@ public class ItemServiceImpl implements ItemService {
 
         int affectedRowCount = itemMapper.softDeleteById(tenantId, itemId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_ITEM_FAIL);
-    }
-
-    private void validateNameUnique(String name, Long excludeId, long tenantId) {
-        if (itemMapper.existsByName(tenantId, name, excludeId))
-            throw new GlobalException(ErrorStatus.DUPLICATE_ITEM_NAME);
-    }
-
-    private void validateCodeUnique(String code, Long excludeId, long tenantId) {
-        if (itemMapper.existsByCode(tenantId, code, excludeId))
-            throw new GlobalException(ErrorStatus.DUPLICATE_ITEM_CODE);
     }
 }

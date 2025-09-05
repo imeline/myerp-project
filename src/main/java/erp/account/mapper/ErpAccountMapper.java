@@ -1,7 +1,7 @@
 package erp.account.mapper;
 
 import erp.account.domain.ErpAccount;
-import erp.auth.dto.internal.LoginUserInfoRow;
+import erp.account.dto.internal.LoginUserInfoRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

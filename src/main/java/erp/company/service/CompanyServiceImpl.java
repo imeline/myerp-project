@@ -1,6 +1,6 @@
+// CompanyServiceImpl.java
 package erp.company.service;
 
-import erp.account.mapper.ErpAccountMapper;
 import erp.company.domain.Company;
 import erp.company.dto.internal.CompanyFindRow;
 import erp.company.dto.request.CompanyFindAllRequest;
@@ -9,6 +9,7 @@ import erp.company.dto.request.CompanyUpdateRequest;
 import erp.company.dto.response.CompanyFindResponse;
 import erp.company.dto.response.CompanyInfoResponse;
 import erp.company.mapper.CompanyMapper;
+import erp.company.validation.CompanyValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import erp.global.response.PageResponse;
@@ -26,13 +27,13 @@ import static erp.global.util.Strings.normalizeOrNull;
 @RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyMapper companyMapper;
-    private final ErpAccountMapper erpAccountMapper;
+    private final CompanyValidator companyValidator;
 
     @Override
     @Transactional
     public Long saveCompany(CompanySaveRequest request) {
-        validateBizNoUnique(request.bizNo(), null);
-        validateNameUnique(request.name(), null);
+        companyValidator.validBizNoUnique(request.bizNo(), null);
+        companyValidator.validNameUnique(request.name(), null);
 
         long newId = companyMapper.nextId();
         Company company = Company.of(
@@ -78,8 +79,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Transactional
     public void updateCompany(Long companyId, CompanyUpdateRequest request) {
         // 중복 여부 체크
-        validateBizNoUnique(request.bizNo(), companyId);
-        validateNameUnique(request.name(), companyId);
+        companyValidator.validBizNoUnique(request.bizNo(), companyId);
+        companyValidator.validNameUnique(request.name(), companyId);
 
         Company company = Company.of(
                 companyId,
@@ -97,7 +98,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Transactional
     public void softDeleteCompany(long companyId) {
         // todo: 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
-//        long related = companyMapper.countEmployees(companyId)
+//        long related = companyMapper.countEmployees(companyId) // 직원 다 삭제해야 삭제 가능
 //                + companyMapper.countOrders(companyId)
 //                + companyMapper.countOutbounds(companyId);
 //        if (related > 0)
@@ -105,18 +106,5 @@ public class CompanyServiceImpl implements CompanyService {
 
         int affectedRowCount = companyMapper.softDeleteById(companyId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_COMPANY_FAIL);
-        // 해당 회사 직원들의 erp_account 도 소프트 삭제
-        erpAccountMapper.softDeleteByCompanyId(companyId);
-    }
-
-    // 중복 검사
-    private void validateBizNoUnique(String bizNo, Long excludeId) {
-        if (companyMapper.existsByBizNo(bizNo, excludeId))
-            throw new GlobalException(ErrorStatus.DUPLICATE_BIZ_NO);
-    }
-
-    private void validateNameUnique(String name, Long excludeId) {
-        if (companyMapper.existsByName(name, excludeId))
-            throw new GlobalException(ErrorStatus.DUPLICATE_NAME);
     }
 }

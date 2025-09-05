@@ -1,3 +1,4 @@
+// DepartmentServiceImpl.java
 package erp.department.service;
 
 import erp.department.domain.Department;
@@ -6,7 +7,8 @@ import erp.department.dto.request.DepartmentUpdateRequest;
 import erp.department.dto.request.TopDepartmentSaveRequest;
 import erp.department.dto.response.DepartmentInfoResponse;
 import erp.department.mapper.DepartmentMapper;
-import erp.employee.mapper.EmployeeMapper;
+import erp.department.validation.DepartmentValidator;
+import erp.employee.validation.EmployeeValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,8 @@ import static erp.global.util.RowCountGuards.requireOneRowAffected;
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentMapper departmentMapper;
-    private final EmployeeMapper employeeMapper;
-
+    private final DepartmentValidator departmentValidator;
+    private final EmployeeValidator employeeValidator;
 
     @Override
     @Transactional
@@ -35,9 +37,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         Long requestedParentId = request.parentId();
 
         // 중복 이름 검사
-        validNameInParentUnique(tenantId, requestedParentId, name, null);
+        departmentValidator.validNameInParentUnique(tenantId, requestedParentId, name, null);
         // 존재하는 부모 id인지 검사
-        validIdIfPresent(requestedParentId, tenantId);
+        departmentValidator.validDepartmentIdIfPresent(requestedParentId, tenantId);
 
         Department department = Department.register(
                 newDepartmentId, name, tenantId, requestedParentId);
@@ -57,7 +59,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         String name = request.name();
         Long parentId = null; // 루트 부서는 parent_id 가 NULL
 
-        validNameInParentUnique(tenantId, parentId, name, null);
+        departmentValidator.validNameInParentUnique(tenantId, parentId, name, null);
 
         Department department = Department.register(
                 newDepartmentId,
@@ -110,7 +112,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         Long parentId = curDepartment.getParentId();
         String newName = request.name();
-        validNameInParentUnique(tenantId, parentId, newName, departmentId);
+        departmentValidator.validNameInParentUnique(tenantId, parentId, newName, departmentId);
 
         Department department = curDepartment.changeName(newName);
         int affectedRowCount = departmentMapper.updateById(tenantId, department);
@@ -120,40 +122,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional
     public void deleteDepartment(Long departmentId, long tenantId) {
-        validChildIfPresent(departmentId, tenantId);
-        validEmployeeInDepartmentIfPresent(departmentId, tenantId);
+        departmentValidator.validNoChildDepartments(departmentId, tenantId);
+        employeeValidator.validNoEmployeesInDepartment(departmentId, tenantId);
 
         int affectedRowCount = departmentMapper.deleteById(tenantId, departmentId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_DEPARTMENT_FAIL);
-    }
-
-    private void validIdIfPresent(Long departmentId, long tenantId) {
-        if (departmentId != null && !departmentMapper.existsById(tenantId,
-                departmentId)) {
-            throw new GlobalException(ErrorStatus.NOT_FOUND_DEPARTMENT);
-        }
-    }
-
-    // 중복 이름 검사
-    private void validNameInParentUnique(long tenantId, Long parentId,
-                                         String name, Long excludeDepartmentId) {
-        if (name != null && departmentMapper.existsByNameAndParentId(
-                tenantId, parentId, name, excludeDepartmentId)) {
-            throw new GlobalException(ErrorStatus.DUPLICATE_DEPARTMENT_NAME);
-        }
-    }
-
-    // 하위 부서가 있는지 검사
-    private void validChildIfPresent(Long departmentId, long tenantId) {
-        if (departmentMapper.existsChildById(tenantId, departmentId)) {
-            throw new GlobalException(ErrorStatus.EXIST_CHILD_DEPARTMENT);
-        }
-    }
-
-    // 해당 부서에 속한 직원이 있는지 검사
-    private void validEmployeeInDepartmentIfPresent(Long departmentId, long tenantId) {
-        if (employeeMapper.existsByDepartmentId(tenantId, departmentId)) {
-            throw new GlobalException(ErrorStatus.EXIST_EMPLOYEE_IN_DEPARTMENT);
-        }
     }
 }
