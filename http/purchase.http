@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/user/purchase
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTY5Nzg3NjgsImV4cCI6MTc1NzAxNDc2OCwidGVuYW50X2lkIjoyfQ.0BxUipW4ABXPoKsPP37PQpGsL79eSoSIt9t2SFnGF5I
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTczMjY3NzAsImV4cCI6MTc1NzM2Mjc3MCwidGVuYW50X2lkIjoyfQ.Qk9qNXRuBALmZNhK1mIdVVh2D1bIuoxTfUwy7TZT2KY
 
 
 ### 발주 등록 (발주 + 발주아이템 저장)
@@ -10,12 +10,14 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "purchaseDate": "2025-09-01",
-  "supplier": "쿠팡",
+  "purchaseDate": "2025-09-02",
+  "supplier": "위메프",
   "employeeId": 6,
   "items": [
-    { "itemId": 3, "quantity": 10 },
-    { "itemId": 2, "quantity": 20 }
+    {
+      "itemId": 5,
+      "quantity": 10
+    }
   ]
 }
 
@@ -61,11 +63,10 @@ Accept: application/json
 }
 
 
-### 특정 발주의 발주아이템 목록 조회 (아래 1을 실제 purchase_id로 교체)
-GET {{base}}/32/items
+### 특정 발주의 발주아이템 목록 요약 조회
+GET {{base}}/35/items/summary
 Authorization: {{token}}
 Accept: application/json
-
 
 ### 발주번호·공급사 목록 (CONFIRMED만)
 GET {{base}}/code-suppliers

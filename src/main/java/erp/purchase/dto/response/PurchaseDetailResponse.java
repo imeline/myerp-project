@@ -3,10 +3,9 @@ package erp.purchase.dto.response;
 import erp.purchase.dto.internal.PurchaseDetailRow;
 import erp.purchase.dto.internal.PurchaseItemDetailRow;
 import erp.purchase.enums.PurchaseStatus;
-import lombok.Builder;
-
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record PurchaseDetailResponse(

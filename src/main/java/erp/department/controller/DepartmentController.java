@@ -47,7 +47,7 @@ public class DepartmentController {
     // 특정 부모의 직계 자식
     @GetMapping("/child/{parentId}")
     public ApiResponse<List<DepartmentInfoResponse>> findChildrenDepartment(
-            @PathVariable long parentId) {
+            @PathVariable Long parentId) {
         long tenantId = TenantContext.get();
         List<DepartmentInfoResponse> departmentInfoResponse =
                 departmentService.findAllByParentId(parentId, tenantId);

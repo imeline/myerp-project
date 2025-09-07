@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/user/item
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyZDhlYjc4NzI1Yjk0MzNmOGY4MTI2MTc0YjczYTI2OCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU2OTc3NjcyLCJleHAiOjE3NTcwMTM2NzIsInRlbmFudF9pZCI6Mn0.be0NjKc-CytVgLT6CvJZToUrfE-VPiPeYxXe9MEpElA
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTczMjY3NzAsImV4cCI6MTc1NzM2Mjc3MCwidGVuYW50X2lkIjoyfQ.Qk9qNXRuBALmZNhK1mIdVVh2D1bIuoxTfUwy7TZT2KY
 
 ### 품목 등록
 POST {{base}}
@@ -9,11 +9,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "책상",
-  "code": "ITM-0003",
-  "price": 320000,
+  "name": "의자",
+  "code": "ITM-0004",
+  "price": 10000,
   "unit": "개",
-  "category": "MERCHANDISE"
+  "category": "MERCHANDISE",
+  "initialQuantity": 100,
+  "warehouse": "A창고"
 }
 
 ### 품목 상세 조회 (여기 123을 실제 item_id로 바꿔서 사용)
@@ -57,6 +59,11 @@ Accept: application/json
   "size": 10,
   "category": "CONSUMABLE"
 }
+
+### 품목 id, name, code 전체 조회 (페이징 없음)
+GET {{base}}/options
+Authorization: {{token}}
+Accept: application/json
 
 ### 품목 수정 (전체 수정: PUT) - 123을 실제 item_id로 교체
 PUT {{base}}/1

@@ -1,6 +1,8 @@
 // PurchaseServiceImpl.java
 package erp.purchase.service;
 
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+
 import erp.employee.validation.EmployeeValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
@@ -16,29 +18,35 @@ import erp.item.service.ItemService;
 import erp.item.validation.ItemValidator;
 import erp.purchase.domain.Purchase;
 import erp.purchase.domain.PurchaseItem;
-import erp.purchase.dto.internal.*;
+import erp.purchase.dto.internal.PurchaseCodeAndSupplierRow;
+import erp.purchase.dto.internal.PurchaseDetailRow;
+import erp.purchase.dto.internal.PurchaseFindRow;
+import erp.purchase.dto.internal.PurchaseItemDetailRow;
+import erp.purchase.dto.internal.PurchaseItemStockFindRow;
 import erp.purchase.dto.request.PurchaseFindAllRequest;
 import erp.purchase.dto.request.PurchaseItemSaveRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
 import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
 import erp.purchase.dto.response.PurchaseDetailResponse;
 import erp.purchase.dto.response.PurchaseFindResponse;
-import erp.purchase.dto.response.PurchaseItemFindResponse;
+import erp.purchase.dto.response.PurchaseItemStockFindResponse;
+import erp.purchase.dto.response.PurchaseItemsSummaryResponse;
 import erp.purchase.enums.PurchaseStatus;
 import erp.purchase.mapper.PurchaseItemMapper;
 import erp.purchase.mapper.PurchaseMapper;
 import erp.purchase.validation.PurchaseValidator;
+import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.SecureRandom;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static erp.global.util.RowCountGuards.requireOneRowAffected;
 
 @Service
 @RequiredArgsConstructor
@@ -75,8 +83,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         // 3) 아이템 단가 일괄 조회 (N+1 제거)
         List<Long> itemIds = requestItems.stream()
-                .map(PurchaseItemSaveRequest::itemId)
-                .toList();
+            .map(PurchaseItemSaveRequest::itemId)
+            .toList();
         // 아이템 존재/활성 일괄 검증
         itemValidator.validItemIdsExist(itemIds, tenantId);
 
@@ -84,7 +92,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         // 4) 조회 결과를 Map<Long itemId, Integer price>로 변환
         Map<Long, Integer> priceMap = priceRows.stream()
-                .collect(Collectors.toMap(ItemPriceRow::itemId, ItemPriceRow::price));
+            .collect(Collectors.toMap(ItemPriceRow::itemId, ItemPriceRow::price));
 
         // 5) 합계 계산(총수량, 총금액)
         Totals totals = computeTotals(requestItems, priceMap);
@@ -103,13 +111,13 @@ public class PurchaseServiceImpl implements PurchaseService {
             try {
                 // 6-1) Purchase 저장
                 long newPurchaseId = savePurchase(
-                        purchaseCode,
-                        supplier,
-                        purchaseDate,
-                        totalQuantity,
-                        totalAmount,
-                        employeeId,
-                        tenantId
+                    purchaseCode,
+                    supplier,
+                    purchaseDate,
+                    totalQuantity,
+                    totalAmount,
+                    employeeId,
+                    tenantId
                 );
 
                 // 6-2) PurchaseItem 배치 저장
@@ -133,7 +141,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<PurchaseFindResponse> findAllPurchase(PurchaseFindAllRequest request, long tenantId) {
+    public PageResponse<PurchaseFindResponse> findAllPurchase(PurchaseFindAllRequest request,
+        long tenantId) {
         PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
 
         DatePeriod datePeriod = request.period();
@@ -145,66 +154,69 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         // 4) 목록 조회 (삭제 제외, tenantGuard는 XML에서 WHERE 마지막)
         List<PurchaseFindRow> rows = purchaseMapper.findAllPurchaseFindRow(
-                tenantId,
-                startDate,
-                endDate,
-                code,
-                status,
-                pageParam.offset(),
-                pageParam.size()
+            tenantId,
+            startDate,
+            endDate,
+            code,
+            status,
+            pageParam.offset(),
+            pageParam.size()
         );
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_PURCHASE);
         }
 
         List<PurchaseFindResponse> responses = rows.stream()
-                .map(PurchaseFindResponse::from)
-                .toList();
+            .map(PurchaseFindResponse::from)
+            .toList();
 
         long total = purchaseMapper.countByPeriodAndCodeAndStatus(
-                tenantId,
-                startDate,
-                endDate,
-                code,
-                status
+            tenantId,
+            startDate,
+            endDate,
+            code,
+            status
         );
 
         return PageResponse.of(
-                responses,
-                pageParam.page(),
-                total,
-                pageParam.size()
+            responses,
+            pageParam.page(),
+            total,
+            pageParam.size()
         );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PurchaseItemFindResponse> findAllPurchaseItems(long purchaseId, long tenantId) {
+    public PurchaseItemsSummaryResponse findPurchaseItemsSummary(long purchaseId, long tenantId) {
         purchaseValidator.validPurchaseId(purchaseId, tenantId);
 
-        List<PurchaseItemFindRow> rows = purchaseItemMapper.findAllPurchaseItemFindRow(tenantId, purchaseId);
+        List<PurchaseItemStockFindRow> rows =
+            purchaseItemMapper.findAllPurchaseItemStockFindRow(tenantId, purchaseId);
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE_ITEM);
         }
 
-        return rows.stream()
-                .map(PurchaseItemFindResponse::from)
-                .toList();
+        List<PurchaseItemStockFindResponse> items = rows.stream()
+            .map(PurchaseItemStockFindResponse::from)
+            .toList();
+
+        return PurchaseItemsSummaryResponse.of(items);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<PurchaseCodeAndSupplierResponse> findAllPurchaseCodeAndSupplier(long tenantId) {
         List<PurchaseCodeAndSupplierRow> rows =
-                purchaseMapper.findAllCodeAndSupplier(tenantId);
+            purchaseMapper.findAllCodeAndSupplier(tenantId);
 
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_PURCHASE);
         }
 
         return rows.stream()
-                .map(PurchaseCodeAndSupplierResponse::from)
-                .toList();
+            .map(PurchaseCodeAndSupplierResponse::from)
+            .toList();
     }
 
     @Override
@@ -213,10 +225,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchaseValidator.validPurchaseId(purchaseId, tenantId);
 
         PurchaseDetailRow header = purchaseMapper.findPurchaseDetailRow(tenantId, purchaseId)
-                .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE));
+            .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE));
 
         List<PurchaseItemDetailRow> itemRows =
-                purchaseItemMapper.findAllPurchaseItemDetailRow(tenantId, purchaseId);
+            purchaseItemMapper.findAllPurchaseItemDetailRow(tenantId, purchaseId);
         if (itemRows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE_ITEM);
         }
@@ -231,7 +243,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchaseValidator.validPurchaseId(purchaseId, tenantId);
 
         // 2) 조건부 업데이트: SHIPPED가 아니면 CANCELLED로 변경
-        int affectedRowCount = purchaseMapper.updateStatusToCancelledIfNotShipped(tenantId, purchaseId);
+        int affectedRowCount = purchaseMapper.updateStatusToCancelledIfNotShipped(tenantId,
+            purchaseId);
 
         // 3) 성공 시 즉시 종료 (추가 조회 불필요)
         if (affectedRowCount == 1) {
@@ -249,23 +262,23 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     // Purchase 저장
     private long savePurchase(String purchaseCode,
-                              String supplier,
-                              LocalDate purchaseDate,
-                              int totalQuantity,
-                              int totalAmount,
-                              Long employeeId,
-                              long tenantId) {
+        String supplier,
+        LocalDate purchaseDate,
+        int totalQuantity,
+        int totalAmount,
+        Long employeeId,
+        long tenantId) {
         long newPurchaseId = purchaseMapper.nextId();
         Purchase purchase = Purchase.register(
-                newPurchaseId,
-                purchaseCode,
-                supplier,
-                purchaseDate,
-                totalQuantity,
-                totalAmount,
-                PurchaseStatus.CONFIRMED,
-                employeeId,
-                tenantId
+            newPurchaseId,
+            purchaseCode,
+            supplier,
+            purchaseDate,
+            totalQuantity,
+            totalAmount,
+            PurchaseStatus.CONFIRMED,
+            employeeId,
+            tenantId
         );
         int affectedRowCount = purchaseMapper.save(tenantId, purchase);
         requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_PURCHASE_FAIL);
@@ -274,14 +287,14 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     // PurchaseItem 배치 저장
     private void savePurchaseItems(long newPurchaseId,
-                                   List<PurchaseItemSaveRequest> requestItems,
-                                   long tenantId) {
+        List<PurchaseItemSaveRequest> requestItems,
+        long tenantId) {
         List<PurchaseItem> items = new ArrayList<>(requestItems.size());
         for (PurchaseItemSaveRequest itemSaveRequest : requestItems) {
             long newPurchaseItemId = purchaseItemMapper.nextId();
             items.add(PurchaseItem.register(
-                    newPurchaseItemId, newPurchaseId,
-                    itemSaveRequest.itemId(), itemSaveRequest.quantity(), tenantId
+                newPurchaseItemId, newPurchaseId,
+                itemSaveRequest.itemId(), itemSaveRequest.quantity(), tenantId
             ));
         }
         int affectedItems = purchaseItemMapper.saveAll(tenantId, items);
@@ -301,7 +314,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     // 합계 계산(총수량, 총금액)
-    private Totals computeTotals(List<PurchaseItemSaveRequest> requestItems, Map<Long, Integer> priceMap) {
+    private Totals computeTotals(List<PurchaseItemSaveRequest> requestItems,
+        Map<Long, Integer> priceMap) {
         int totalQuantity = 0;
         int totalAmount = 0;
         for (PurchaseItemSaveRequest itemSaveRequest : requestItems) {

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.stock.mapper.StockMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT stock_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO stock (stock_id, warehouse, on_hand_quantity,
+                           allocated_quantity, item_id, company_id)
+        VALUES (#{stock.stockId}, #{stock.warehouse}, #{stock.onHandQuantity},
+                #{stock.allocatedQuantity}, #{stock.itemId},
+                #{tenantId})
+    </insert>
+
+</mapper>

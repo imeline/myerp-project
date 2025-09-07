@@ -20,8 +20,9 @@
         SELECT employee_id, name
         FROM employee
         WHERE
+        status != 'RETIRED'
+        AND
         <include refid="frag.tenantGuard"/>
-        AND status != 'RETIRED'
         ORDER BY name
     </select>
 
@@ -33,7 +34,7 @@
         d.name AS departmentName,
         p.name AS positionName,
         e.phone AS phone,
-        e.email AS email,
+        a.login_email AS email,
         e.created_at AS createdAt
         FROM employee e
         LEFT JOIN department d
@@ -42,6 +43,9 @@
         LEFT JOIN position p
         ON p.position_id = e.position_id
         AND p.company_id = e.company_id
+        LEFT JOIN erp_account a
+        ON a.employee_id = e.employee_id
+        AND a.company_id = e.company_id
         WHERE e.status != 'RETIRED'
         <if test="departmentId != null">
             AND e.department_id = #{departmentId}
@@ -52,6 +56,7 @@
         <if test="name != null">
             AND e.name LIKE '%' || #{name} || '%'
         </if>
+        AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="e"/>
         </include>
@@ -59,16 +64,16 @@
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
+
     <select id="findEmployeeFindRowById" resultType="EmployeeFindRow">
         SELECT
-        e.employee_id AS employeeId,
         e.emp_no AS empNo,
         e.name AS name,
+        d.department_id AS departmentId,
         d.name AS departmentName,
+        p.position_id AS positionId,
         p.name AS positionName,
-        e.phone AS phone,
-        e.email AS email,
-        e.created_at AS createdAt
+        e.phone AS phone
         FROM employee e
         LEFT JOIN department d
         ON d.department_id = e.department_id
@@ -76,23 +81,38 @@
         LEFT JOIN position p
         ON p.position_id = e.position_id
         AND p.company_id = e.company_id
+        LEFT JOIN erp_account a
+        ON a.employee_id = e.employee_id
+        AND a.company_id = e.company_id
         WHERE e.employee_id = #{employeeId}
         AND e.status != 'RETIRED'
+        AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="e"/>
         </include>
     </select>
 
+
     <update id="updateById">
         UPDATE employee
-        SET emp_no        = #{employee.empNo},
-            name          = #{employee.name},
-            phone         = #{employee.phone},
-            department_id = #{employee.departmentId},
-            position_id   = #{employee.positionId}
+        SET emp_no = #{employee.empNo},
+        name = #{employee.name},
+        phone = #{employee.phone},
+        department_id = #{employee.departmentId},
+        position_id = #{employee.positionId}
         WHERE employee_id = #{employee.employeeId}
-          AND status != 'RETIRED'
-      AND company_id = #{tenantId}
+        AND status != 'RETIRED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <update id="updateStatusToRetired">
+        UPDATE employee
+        SET status = 'RETIRED'
+        WHERE employee_id = #{employeeId}
+        AND status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
     </update>
 
     <select id="countByFilters" resultType="long">
@@ -108,6 +128,7 @@
         <if test="name != null">
             AND name LIKE '%' || #{name} || '%'
         </if>
+        AND
         <include refid="frag.tenantGuard"/>
     </select>
 
