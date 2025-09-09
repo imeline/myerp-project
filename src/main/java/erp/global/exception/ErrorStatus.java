@@ -81,6 +81,7 @@ public enum ErrorStatus {
     // STOCK
     INVALID_STOCK_QUANTITY("STK801", "재고 수량은 0 이상이어야 합니다."),
     CREATE_STOCK_FAIL("STK802", "재고 생성에 실패했습니다."),
+    NOT_REGISTERED_STOCK("STK803", "등록된 재고가 없습니다."),
 
     // PURCHASE
     CREATE_PURCHASE_FAIL("PUR901", "발주 생성에 실패했습니다."),

@@ -2,11 +2,24 @@ package erp.stock.service;
 
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.global.response.PageResponse;
+import erp.global.util.PageParam;
+import erp.global.util.Strings;
+import erp.item.enums.ItemCategory;
 import erp.stock.domain.Stock;
+import erp.stock.dto.internal.StockFindAllRow;
+import erp.stock.dto.internal.StockFindFilterRow;
+import erp.stock.dto.internal.StockPriceFindRow;
+import erp.stock.dto.request.StockFindAllRequest;
+import erp.stock.dto.response.StockFindAllResponse;
+import erp.stock.dto.response.StockPriceFindResponse;
+import erp.stock.enums.StockSortBy;
 import erp.stock.mapper.StockMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static erp.global.util.RowCountGuards.requireOneRowAffected;
 
@@ -38,5 +51,82 @@ public class StockServiceImpl implements StockService {
         requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_STOCK_FAIL);
 
         return newStockId;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<StockFindAllResponse> findAllStock(
+            StockFindAllRequest request,
+            long tenantId
+    ) {
+        String normalizedItemName = Strings.normalizeOrNull(request.name());
+        String normalizedWarehouseName = Strings.normalizeOrNull(request.warehouse());
+        ItemCategory itemCategory = request.category();
+
+        PageParam pageParameter = PageParam.of(request.page(), request.size(), 20);
+
+        StockSortBy sortBy = request.sortBy();
+        String sortDirection = resolveDefaultSortDirection(sortBy);
+
+        StockFindFilterRow query = StockFindFilterRow.of(
+                normalizedItemName,
+                itemCategory,
+                normalizedWarehouseName,
+                request.availableQuantityFrom(),
+                request.availableQuantityTo(),
+                sortBy,
+                sortDirection,
+                pageParameter.offset(),
+                pageParameter.size()
+        );
+
+        List<StockFindAllRow> rows = stockMapper.findAllStockFindAllRow(
+                tenantId,
+                query
+        );
+        if (rows.isEmpty())
+            throw new GlobalException(ErrorStatus.NOT_REGISTERED_STOCK);
+
+        long totalCount = stockMapper.countByStock(
+                tenantId,
+                query
+        );
+        List<StockFindAllResponse> responseList = rows.stream()
+                .map(StockFindAllResponse::from)
+                .toList();
+
+        return PageResponse.of(
+                responseList,
+                pageParameter.page(),
+                totalCount,
+                pageParameter.size()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StockPriceFindResponse findStockPrice(long itemId, long tenantId) {
+        StockPriceFindRow row =
+                stockMapper.findStockPriceFindRowByItemId(tenantId, itemId)
+                        .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ITEM));
+
+        return StockPriceFindResponse.from(row);
+    }
+
+    /**
+     * 기본 정렬 방향 정책
+     * - 텍스트(ITEM_NAME, ITEM_CODE): ASC
+     * - 수치/일자(그 외): DESC
+     */
+    private String resolveDefaultSortDirection(
+            StockSortBy sortBy
+    ) {
+        if (sortBy == null) {
+            return "DESC";
+        }
+        return switch (sortBy) {
+            case ITEM_NAME, ITEM_CODE -> "ASC";
+            default -> "DESC";
+        };
     }
 }

@@ -1,0 +1,7 @@
+@base = {{host}}/api/v1/user/report/stock/overview
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI5YzI0MDRkOTI4NTM0YjE4YWEzZDVmNGNjZWU3NjBmMCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU3NDEyOTg1LCJleHAiOjE3NTc0NDg5ODUsInRlbmFudF9pZCI6Mn0.SzPcMxKZTUfJdFd4U7F-_Ots8hmAmtbUsTIkcozoirU
+
+### 재고 현황 조회 (전체 스냅샷)
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
