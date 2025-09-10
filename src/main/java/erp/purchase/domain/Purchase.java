@@ -28,7 +28,6 @@ public class Purchase extends TimeStamped {
             LocalDate purchaseDate,
             int totalQuantity,
             int totalAmount,
-            PurchaseStatus status,
             long employeeId,
             long companyId
     ) {
@@ -39,7 +38,7 @@ public class Purchase extends TimeStamped {
                 .purchaseDate(purchaseDate)
                 .totalQuantity(totalQuantity)
                 .totalAmount(totalAmount)
-                .status(status)
+                .status(PurchaseStatus.CONFIRMED)
                 .employeeId(employeeId)
                 .companyId(companyId)
                 .build();

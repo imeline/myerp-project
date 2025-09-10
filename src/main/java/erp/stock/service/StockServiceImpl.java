@@ -6,6 +6,7 @@ import erp.global.response.PageResponse;
 import erp.global.util.PageParam;
 import erp.global.util.Strings;
 import erp.item.enums.ItemCategory;
+import erp.item.validation.ItemValidator;
 import erp.stock.domain.Stock;
 import erp.stock.dto.internal.StockFindAllRow;
 import erp.stock.dto.internal.StockFindFilterRow;
@@ -28,6 +29,8 @@ import static erp.global.util.RowCountGuards.requireOneRowAffected;
 public class StockServiceImpl implements StockService {
 
     private final StockMapper stockMapper;
+
+    private final ItemValidator itemValidator;
 
 
     @Override
@@ -111,6 +114,30 @@ public class StockServiceImpl implements StockService {
                         .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ITEM));
 
         return StockPriceFindResponse.from(row);
+    }
+
+    @Override
+    @Transactional
+    public void increaseOnHandQuantity(long itemId, int delta, long tenantId) {
+        if (delta <= 0) {
+            throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
+        }
+        itemValidator.validItemIdsIfPresent(List.of(itemId), tenantId);
+        int affectedRowCount = stockMapper.increaseOnHandQuantityByItemId(
+                tenantId, itemId, delta);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.NOT_FOUND_STOCK);
+    }
+
+    @Override
+    @Transactional
+    public void decreaseOnHandQuantity(long itemId, int delta, long tenantId) {
+        if (delta <= 0) {
+            throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
+        }
+        itemValidator.validItemIdsIfPresent(List.of(itemId), tenantId);
+        int affected = stockMapper.decreaseOnHandQuantityByItemId(
+                tenantId, itemId, delta);
+        requireOneRowAffected(affected, ErrorStatus.NOT_FOUND_STOCK);
     }
 
     /**

@@ -23,7 +23,6 @@ public class Inbound extends TimeStamped {
             long inboundId,
             String code,
             LocalDate inboundDate,
-            InboundStatus status,
             long employeeId,
             long purchaseId,
             long companyId
@@ -32,7 +31,7 @@ public class Inbound extends TimeStamped {
                 .inboundId(inboundId)
                 .code(code)
                 .inboundDate(inboundDate)
-                .status(status)
+                .status(InboundStatus.ACTIVE)
                 .employeeId(employeeId)
                 .purchaseId(purchaseId)
                 .companyId(companyId)

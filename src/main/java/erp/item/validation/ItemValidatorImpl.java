@@ -29,7 +29,7 @@ public class ItemValidatorImpl implements ItemValidator {
     }
 
     @Override
-    public void validItemIdsExist(List<Long> itemIds, long tenantId) {
+    public void validItemIdsIfPresent(List<Long> itemIds, long tenantId) {
         if (!itemMapper.existsByIds(tenantId, itemIds)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM);
         }

@@ -95,4 +95,26 @@
         ORDER BY pi.purchase_item_id ASC
     </select>
 
+    <select id="findAllPurchaseItemQuantityRow"
+            resultType="PurchaseItemQuantityRow">
+        SELECT
+        pi.purchase_item_id AS purchaseItemId,
+        pi.item_id AS itemId,
+        pi.quantity AS quantity
+        FROM purchase_item pi
+        JOIN purchase p ON p.purchase_id = pi.purchase_id
+        JOIN item i ON i.item_id = pi.item_id
+        WHERE pi.purchase_id = #{purchaseId}
+        AND p.status != 'CANCELLED'
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+    </select>
+
 </mapper>

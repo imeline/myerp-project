@@ -16,4 +16,8 @@ public interface StockService {
     );
 
     StockPriceFindResponse findStockPrice(long itemId, long tenantId);
+
+    void increaseOnHandQuantity(long itemId, int delta, long tenantId);
+
+    void decreaseOnHandQuantity(long itemId, int delta, long tenantId);
 }

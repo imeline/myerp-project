@@ -7,5 +7,5 @@ public interface ItemValidator {
 
     void validCodeUnique(String code, Long excludeId, long tenantId);
 
-    void validItemIdsExist(List<Long> itemIds, long tenantId);
+    void validItemIdsIfPresent(List<Long> itemIds, long tenantId);
 }

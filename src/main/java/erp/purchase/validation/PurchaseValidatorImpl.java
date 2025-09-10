@@ -13,7 +13,7 @@ public class PurchaseValidatorImpl implements PurchaseValidator {
     private final PurchaseMapper purchaseMapper;
 
     @Override
-    public void validPurchaseId(Long purchaseId, long tenantId) {
+    public void validPurchaseIdIfPresent(Long purchaseId, long tenantId) {
         if (purchaseId == null || !purchaseMapper.existsById(tenantId, purchaseId)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE);
         }
