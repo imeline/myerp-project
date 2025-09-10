@@ -2,7 +2,8 @@ package erp.purchase.mapper;
 
 import erp.purchase.domain.PurchaseItem;
 import erp.purchase.dto.internal.PurchaseItemDetailRow;
-import erp.purchase.dto.internal.PurchaseItemFindRow;
+import erp.purchase.dto.internal.PurchaseItemQuantityRow;
+import erp.purchase.dto.internal.PurchaseItemStockFindRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,7 +17,7 @@ public interface PurchaseItemMapper {
     int saveAll(@Param("tenantId") long tenantId,
                 @Param("items") List<PurchaseItem> items);
 
-    List<PurchaseItemFindRow> findAllPurchaseItemFindRow(
+    List<PurchaseItemStockFindRow> findAllPurchaseItemStockFindRow(
             @Param("tenantId") long tenantId,
             @Param("purchaseId") long purchaseId
     );
@@ -24,4 +25,9 @@ public interface PurchaseItemMapper {
     List<PurchaseItemDetailRow> findAllPurchaseItemDetailRow(
             @Param("tenantId") long tenantId,
             @Param("purchaseId") long purchaseId);
+
+    List<PurchaseItemQuantityRow> findAllPurchaseItemQuantityRow(
+            @Param("tenantId") long tenantId,
+            @Param("purchaseId") long purchaseId
+    );
 }

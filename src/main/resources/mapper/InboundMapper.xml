@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.inbound.mapper.InboundMapper">
+    <select id="nextId" resultType="long">
+        SELECT inbound_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO inbound (inbound_id,
+                             code,
+                             inbound_date,
+                             status,
+                             employee_id,
+                             purchase_id,
+                             company_id)
+        VALUES (#{inbound.inboundId},
+                #{inbound.code},
+                #{inbound.inboundDate},
+                #{inbound.status},
+                #{inbound.employeeId},
+                #{inbound.purchaseId},
+                #{tenantId})
+    </insert>
+</mapper>

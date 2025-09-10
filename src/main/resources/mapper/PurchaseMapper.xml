@@ -120,12 +120,22 @@
         </include>
     </select>
 
-    <!-- SHIPPED 가 아닌 경우에만 CANCELLED 로 변경 (조건부 UPDATE 먼저 시도) -->
-    <update id="updateStatusToCancelledIfNotShipped">
-        UPDATE purchase
-        SET status = 'CANCELLED'
+    <!-- 상태 단건 조회 -->
+    <select id="findStatusRowById" resultType="PurchaseStatusRow">
+        SELECT
+        status AS status
+        FROM purchase
         WHERE purchase_id = #{purchaseId}
-        AND status != 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <!-- 현재가 CONFIRMED일 때만 목표 상태로 전이 -->
+    <update id="updateStatusToIfConfirmed">
+        UPDATE purchase
+        SET status = #{to}
+        WHERE purchase_id = #{purchaseId}
+        AND status = 'CONFIRMED'
         AND
         <include refid="frag.tenantGuard"/>
     </update>

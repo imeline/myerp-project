@@ -32,9 +32,16 @@ public interface PurchaseMapper {
             @Param("tenantId") long tenantId
     );
 
-    // SHIPPED 가 아닌 경우에만 CANCELLED 로 변경 (조건부 업데이트)
-    int updateStatusToCancelledIfNotShipped(@Param("tenantId") long tenantId,
+    Optional<PurchaseDetailRow> findPurchaseDetailRow(
+            @Param("tenantId") long tenantId,
+            @Param("purchaseId") long purchaseId);
+
+    Optional<PurchaseStatus> findStatusById(@Param("tenantId") long tenantId,
                                             @Param("purchaseId") long purchaseId);
+
+    int updateStatusToIfConfirmed(@Param("tenantId") long tenantId,
+                                  @Param("purchaseId") long purchaseId,
+                                  @Param("to") PurchaseStatus to);
 
     long countByPeriodAndCodeAndStatus(
             @Param("tenantId") long tenantId,
@@ -50,7 +57,4 @@ public interface PurchaseMapper {
     boolean existsShippedById(@Param("tenantId") long tenantId,
                               @Param("purchaseId") long purchaseId);
 
-    Optional<PurchaseDetailRow> findPurchaseDetailRow(
-            @Param("tenantId") long tenantId,
-            @Param("purchaseId") long purchaseId);
 }

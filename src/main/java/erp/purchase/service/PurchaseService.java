@@ -1,12 +1,13 @@
 package erp.purchase.service;
 
 import erp.global.response.PageResponse;
+import erp.purchase.dto.internal.PurchaseItemQuantityRow;
 import erp.purchase.dto.request.PurchaseFindAllRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
 import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
 import erp.purchase.dto.response.PurchaseDetailResponse;
 import erp.purchase.dto.response.PurchaseFindResponse;
-import erp.purchase.dto.response.PurchaseItemFindResponse;
+import erp.purchase.dto.response.PurchaseItemsSummaryResponse;
 
 import java.util.List;
 
@@ -26,4 +27,8 @@ public interface PurchaseService {
     PurchaseDetailResponse findPurchaseDetail(long purchaseId, long tenantId);
 
     void cancelPurchase(long purchaseId, long tenantId);
+
+    List<PurchaseItemQuantityRow> findAllPurchaseItemQuantityRow(long purchaseId, long tenantId);
+
+    void updateStatusToShippedIfConfirmed(long purchaseId, long tenantId);
 }
