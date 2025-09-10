@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.stock.mapper.StockMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT stock_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO stock (stock_id, warehouse, on_hand_quantity,
+                           allocated_quantity, item_id, company_id)
+        VALUES (#{stock.stockId}, #{stock.warehouse}, #{stock.onHandQuantity},
+                #{stock.allocatedQuantity}, #{stock.itemId},
+                #{tenantId})
+    </insert>
+
+    <!-- 목록 조회 -->
+    <select id="findAllStockFindAllRow" resultType="StockFindAllRow">
+        SELECT
+        i.item_id AS itemId,
+        i.name AS itemName,
+        i.code AS itemCode,
+        (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) AS
+        availableQuantity,
+        NVL(s.on_hand_quantity, 0) AS onHandQuantity,
+        NVL(s.allocated_quantity, 0) AS allocatedQuantity,
+        i.unit AS unit,
+        s.warehouse AS warehouse,
+        CAST(i.price AS NUMBER(10,0)) AS unitPrice,
+        (NVL(s.on_hand_quantity, 0) * CAST(i.price AS NUMBER(10,0))) AS
+        inventoryValue
+        FROM
+        item i
+        JOIN stock s ON s.item_id = i.item_id
+        WHERE
+        1 = 1
+
+        <!-- 검색 조건 -->
+        <if test="query.itemName != null">
+            AND UPPER(i.name) LIKE '%' || UPPER(#{query.itemName}) || '%'
+        </if>
+
+        <if test="query.itemCategory != null">
+            AND i.category = #{query.itemCategory}
+        </if>
+
+        <if test="query.warehouseName != null">
+            AND UPPER(s.warehouse) LIKE '%' || UPPER(#{query.warehouseName}) ||
+            '%'
+        </if>
+
+        <if test="query.availableQuantityFrom != null">
+            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) &gt;=
+            #{query.availableQuantityFrom}
+        </if>
+
+        <if test="query.availableQuantityTo != null">
+            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) &lt;=
+            #{query.availableQuantityTo}
+        </if>
+
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+
+        <choose>
+            <when test="query.sortBy.name() == 'AVAILABLE'">
+                ORDER BY (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity,
+                0)) ${query.sortDirection},
+                i.name ASC,
+                i.item_id DESC
+            </when>
+            <when test="query.sortBy.name() == 'ON_HAND'">
+                ORDER BY NVL(s.on_hand_quantity, 0) ${query.sortDirection},
+                i.name ASC,
+                i.item_id DESC
+            </when>
+            <when test="query.sortBy.name() == 'ALLOCATED'">
+                ORDER BY NVL(s.allocated_quantity, 0) ${query.sortDirection},
+                i.name ASC,
+                i.item_id DESC
+            </when>
+            <when test="query.sortBy.name() == 'ITEM_NAME'">
+                ORDER BY i.name ${query.sortDirection},
+                i.item_id DESC
+            </when>
+            <when test="query.sortBy.name() == 'ITEM_CODE'">
+                ORDER BY i.code ${query.sortDirection},
+                i.item_id DESC
+            </when>
+            <when test="query.sortBy.name() == 'UNIT_PRICE'">
+                ORDER BY CAST(i.price AS NUMBER(10,0)) ${query.sortDirection},
+                i.name ASC,
+                i.item_id DESC
+            </when>
+            <when test="query.sortBy.name() == 'INVENTORY_VALUE'">
+                ORDER BY (NVL(s.on_hand_quantity, 0) * CAST(i.price AS
+                NUMBER(10,0))) ${query.sortDirection},
+                i.name ASC,
+                i.item_id DESC
+            </when>
+            <when test="query.sortBy.name() == 'CREATED_AT'">
+                ORDER BY i.created_at ${query.sortDirection},
+                i.item_id DESC
+            </when>
+            <otherwise>
+                ORDER BY (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity,
+                0)) DESC,
+                i.name ASC,
+                i.item_id DESC
+            </otherwise>
+        </choose>
+
+        OFFSET #{query.offset} ROWS
+        FETCH NEXT #{query.size} ROWS ONLY
+    </select>
+
+    <select id="findStockPriceFindRowByItemId"
+            resultType="StockPriceFindRow">
+
+        SELECT
+        NVL(SUM(s.on_hand_quantity), 0) AS onHandQuantity,
+        NVL(SUM(s.allocated_quantity), 0) AS allocatedQuantity,
+        NVL(SUM(s.on_hand_quantity), 0) - NVL(SUM(s.allocated_quantity), 0) AS
+        availableQuantity,
+        i.price AS unitPrice
+        FROM
+        item i
+        LEFT JOIN stock s
+        ON s.item_id = i.item_id
+        WHERE
+        i.item_id = #{itemId}
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+        GROUP BY
+        i.price
+    </select>
+
+
+    <!-- 총 개수 -->
+    <select id="countByStock" resultType="long">
+        SELECT COUNT(1)
+        FROM
+        item i
+        JOIN stock s ON s.item_id = i.item_id
+        WHERE
+        1 = 1
+
+        <!-- 검색 조건(목록과 동일) -->
+        <if test="query.itemName != null">
+            AND UPPER(i.name) LIKE '%' || UPPER(#{query.itemName}) || '%'
+        </if>
+
+        <if test="query.itemCategory != null">
+            AND i.category = #{query.itemCategory}
+        </if>
+
+        <if test="query.warehouseName != null">
+            AND UPPER(s.warehouse) LIKE '%' || UPPER(#{query.warehouseName}) ||
+            '%'
+        </if>
+
+        <if test="query.availableQuantityFrom != null">
+            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) &gt;=
+            #{query.availableQuantityFrom}
+        </if>
+
+        <if test="query.availableQuantityTo != null">
+            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) &lt;=
+            #{query.availableQuantityTo}
+        </if>
+
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+    </select>
+
+</mapper>

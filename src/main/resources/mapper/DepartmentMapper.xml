@@ -106,8 +106,8 @@
         <if test="parentId == null">
             AND parent_id IS NULL
         </if>
-        <if test="excludeDepartmentId != null">
-            AND department_id != #{excludeDepartmentId}
+        <if test="excludeId != null">
+            AND department_id != #{excludeId}
         </if>
         AND
         <include refid="frag.tenantGuard"/>

@@ -19,12 +19,14 @@ public enum ErrorStatus {
 
     // AUTH
     DUPLICATE_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
-    INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103", "테넌트 ID가 설정되지 않았습니다."),
+    INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103",
+            "테넌트 ID가 설정되지 않았습니다."),
     SIGNUP_FAIL("AUTH104", "회원가입에 실패했습니다."),
     NOT_FOUND_ERP_ACCOUNT("AUTH105", "계정을 찾을 수 없습니다."),
 
     // ERP ACCOUNT
     CREATE_ERP_ACCOUNT_FAIL("ERP201", "계정 생성에 실패했습니다."),
+    DELETE_ERP_ACCOUNT_FAIL("ERP202", "계정 삭제에 실패했습니다."),
 
     // EMPLOYEE
     NOT_REGISTERED_EMPLOYEE("EMP301", "등록된 직원이 없습니다."),
@@ -32,6 +34,8 @@ public enum ErrorStatus {
     DUPLICATE_PHONE("EMP303", "이미 등록된 전화번호입니다."),
     CREATE_EMPLOYEE_FAIL("EMP304", "직원 생성에 실패했습니다."),
     NOT_FOUND_EMPLOYEE("EMP305", "존재하지 않는 직원입니다."),
+    UPDATE_EMPLOYEE_FAIL("EMP306", "직원 수정에 실패했습니다."),
+    ALREADY_RETIRED_EMPLOYEE("EMP307", "이미 퇴사 처리된 직원입니다."),
 
     // COMPANY
     DUPLICATE_BIZ_NO("COMP401", "이미 등록된 사업자등록번호입니다."),
@@ -49,7 +53,8 @@ public enum ErrorStatus {
     CREATE_DEPARTMENT_FAIL("DPT503", "부서 생성에 실패했습니다."),
     UPDATE_DEPARTMENT_FAIL("DPT504", "부서 수정에 실패했습니다."),
     DELETE_DEPARTMENT_FAIL("DPT505", "부서를 찾을 수 없거나 이미 삭제된 부서입니다."),
-    NO_FOUND_PARENT_DEPARTMENT("DPT506", "유효하지 않은 상위 부서입니다."), EXIST_EMPLOYEE_IN_DEPARTMENT("DPT507", "해당 부서에 속한 직원이 존재합니다."),
+    NO_FOUND_PARENT_DEPARTMENT("DPT506", "유효하지 않은 상위 부서입니다."), EXIST_EMPLOYEE_IN_DEPARTMENT(
+            "DPT507", "해당 부서에 속한 직원이 존재합니다."),
     EXIST_CHILD_DEPARTMENT("DPT508", "하위 부서가 존재하여 삭제할 수 없습니다."),
     NOT_REGISTERED_DEPARTMENT("DPT509", "등록된 부서가 없습니다."),
 
@@ -71,9 +76,12 @@ public enum ErrorStatus {
     DUPLICATE_ITEM_CODE("ITEM706", "이미 등록된 품목 코드입니다."),
     NOT_REGISTERED_ITEM("ITEM707", "등록된 품목이 없습니다."),
     DUPLICATE_ITEM("ITEM708", "중복된 품목이 있습니다."),
+    NOT_FOUND_ITEM_PRICE("ITEM709", "품목에 대한 가격 정보가 없습니다."),
 
     // STOCK
-
+    INVALID_STOCK_QUANTITY("STK801", "재고 수량은 0 이상이어야 합니다."),
+    CREATE_STOCK_FAIL("STK802", "재고 생성에 실패했습니다."),
+    NOT_REGISTERED_STOCK("STK803", "등록된 재고가 없습니다."),
 
     // PURCHASE
     CREATE_PURCHASE_FAIL("PUR901", "발주 생성에 실패했습니다."),
@@ -86,8 +94,6 @@ public enum ErrorStatus {
     CANCEL_PURCHASE_FAIL("PUR908", "발주 취소에 실패했습니다."),
     NOT_REGISTERED_PURCHASE_ITEM("PUR909", "등록된 발주 품목이 없습니다."),
     ;
-
-
     private final String status;
     private final String message;
 }

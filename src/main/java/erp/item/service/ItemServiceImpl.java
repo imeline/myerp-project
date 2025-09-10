@@ -1,3 +1,4 @@
+// ItemServiceImpl.java
 package erp.item.service;
 
 import erp.global.exception.ErrorStatus;
@@ -6,15 +7,18 @@ import erp.global.response.PageResponse;
 import erp.global.util.PageParam;
 import erp.item.domain.Item;
 import erp.item.dto.internal.ItemFindRow;
-import erp.item.dto.internal.ItemIdAndNameRow;
+import erp.item.dto.internal.ItemOptionRow;
+import erp.item.dto.internal.ItemPriceRow;
 import erp.item.dto.request.ItemFindAllRequest;
 import erp.item.dto.request.ItemSaveRequest;
 import erp.item.dto.request.ItemUpdateRequest;
 import erp.item.dto.response.ItemFindResponse;
-import erp.item.dto.response.ItemIdAndNameResponse;
 import erp.item.dto.response.ItemInfoResponse;
+import erp.item.dto.response.ItemOptionResponse;
 import erp.item.enums.ItemCategory;
 import erp.item.mapper.ItemMapper;
+import erp.item.validation.ItemValidator;
+import erp.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,21 +33,23 @@ import static erp.global.util.Strings.normalizeOrNull;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemMapper itemMapper;
+    private final StockService stockService;
+    private final ItemValidator itemValidator;
 
     @Override
     @Transactional
-    public Long saveItem(ItemSaveRequest request, long tenantId) {
+    public Long saveItemAndStock(ItemSaveRequest request, long tenantId) {
         String name = normalizeOrNull(request.name());
         String code = normalizeOrNull(request.code());
         ItemCategory category = request.category();
 
-        validateNameUnique(name, null, tenantId);
-        validateCodeUnique(code, null, tenantId);
+        itemValidator.validNameUnique(name, null, tenantId);
+        itemValidator.validCodeUnique(code, null, tenantId);
 
-        long newId = itemMapper.nextId();
+        long newItemId = itemMapper.nextId();
 
         Item item = Item.of(
-                newId,
+                newItemId,
                 name,
                 code,
                 request.price(),
@@ -55,7 +61,15 @@ public class ItemServiceImpl implements ItemService {
         int affectedRowCount = itemMapper.save(tenantId, item);
         requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_ITEM_FAIL);
 
-        return newId;
+        stockService.saveStock(
+                newItemId,
+                request.initialQuantity(),
+                request.warehouse(),
+                tenantId
+        );
+
+
+        return newItemId;
     }
 
     @Override
@@ -89,13 +103,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemIdAndNameResponse> findAllItemIdAndName(long tenantId) {
-        List<ItemIdAndNameRow> rows = itemMapper.findAllIdAndNameByTenantId(tenantId);
+    public List<ItemOptionResponse> findAllItemOption(long tenantId) {
+        List<ItemOptionRow> rows = itemMapper.findAllItemOptionRow(tenantId);
         if (rows.isEmpty())
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_ITEM);
         return rows.stream()
-                .map(ItemIdAndNameResponse::from)
+                .map(ItemOptionResponse::from)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ItemPriceRow> findAllItemPriceByIds(List<Long> itemIds, long tenantId) {
+        List<ItemPriceRow> priceRows = itemMapper.findAllPriceByIds(tenantId, itemIds);
+        if (priceRows.isEmpty())
+            throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM_PRICE);
+        return priceRows;
     }
 
     @Override
@@ -106,8 +129,8 @@ public class ItemServiceImpl implements ItemService {
         String code = normalizeOrNull(request.code());
         ItemCategory category = request.category();
 
-        validateNameUnique(name, itemId, tenantId);
-        validateCodeUnique(code, itemId, tenantId);
+        itemValidator.validNameUnique(name, itemId, tenantId);
+        itemValidator.validCodeUnique(code, itemId, tenantId);
 
         Item item = Item.of(
                 itemId,
@@ -130,15 +153,5 @@ public class ItemServiceImpl implements ItemService {
 
         int affectedRowCount = itemMapper.softDeleteById(tenantId, itemId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_ITEM_FAIL);
-    }
-
-    private void validateNameUnique(String name, Long excludeId, long tenantId) {
-        if (itemMapper.existsByName(tenantId, name, excludeId))
-            throw new GlobalException(ErrorStatus.DUPLICATE_ITEM_NAME);
-    }
-
-    private void validateCodeUnique(String code, Long excludeId, long tenantId) {
-        if (itemMapper.existsByCode(tenantId, code, excludeId))
-            throw new GlobalException(ErrorStatus.DUPLICATE_ITEM_CODE);
     }
 }

@@ -48,8 +48,8 @@
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
-    <select id="findAllIdAndNameByTenantId" resultType="ItemIdAndNameRow">
-        SELECT item_id, name
+    <select id="findAllItemOptionRow" resultType="ItemOptionRow">
+        SELECT item_id, name, code
         FROM item
         WHERE
         <include refid="frag.tenantGuard"/>

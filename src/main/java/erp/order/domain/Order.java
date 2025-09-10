@@ -16,8 +16,8 @@ public class Order extends TimeStamped {
     private String code;
     private String customer;
     private LocalDate orderDate;
-    private Integer totalQuantity;
-    private Integer totalAmount;
+    private int totalQuantity;
+    private int totalAmount;
     private OrderStatus status;
     private long employeeId;
     private long companyId;

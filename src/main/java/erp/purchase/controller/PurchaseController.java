@@ -8,13 +8,18 @@ import erp.purchase.dto.request.PurchaseSaveRequest;
 import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
 import erp.purchase.dto.response.PurchaseDetailResponse;
 import erp.purchase.dto.response.PurchaseFindResponse;
-import erp.purchase.dto.response.PurchaseItemFindResponse;
+import erp.purchase.dto.response.PurchaseItemsSummaryResponse;
 import erp.purchase.service.PurchaseService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,23 +43,24 @@ public class PurchaseController {
      */
     @GetMapping
     public ApiResponse<PageResponse<PurchaseFindResponse>> findAllPurchases(
-            @Valid @RequestBody PurchaseFindAllRequest request
+        @Valid @RequestBody PurchaseFindAllRequest request
     ) {
         long tenantId = TenantContext.get();
-        PageResponse<PurchaseFindResponse> page = purchaseService.findAllPurchase(request, tenantId);
+        PageResponse<PurchaseFindResponse> page = purchaseService.findAllPurchase(request,
+            tenantId);
         return ApiResponse.onSuccess(page);
     }
 
     /**
-     * 특정 발주의 발주아이템 목록 조회
+     * 특정 발주의 발주아이템 목록 요약 조회
      */
-    @GetMapping("/{purchaseId}/items")
-    public ApiResponse<List<PurchaseItemFindResponse>> findAllPurchaseItem(
-            @PathVariable long purchaseId
-    ) {
+    @GetMapping("/{purchaseId}/items/summary")
+    public ApiResponse<PurchaseItemsSummaryResponse> findPurchaseItemsSummary(
+        @PathVariable long purchaseId) {
         long tenantId = TenantContext.get();
-        List<PurchaseItemFindResponse> responses = purchaseService.findAllPurchaseItems(purchaseId, tenantId);
-        return ApiResponse.onSuccess(responses);
+        PurchaseItemsSummaryResponse response = purchaseService.findPurchaseItemsSummary(purchaseId,
+            tenantId);
+        return ApiResponse.onSuccess(response);
     }
 
     /**
@@ -63,7 +69,8 @@ public class PurchaseController {
     @GetMapping("/code-suppliers")
     public ApiResponse<List<PurchaseCodeAndSupplierResponse>> findAllPurchaseCodeAndSupplier() {
         long tenantId = TenantContext.get();
-        List<PurchaseCodeAndSupplierResponse> responses = purchaseService.findAllPurchaseCodeAndSupplier(tenantId);
+        List<PurchaseCodeAndSupplierResponse> responses = purchaseService.findAllPurchaseCodeAndSupplier(
+            tenantId);
         return ApiResponse.onSuccess(responses);
     }
 
@@ -71,7 +78,7 @@ public class PurchaseController {
      * 발주 상세 조회
      */
     @GetMapping("/{purchaseId}")
-    public ApiResponse<PurchaseDetailResponse> findPurchaseDetail(@PathVariable long purchaseId) {
+    public ApiResponse<PurchaseDetailResponse> findPurchaseDetail(@PathVariable Long purchaseId) {
         long tenantId = TenantContext.get();
         PurchaseDetailResponse response = purchaseService.findPurchaseDetail(purchaseId, tenantId);
         return ApiResponse.onSuccess(response);
@@ -81,7 +88,7 @@ public class PurchaseController {
      * 발주 취소(삭제) — status를 CANCELLED로 변경. SHIPPED이면 불가
      */
     @DeleteMapping("/{purchaseId}")
-    public ApiResponse<Void> cancelPurchase(@PathVariable long purchaseId) {
+    public ApiResponse<Void> cancelPurchase(@PathVariable Long purchaseId) {
         long tenantId = TenantContext.get();
         purchaseService.cancelPurchase(purchaseId, tenantId);
         return ApiResponse.onSuccess(null);
