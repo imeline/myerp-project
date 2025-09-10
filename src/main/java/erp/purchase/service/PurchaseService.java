@@ -11,14 +11,14 @@ import erp.purchase.dto.response.PurchaseItemFindResponse;
 import java.util.List;
 
 public interface PurchaseService {
+
     long savePurchaseAndPurchaseItems(
             PurchaseSaveRequest request, long tenantId);
 
     PageResponse<PurchaseFindResponse> findAllPurchase(
             PurchaseFindAllRequest request, long tenantId);
 
-    List<PurchaseItemFindResponse> findAllPurchaseItems(
-            long purchaseId, long tenantId);
+    PurchaseItemsSummaryResponse findPurchaseItemsSummary(long purchaseId, long tenantId);
 
     List<PurchaseCodeAndSupplierResponse> findAllPurchaseCodeAndSupplier(
             long tenantId);

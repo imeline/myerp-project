@@ -8,10 +8,13 @@ import erp.item.dto.request.ItemSaveRequest;
 import erp.item.dto.request.ItemUpdateRequest;
 import erp.item.dto.response.ItemFindResponse;
 import erp.item.dto.response.ItemInfoResponse;
+import erp.item.dto.response.ItemOptionResponse;
 import erp.item.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,13 +24,13 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ApiResponse<Long> saveItem(@Valid @RequestBody ItemSaveRequest request) {
+    public ApiResponse<Long> saveItemAndStock(@Valid @RequestBody ItemSaveRequest request) {
         long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(itemService.saveItem(request, tenantId));
+        return ApiResponse.onSuccess(itemService.saveItemAndStock(request, tenantId));
     }
 
     @GetMapping("/{itemId}")
-    public ApiResponse<ItemInfoResponse> findItem(@PathVariable long itemId) {
+    public ApiResponse<ItemInfoResponse> findItem(@PathVariable Long itemId) {
         long tenantId = TenantContext.get();
         return ApiResponse.onSuccess(itemService.findItem(itemId, tenantId));
     }
@@ -39,8 +42,15 @@ public class ItemController {
         return ApiResponse.onSuccess(itemService.findAllItems(request, tenantId));
     }
 
+    @GetMapping("/options")
+    public ApiResponse<List<ItemOptionResponse>> findAllItemOption() {
+        long tenantId = TenantContext.get();
+        List<ItemOptionResponse> responses = itemService.findAllItemOption(tenantId);
+        return ApiResponse.onSuccess(responses);
+    }
+
     @PutMapping("/{itemId}")
-    public ApiResponse<Void> updateItem(@PathVariable long itemId,
+    public ApiResponse<Void> updateItem(@PathVariable Long itemId,
                                         @Valid @RequestBody ItemUpdateRequest request) {
         long tenantId = TenantContext.get();
         itemService.updateItem(itemId, request, tenantId);
@@ -48,7 +58,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    public ApiResponse<Void> softDeleteItem(@PathVariable long itemId) {
+    public ApiResponse<Void> softDeleteItem(@PathVariable Long itemId) {
         long tenantId = TenantContext.get();
         itemService.softDeleteItem(itemId, tenantId);
         return ApiResponse.onSuccess(null);

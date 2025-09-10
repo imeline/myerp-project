@@ -10,6 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface PurchaseItemMapper {
+
     long nextId();
 
     int saveAll(@Param("tenantId") long tenantId,

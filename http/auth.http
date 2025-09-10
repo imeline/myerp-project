@@ -20,13 +20,13 @@ POST {{base}}/signup/admin
 Content-Type: application/json
 
 {
-  "loginEmail": "admin1@naver.com",
+  "loginEmail": "admin2@naver.com",
   "password": "123456",
-  "empNo": "AD123",
-  "name": "admin1",
-  "phone": "010-3322-5678",
+  "empNo": "AD234",
+  "name": "admin2",
+  "phone": "010-2222-5678",
   "departmentId": 3,
-  "positionId": 3,
+  "positionId": 4,
   "companyId": 2
 }
 
@@ -59,7 +59,7 @@ POST {{base}}/login
 Content-Type: application/json
 
 {
-  "loginEmail": "admin1@naver.com",
+  "loginEmail": "admin2@naver.com",
   "password": "123456"
 }
 

@@ -34,4 +34,22 @@ public class Employee extends TimeStamped {
                 .companyId(companyId)
                 .build();
     }
+
+    public static Employee update(Long employeeId,
+                                  String empNo,
+                                  String name,
+                                  String phone,
+                                  Long departmentId,
+                                  Long positionId,
+                                  long companyId) {
+        return Employee.builder()
+                .employeeId(employeeId)
+                .name(name)
+                .empNo(empNo)
+                .departmentId(departmentId)
+                .positionId(positionId)
+                .phone(phone)
+                .companyId(companyId)
+                .build();
+    }
 }

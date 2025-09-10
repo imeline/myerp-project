@@ -1,0 +1,14 @@
+@base = {{host}}/api/v1/user/report/stock/5/movement
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI5YzI0MDRkOTI4NTM0YjE4YWEzZDVmNGNjZWU3NjBmMCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU3NDEyOTg1LCJleHAiOjE3NTc0NDg5ODUsInRlbmFudF9pZCI6Mn0.SzPcMxKZTUfJdFd4U7F-_Ots8hmAmtbUsTIkcozoirU
+
+### 재고 변동 내역 조회(팝업)
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "period": "ALL",
+  "status": "ALL",
+  "page": 0,
+  "size": 20
+}

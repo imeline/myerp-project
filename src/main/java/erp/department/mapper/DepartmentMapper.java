@@ -36,7 +36,7 @@ public interface DepartmentMapper {
                                     // 한 부모 안에 같은 이름의 부서가 있는지 검사(수정 시 자기 자신은 제외)
                                     @Param("parentId") Long parentId,
                                     @Param("name") String name,
-                                    @Param("excludeDepartmentId") Long excludeDepartmentId);
+                                    @Param("excludeId") Long excludeId);
 
     boolean existsById(@Param("tenantId") long tenantId,
                        @Param("departmentId") Long departmentId);

@@ -83,8 +83,8 @@
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM position
         WHERE LOWER(name) = LOWER(#{name})
-        <if test="excludePositionId != null">
-            AND position_id != #{excludePositionId}
+        <if test="excludeId != null">
+            AND position_id != #{excludeId}
         </if>
         AND
         <include refid="frag.tenantGuard"/>

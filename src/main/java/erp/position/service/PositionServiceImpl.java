@@ -1,6 +1,7 @@
+// PositionServiceImpl.java
 package erp.position.service;
 
-import erp.employee.mapper.EmployeeMapper;
+import erp.employee.validation.EmployeeValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import erp.position.domain.Position;
@@ -8,6 +9,7 @@ import erp.position.dto.request.PositionLevelNoRequest;
 import erp.position.dto.request.PositionNameRequest;
 import erp.position.dto.response.PositionFindAllResponse;
 import erp.position.mapper.PositionMapper;
+import erp.position.validation.PositionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,8 @@ import static erp.global.util.Strings.normalizeOrNull;
 public class PositionServiceImpl implements PositionService {
 
     private final PositionMapper positionMapper;
-    private final EmployeeMapper employeeMapper;
+    private final PositionValidator positionValidator;
+    private final EmployeeValidator employeeValidator;
 
     @Override
     @Transactional
@@ -83,7 +86,8 @@ public class PositionServiceImpl implements PositionService {
     @Override
     @Transactional
     public void deletePosition(long positionId, long tenantId) {
-        validEmployeeInPositionIfPresent(positionId, tenantId);
+        // 해당 직급에 속한 사원이 있는지 검사
+        employeeValidator.validNoEmployeesInPosition(positionId, tenantId);
         // 삭제하려는 직급의 levelNo
         int oldLevelNo = positionMapper.findLevelNoById(tenantId, positionId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_POSITION));
@@ -94,16 +98,8 @@ public class PositionServiceImpl implements PositionService {
         positionMapper.shiftDownRange(tenantId, oldLevelNo, Integer.MAX_VALUE);
     }
 
-    private void validNameUnique(String name, Long excludePositionId, long tenantId) {
-        if (positionMapper.existsByName(tenantId, name, excludePositionId)) {
-            throw new GlobalException(ErrorStatus.DUPLICATE_POSITION_NAME);
-        }
-    }
-
-    // 해당 직급에 속한 사원이 있는지 검사
-    private void validEmployeeInPositionIfPresent(long positionId, long tenantId) {
-        if (employeeMapper.existsByPositionId(tenantId, positionId)) {
-            throw new GlobalException(ErrorStatus.EXIST_EMPLOYEE_IN_POSITION);
-        }
+    // 원래 네이밍/흐름 유지
+    private void validNameUnique(String name, Long excludeId, long tenantId) {
+        positionValidator.validNameUnique(name, excludeId, tenantId);
     }
 }
