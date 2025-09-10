@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -43,14 +43,14 @@
         JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
         JOIN item i ON i.item_id = pi.item_id
         WHERE i.item_id = #{filter.itemId}
-        <if test="filter.startDate != null">AND inb.inbound_date &gt;=
-            #{filter.startDate}
+        <if test="filter.startDate != null">
+            AND inb.inbound_date >= #{filter.startDate}
         </if>
-        <if test="filter.endDate != null">AND inb.inbound_date &lt;=
-            #{filter.endDate}
+        <if test="filter.endDate != null">
+            AND #{filter.endDate} >= inb.inbound_date
         </if>
-        <if test="filter.code != null">AND UPPER(inb.code) LIKE '%' ||
-            UPPER(#{filter.code}) || '%'
+        <if test="filter.code != null">
+            AND UPPER(inb.code) LIKE '%' || UPPER(#{filter.code}) || '%'
         </if>
         <choose>
             <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
@@ -81,14 +81,14 @@
         JOIN order_item oi ON oi.order_id = o.order_id
         JOIN item i ON i.item_id = oi.item_id
         WHERE i.item_id = #{filter.itemId}
-        <if test="filter.startDate != null">AND outb.outbound_date &gt;=
-            #{filter.startDate}
+        <if test="filter.startDate != null">
+            AND outb.outbound_date >= #{filter.startDate}
         </if>
-        <if test="filter.endDate != null">AND outb.outbound_date &lt;=
-            #{filter.endDate}
+        <if test="filter.endDate != null">
+            AND #{filter.endDate} >= outb.outbound_date
         </if>
-        <if test="filter.code != null">AND UPPER(outb.code) LIKE '%' ||
-            UPPER(#{filter.code}) || '%'
+        <if test="filter.code != null">
+            AND UPPER(outb.code) LIKE '%' || UPPER(#{filter.code}) || '%'
         </if>
         <choose>
             <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
@@ -134,14 +134,14 @@
         JOIN stock s ON s.item_id = i.item_id
         JOIN employee e ON e.employee_id = inb.employee_id
         WHERE i.item_id = #{filter.itemId}
-        <if test="filter.startDate != null">AND inb.inbound_date &gt;=
-            #{filter.startDate}
+        <if test="filter.startDate != null">
+            AND inb.inbound_date >= #{filter.startDate}
         </if>
-        <if test="filter.endDate != null">AND inb.inbound_date &lt;=
-            #{filter.endDate}
+        <if test="filter.endDate != null">
+            AND #{filter.endDate} >= inb.inbound_date
         </if>
-        <if test="filter.code != null">AND UPPER(inb.code) LIKE '%' ||
-            UPPER(#{filter.code}) || '%'
+        <if test="filter.code != null">
+            AND UPPER(inb.code) LIKE '%' || UPPER(#{filter.code}) || '%'
         </if>
         <choose>
             <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
@@ -191,14 +191,14 @@
         JOIN stock s ON s.item_id = i.item_id
         JOIN employee e ON e.employee_id = outb.employee_id
         WHERE i.item_id = #{filter.itemId}
-        <if test="filter.startDate != null">AND outb.outbound_date &gt;=
-            #{filter.startDate}
+        <if test="filter.startDate != null">
+            AND outb.outbound_date >= #{filter.startDate}
         </if>
-        <if test="filter.endDate != null">AND outb.outbound_date &lt;=
-            #{filter.endDate}
+        <if test="filter.endDate != null">
+            AND #{filter.endDate} >= outb.outbound_date
         </if>
-        <if test="filter.code != null">AND UPPER(outb.code) LIKE '%' ||
-            UPPER(#{filter.code}) || '%'
+        <if test="filter.code != null">
+            AND UPPER(outb.code) LIKE '%' || UPPER(#{filter.code}) || '%'
         </if>
         <choose>
             <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
@@ -237,30 +237,23 @@
 
     <!-- 총 개수 -->
     <select id="countMovementRows" resultType="long">
-        SELECT COUNT(1) FROM (
+        SELECT COUNT(1)
+        FROM (
         SELECT inb.inbound_id AS id
         FROM inbound inb
         JOIN purchase p ON p.purchase_id = inb.purchase_id
         JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
         JOIN item i ON i.item_id = pi.item_id
         WHERE i.item_id = #{filter.itemId}
-        <if test="filter.startDate != null">AND inb.inbound_date &gt;=
-            #{filter.startDate}
+        <if test="filter.startDate != null">
+            AND inb.inbound_date >= #{filter.startDate}
         </if>
-        <if test="filter.endDate != null">AND inb.inbound_date &lt;=
-            #{filter.endDate}
+        <if test="filter.endDate != null">
+            AND #{filter.endDate} >= inb.inbound_date
         </if>
-        <if test="filter.code != null">AND UPPER(inb.code) LIKE '%' ||
-            UPPER(#{filter.code}) || '%'
+        <if test="filter.code != null">
+            AND UPPER(inb.code) LIKE '%' || UPPER(#{filter.code}) || '%'
         </if>
-        <choose>
-            <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
-                AND inb.status = 'ACTIVE'
-            </when>
-            <when test="filter.status != null and filter.status.name() == 'CANCELED'">
-                AND inb.status = 'CANCELED'
-            </when>
-        </choose>
         AND i.deleted_at IS NULL
         AND
         <include refid="frag.tenantGuardAlias">
@@ -283,23 +276,15 @@
         JOIN order_item oi ON oi.order_id = o.order_id
         JOIN item i ON i.item_id = oi.item_id
         WHERE i.item_id = #{filter.itemId}
-        <if test="filter.startDate != null">AND outb.outbound_date &gt;=
-            #{filter.startDate}
+        <if test="filter.startDate != null">
+            AND outb.outbound_date >= #{filter.startDate}
         </if>
-        <if test="filter.endDate != null">AND outb.outbound_date &lt;=
-            #{filter.endDate}
+        <if test="filter.endDate != null">
+            AND #{filter.endDate} >= outb.outbound_date
         </if>
-        <if test="filter.code != null">AND UPPER(outb.code) LIKE '%' ||
-            UPPER(#{filter.code}) || '%'
+        <if test="filter.code != null">
+            AND UPPER(outb.code) LIKE '%' || UPPER(#{filter.code}) || '%'
         </if>
-        <choose>
-            <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
-                AND outb.status = 'ACTIVE'
-            </when>
-            <when test="filter.status != null and filter.status.name() == 'CANCELED'">
-                AND outb.status = 'CANCELED'
-            </when>
-        </choose>
         AND i.deleted_at IS NULL
         AND
         <include refid="frag.tenantGuardAlias">

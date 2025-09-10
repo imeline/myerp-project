@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -10,10 +10,17 @@
     </select>
 
     <insert id="save">
-        INSERT INTO stock (stock_id, warehouse, on_hand_quantity,
-                           allocated_quantity, item_id, company_id)
-        VALUES (#{stock.stockId}, #{stock.warehouse}, #{stock.onHandQuantity},
-                #{stock.allocatedQuantity}, #{stock.itemId},
+        INSERT INTO stock (stock_id,
+                           warehouse,
+                           on_hand_quantity,
+                           allocated_quantity,
+                           item_id,
+                           company_id)
+        VALUES (#{stock.stockId},
+                #{stock.warehouse},
+                #{stock.onHandQuantity},
+                #{stock.allocatedQuantity},
+                #{stock.itemId},
                 #{tenantId})
     </insert>
 
@@ -32,11 +39,9 @@
         CAST(i.price AS NUMBER(10,0)) AS unitPrice,
         (NVL(s.on_hand_quantity, 0) * CAST(i.price AS NUMBER(10,0))) AS
         inventoryValue
-        FROM
-        item i
+        FROM item i
         JOIN stock s ON s.item_id = i.item_id
-        WHERE
-        1 = 1
+        WHERE 1 = 1
 
         <!-- 검색 조건 -->
         <if test="query.itemName != null">
@@ -53,13 +58,13 @@
         </if>
 
         <if test="query.availableQuantityFrom != null">
-            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) &gt;=
+            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) >=
             #{query.availableQuantityFrom}
         </if>
 
         <if test="query.availableQuantityTo != null">
-            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) &lt;=
-            #{query.availableQuantityTo}
+            AND #{query.availableQuantityTo} >= (NVL(s.on_hand_quantity, 0) -
+            NVL(s.allocated_quantity, 0))
         </if>
 
         AND i.deleted_at IS NULL
@@ -124,21 +129,16 @@
         FETCH NEXT #{query.size} ROWS ONLY
     </select>
 
-    <select id="findStockPriceFindRowByItemId"
-            resultType="StockPriceFindRow">
-
+    <select id="findStockPriceFindRowByItemId" resultType="StockPriceFindRow">
         SELECT
         NVL(SUM(s.on_hand_quantity), 0) AS onHandQuantity,
         NVL(SUM(s.allocated_quantity), 0) AS allocatedQuantity,
         NVL(SUM(s.on_hand_quantity), 0) - NVL(SUM(s.allocated_quantity), 0) AS
         availableQuantity,
         i.price AS unitPrice
-        FROM
-        item i
-        LEFT JOIN stock s
-        ON s.item_id = i.item_id
-        WHERE
-        i.item_id = #{itemId}
+        FROM item i
+        LEFT JOIN stock s ON s.item_id = i.item_id
+        WHERE i.item_id = #{itemId}
         AND i.deleted_at IS NULL
         AND
         <include refid="frag.tenantGuardAlias">
@@ -148,19 +148,15 @@
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="s"/>
         </include>
-        GROUP BY
-        i.price
+        GROUP BY i.price
     </select>
-
 
     <!-- 총 개수 -->
     <select id="countByStock" resultType="long">
         SELECT COUNT(1)
-        FROM
-        item i
+        FROM item i
         JOIN stock s ON s.item_id = i.item_id
-        WHERE
-        1 = 1
+        WHERE 1 = 1
 
         <!-- 검색 조건(목록과 동일) -->
         <if test="query.itemName != null">
@@ -177,13 +173,13 @@
         </if>
 
         <if test="query.availableQuantityFrom != null">
-            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) &gt;=
+            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) >=
             #{query.availableQuantityFrom}
         </if>
 
         <if test="query.availableQuantityTo != null">
-            AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) &lt;=
-            #{query.availableQuantityTo}
+            AND #{query.availableQuantityTo} >= (NVL(s.on_hand_quantity, 0) -
+            NVL(s.allocated_quantity, 0))
         </if>
 
         AND i.deleted_at IS NULL
@@ -201,6 +197,15 @@
         UPDATE stock
         SET on_hand_quantity = on_hand_quantity + #{delta}
         WHERE item_id = #{itemId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <update id="decreaseOnHandQuantityByItemId">
+        UPDATE stock
+        SET on_hand_quantity = on_hand_quantity - #{delta}
+        WHERE item_id = #{itemId}
+        AND on_hand_quantity >= #{delta}
         AND
         <include refid="frag.tenantGuard"/>
     </update>

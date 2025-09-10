@@ -96,11 +96,20 @@ public enum ErrorStatus {
     NOT_REGISTERED_PURCHASE_ITEM("PUR909", "등록된 발주 품목이 없습니다."),
     CANNOT_SHIP_CANCELLED_PURCHASE("PUR910", "취소된 발주는 입고 처리할 수 없습니다."),
     ALREADY_SHIPPED_PURCHASE("PUR911", "이미 입고 처리된 발주입니다."),
-    SHIP_PURCHASE_FAIL("PUR912", "발주 입고 처리에 실패했습니다."),
+    UPDATE_PURCHASE_STATUS_FAIL("PUR912", "발주 상태 변경에 실패했습니다."),
+    CANNOT_REVERT_CANCELLED_PURCHASE("PUR913", "취소된 발주는 상태를 되돌릴 수 없습니다."),
+    ALREADY_CONFIRMED_PURCHASE("PUR914", "이미 확정 상태의 발주입니다."),
+
 
     // INBOUND
     CREATE_INBOUND_FAIL("INB1001", "입고 생성에 실패했습니다."),
+    NOT_REGISTERED_INBOUND("INB1002", "등록된 입고가 없습니다."),
+    NOT_FOUND_INBOUND("INB1003", "존재하지 않는 입고입니다."),
+    INBOUND_NOT_ACTIVE("INB1004", "활성 상태가 아닌 입고입니다."),
+    CANCEL_INBOUND_FAIL("INB1005", "입고 취소에 실패했습니다."),
     ;
+
+
     private final String status;
     private final String message;
 }

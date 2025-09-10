@@ -31,4 +31,6 @@ public interface PurchaseService {
     List<PurchaseItemQuantityRow> findAllPurchaseItemQuantityRow(long purchaseId, long tenantId);
 
     void updateStatusToShippedIfConfirmed(long purchaseId, long tenantId);
+
+    void updateStatusToConfirmedIfShipped(long purchaseId, long tenantId);
 }

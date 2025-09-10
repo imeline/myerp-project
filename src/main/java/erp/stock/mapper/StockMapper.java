@@ -30,6 +30,10 @@ public interface StockMapper {
                                        @Param("itemId") long itemId,
                                        @Param("delta") int delta);
 
+    int decreaseOnHandQuantityByItemId(@Param("tenantId") long tenantId,
+                                       @Param("itemId") long itemId,
+                                       @Param("delta") int delta);
+
     long countByStock(@Param("tenantId") long tenantId,
                       @Param("query") StockFindFilterRow query);
 }

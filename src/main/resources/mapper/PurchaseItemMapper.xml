@@ -109,11 +109,11 @@
         AND i.deleted_at IS NULL
         AND
         <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="'p'"/>
+            <property name="alias" value="p"/>
         </include>
         AND
         <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="'i'"/>
+            <property name="alias" value="i"/>
         </include>
     </select>
 

@@ -3,6 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="erp.inbound.mapper.InboundMapper">
+
     <select id="nextId" resultType="long">
         SELECT inbound_seq.NEXTVAL
         FROM dual
@@ -24,4 +25,132 @@
                 #{inbound.purchaseId},
                 #{tenantId})
     </insert>
+
+    <select id="findAllInboundFindAllRow" resultType="InboundFindAllRow">
+        SELECT
+        i.inbound_id AS inboundId,
+        i.code AS inboundCode,
+        i.inbound_date AS inboundDate,
+        e.name AS employeeName,
+        p.purchase_id AS purchaseId,
+        p.code AS purchaseCode,
+        p.total_quantity AS totalQuantity,
+        p.total_amount AS totalAmount
+        FROM inbound i
+        JOIN purchase p ON p.purchase_id = i.purchase_id
+        JOIN employee e ON e.employee_id = i.employee_id
+        WHERE 1 = 1
+        <if test="startDate != null">
+            AND i.inbound_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= i.inbound_date
+        </if>
+        <if test="code != null">
+            AND i.code LIKE '%' || #{code} || '%'
+        </if>
+        AND i.status != 'CANCELED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        ORDER BY i.inbound_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <!-- 취소용 단일 조회: inboundId로 purchaseId/상태/품목수량 조회 -->
+    <select id="findAllCancelItemRowById"
+            resultType="InboundCancelItemRow">
+        SELECT
+        inb.purchase_id AS purchaseId,
+        inb.status AS inboundStatus,
+        pi.item_id AS itemId,
+        pi.quantity AS quantity
+        FROM inbound inb
+        JOIN purchase p ON p.purchase_id = inb.purchase_id
+        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+        JOIN item i ON i.item_id = pi.item_id
+        WHERE inb.inbound_id = #{inboundId}
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="inb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+    </select>
+
+    <update id="updateStatusToCanceledIfActive">
+        UPDATE inbound
+        SET status = 'CANCELED'
+        WHERE inbound_id = #{inboundId}
+        AND status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <select id="countByPeriodAndCode" resultType="long">
+        SELECT COUNT(1)
+        FROM (
+        SELECT DISTINCT i.inbound_id
+        FROM inbound i
+        JOIN purchase p ON p.purchase_id = i.purchase_id
+        JOIN employee e ON e.employee_id = i.employee_id
+        WHERE 1 = 1
+        <if test="startDate != null">
+            AND i.inbound_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= i.inbound_date
+        </if>
+        <if test="code != null">
+            AND i.code LIKE '%' || #{code} || '%'
+        </if>
+        AND i.status != 'CANCELED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        )
+    </select>
+
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM inbound
+        WHERE inbound_id = #{inboundId}
+        AND status != 'CANCELED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsActiveById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM inbound
+        WHERE inbound_id = #{inboundId}
+        AND status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
 </mapper>

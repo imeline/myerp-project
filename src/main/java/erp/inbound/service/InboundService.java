@@ -13,4 +13,6 @@ public interface InboundService {
             InboundFindAllRequest request,
             long tenantId
     );
+
+    void cancelInbound(long inboundId, long tenantId);
 }

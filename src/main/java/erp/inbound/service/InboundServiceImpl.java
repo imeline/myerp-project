@@ -11,11 +11,13 @@ import erp.global.util.time.DatePeriod;
 import erp.global.util.time.DateRange;
 import erp.global.util.time.Periods;
 import erp.inbound.domain.Inbound;
+import erp.inbound.dto.internal.InboundCancelItemRow;
 import erp.inbound.dto.internal.InboundFindAllRow;
 import erp.inbound.dto.request.InboundFindAllRequest;
 import erp.inbound.dto.request.InboundSaveRequest;
 import erp.inbound.dto.response.InboundFindAllResponse;
 import erp.inbound.mapper.InboundMapper;
+import erp.inbound.validation.InboundValidator;
 import erp.purchase.dto.internal.PurchaseItemQuantityRow;
 import erp.purchase.service.PurchaseService;
 import erp.purchase.validation.PurchaseValidator;
@@ -38,6 +40,7 @@ public class InboundServiceImpl implements InboundService {
     private final InboundMapper inboundMapper;
     private final StockService stockService;
     private final PurchaseService purchaseService;
+    private final InboundValidator inboundValidator;
     private final EmployeeValidator employeeValidator;
     private final PurchaseValidator purchaseValidator;
 
@@ -132,7 +135,7 @@ public class InboundServiceImpl implements InboundService {
                 .map(InboundFindAllResponse::from)
                 .toList();
 
-        long total = inboundMapper.countByPeriodAndCodeExcludingCanceled(
+        long total = inboundMapper.countByPeriodAndCode(
                 tenantId,
                 startDate,
                 endDate,
@@ -145,5 +148,37 @@ public class InboundServiceImpl implements InboundService {
                 total,
                 pageParam.size()
         );
+    }
+
+    @Override
+    @Transactional
+    public void cancelInbound(long inboundId, long tenantId) {
+        inboundValidator.validInboundActive(inboundId, tenantId);
+
+        List<InboundCancelItemRow> rows = inboundMapper.findAllCancelItemRowById(
+                tenantId,
+                inboundId
+        );
+        if (rows.isEmpty()) {
+            throw new GlobalException(ErrorStatus.NOT_FOUND_INBOUND);
+        }
+        long purchaseId = rows.get(0).purchaseId();
+
+        // 3) 현재 재고 롤백 (입고 수량만큼 on_hand 감소)
+        for (InboundCancelItemRow row : rows) {
+            stockService.decreaseOnHandQuantity(
+                    row.itemId(),
+                    row.quantity(),
+                    tenantId
+            );
+        }
+
+        // 4) 입고 상태를 CANCELED로 변경
+        int affected = inboundMapper.updateStatusToCanceledIfActive(tenantId, inboundId);
+        requireOneRowAffected(affected, ErrorStatus.CANCEL_INBOUND_FAIL);
+
+        // 5) 발주 상태를 CONFIRMED로 되돌림 (SHIPPED → CONFIRMED)
+        // 실패 사유는 PurchaseService에서 처리
+        purchaseService.updateStatusToConfirmedIfShipped(purchaseId, tenantId);
     }
 }

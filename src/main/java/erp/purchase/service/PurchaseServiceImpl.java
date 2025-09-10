@@ -276,9 +276,28 @@ public class PurchaseServiceImpl implements PurchaseService {
                     throw new GlobalException(ErrorStatus.ALREADY_SHIPPED_PURCHASE);
             case CANCELLED ->
                     throw new GlobalException(ErrorStatus.CANNOT_SHIP_CANCELLED_PURCHASE);
-            case CONFIRMED ->
-                    throw new GlobalException(ErrorStatus.SHIP_PURCHASE_FAIL);
         }
+        throw new GlobalException(ErrorStatus.UPDATE_PURCHASE_STATUS_FAIL);
+    }
+
+    @Override
+    @Transactional
+    public void updateStatusToConfirmedIfShipped(long purchaseId, long tenantId) {
+        int affectedRowCount = purchaseMapper.updateStatusToConfirmedIfShipped(tenantId, purchaseId);
+        if (affectedRowCount == 1) {
+            return;
+        }
+
+        // 실패 사유 판정
+        PurchaseStatus status = purchaseMapper.findStatusById(tenantId, purchaseId)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE));
+        switch (status) {
+            case CANCELLED ->
+                    throw new GlobalException(ErrorStatus.CANNOT_REVERT_CANCELLED_PURCHASE);
+            case CONFIRMED ->
+                    throw new GlobalException(ErrorStatus.ALREADY_CONFIRMED_PURCHASE);
+        }
+        throw new GlobalException(ErrorStatus.UPDATE_PURCHASE_STATUS_FAIL);
     }
 
     // Purchase 저장
