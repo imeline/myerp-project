@@ -25,24 +25,21 @@ public class EmployeeController {
     @GetMapping("/id-name")
     public ApiResponse<List<EmployeeIdAndNameResponse>> findAllIdAndName() {
         long tenantId = TenantContext.get();
-        List<EmployeeIdAndNameResponse> responses = employeeService.findAllIdAndName(tenantId);
-        return ApiResponse.onSuccess(responses);
+        return ApiResponse.onSuccess(employeeService.findAllIdAndName(tenantId));
     }
 
     @GetMapping
     public ApiResponse<PageResponse<EmployeeFindAllResponse>> findAllEmployees(
             @Valid @RequestBody EmployeeFindAllRequest request) {
         long tenantId = TenantContext.get();
-        PageResponse<EmployeeFindAllResponse> response = employeeService.findAllEmployees(request,
-                tenantId);
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(
+                employeeService.findAllEmployees(request, tenantId));
     }
 
     @GetMapping("/{employeeId}")
     public ApiResponse<EmployeeFindResponse> findEmployee(@PathVariable Long employeeId) {
         long tenantId = TenantContext.get();
-        EmployeeFindResponse response = employeeService.findEmployee(employeeId, tenantId);
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(employeeService.findEmployee(employeeId, tenantId));
     }
 
     @PutMapping("/{employeeId}")

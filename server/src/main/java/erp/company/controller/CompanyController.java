@@ -20,10 +20,8 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @PostMapping
-    public ApiResponse<Long> saveCompany(@Valid @RequestBody CompanySaveRequest request /*@AuthenticationPrincipal UserPrincipal user*/) {
-        Long addCompanyId = companyService.saveCompany(request);
-
-        return ApiResponse.onSuccess(addCompanyId);
+    public ApiResponse<Long> saveCompany(@Valid @RequestBody CompanySaveRequest request) {
+        return ApiResponse.onSuccess(companyService.saveCompany(request));
     }
 
     @GetMapping("/{companyId}")

@@ -23,25 +23,24 @@ public class DepartmentController {
     @PostMapping("/top")
     public ApiResponse<Long> saveTopDepartment(@RequestBody TopDepartmentSaveRequest request) {
         long tenantId = TenantContext.get();
-        Long saveDepartmentId = departmentService.saveTopDepartment(request, tenantId);
-        return ApiResponse.onSuccess(saveDepartmentId);
+        return ApiResponse.onSuccess(
+                departmentService.saveTopDepartment(request, tenantId));
     }
 
     // 자식 부서 생성 (parent_id != NULL)
     @PostMapping("/child")
     public ApiResponse<Long> saveChildDepartment(@RequestBody ChildDepartmentSaveRequest request) {
         long tenantId = TenantContext.get();
-        Long saveDepartmentId = departmentService.saveChildDepartment(request, tenantId);
-        return ApiResponse.onSuccess(saveDepartmentId);
+        return ApiResponse.onSuccess(
+                departmentService.saveChildDepartment(request, tenantId));
     }
 
     // 최상위(parent_id IS NULL)만
     @GetMapping("/top")
     public ApiResponse<List<DepartmentInfoResponse>> findAllTopDepartment() {
         long tenantId = TenantContext.get();
-        List<DepartmentInfoResponse> departmentInfoResponse =
-                departmentService.findAllTopLevelDepartment(tenantId);
-        return ApiResponse.onSuccess(departmentInfoResponse);
+        return ApiResponse.onSuccess(
+                departmentService.findAllTopLevelDepartment(tenantId));
     }
 
     // 특정 부모의 직계 자식
@@ -49,9 +48,8 @@ public class DepartmentController {
     public ApiResponse<List<DepartmentInfoResponse>> findChildrenDepartment(
             @PathVariable Long parentId) {
         long tenantId = TenantContext.get();
-        List<DepartmentInfoResponse> departmentInfoResponse =
-                departmentService.findAllByParentId(parentId, tenantId);
-        return ApiResponse.onSuccess(departmentInfoResponse);
+        return ApiResponse.onSuccess(
+                departmentService.findAllByParentId(parentId, tenantId));
     }
 
     @PutMapping("/{departmentId}")

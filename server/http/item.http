@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/user/item
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTczMjY3NzAsImV4cCI6MTc1NzM2Mjc3MCwidGVuYW50X2lkIjoyfQ.Qk9qNXRuBALmZNhK1mIdVVh2D1bIuoxTfUwy7TZT2KY
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc2NTk1MjIsImV4cCI6MTc1NzY5NTUyMiwidGVuYW50X2lkIjoyfQ.pQ6DGNBqyAuoF8HsW7EYIth7WiJzJc23Vs_jhfSyePA
 
 ### 품목 등록
 POST {{base}}
@@ -9,13 +9,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "의자",
-  "code": "ITM-0004",
-  "price": 10000,
+  "name": "담요",
+  "code": "ITM-0005",
+  "price": 50000,
   "unit": "개",
   "category": "MERCHANDISE",
-  "initialQuantity": 100,
-  "warehouse": "A창고"
+  "initialQuantity": 500,
+  "warehouse": "M창고"
 }
 
 ### 품목 상세 조회 (여기 123을 실제 item_id로 바꿔서 사용)

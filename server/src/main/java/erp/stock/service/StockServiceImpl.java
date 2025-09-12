@@ -118,27 +118,46 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
-    public void increaseOnHandQuantity(long itemId, int delta, long tenantId) {
+    public void increaseOnHand(long itemId, int delta, long tenantId) {
         if (delta <= 0) {
             throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
         }
         itemValidator.validItemIdsIfPresent(List.of(itemId), tenantId);
-        int affectedRowCount = stockMapper.increaseOnHandQuantityByItemId(
+        int affectedRowCount = stockMapper.increaseOnHand(
                 tenantId, itemId, delta);
         requireOneRowAffected(affectedRowCount, ErrorStatus.NOT_FOUND_STOCK);
     }
 
     @Override
     @Transactional
-    public void decreaseOnHandQuantity(long itemId, int delta, long tenantId) {
+    public void decreaseOnHand(long itemId, int delta, long tenantId) {
         if (delta <= 0) {
             throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
         }
         itemValidator.validItemIdsIfPresent(List.of(itemId), tenantId);
-        int affected = stockMapper.decreaseOnHandQuantityByItemId(
+        int affected = stockMapper.decreaseOnHandIfEnough(
                 tenantId, itemId, delta);
         requireOneRowAffected(affected, ErrorStatus.NOT_FOUND_STOCK);
     }
+
+    @Override
+    @Transactional
+    public void increaseAllocatedIfEnoughOnHand(long tenantId, long itemId, int quantity) {
+        int affectedRowCount = stockMapper.increaseAllocatedIfEnoughOnHand(
+                tenantId, itemId, quantity
+        );
+        requireOneRowAffected(affectedRowCount, ErrorStatus.INCREASE_STOCK_ALLOCATED_FAIL);
+    }
+
+    @Override
+    @Transactional
+    public void decreaseAllocated(long tenantId, long itemId, int quantity) {
+        int affectedRowCount = stockMapper.decreaseAllocatedIfEnough(
+                tenantId, itemId, quantity
+        );
+        requireOneRowAffected(affectedRowCount, ErrorStatus.DECREASE_STOCK_ALLOCATED_FAIL);
+    }
+
 
     /**
      * 기본 정렬 방향 정책

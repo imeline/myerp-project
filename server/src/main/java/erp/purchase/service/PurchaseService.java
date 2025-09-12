@@ -6,7 +6,7 @@ import erp.purchase.dto.request.PurchaseFindAllRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
 import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
 import erp.purchase.dto.response.PurchaseDetailResponse;
-import erp.purchase.dto.response.PurchaseFindResponse;
+import erp.purchase.dto.response.PurchaseFindAllResponse;
 import erp.purchase.dto.response.PurchaseItemsSummaryResponse;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public interface PurchaseService {
     long savePurchaseAndPurchaseItems(
             PurchaseSaveRequest request, long tenantId);
 
-    PageResponse<PurchaseFindResponse> findAllPurchase(
+    PageResponse<PurchaseFindAllResponse> findAllPurchase(
             PurchaseFindAllRequest request, long tenantId);
 
     PurchaseItemsSummaryResponse findPurchaseItemsSummary(long purchaseId, long tenantId);

@@ -1,0 +1,26 @@
+package erp.order.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public record OrderSaveRequest(
+
+        @NotNull
+        LocalDate orderDate,
+
+        @NotBlank
+        String customer,
+
+        @NotNull
+        @Size(min = 1)
+        List<OrderItemSaveRequest> items,
+
+        @Positive
+        long employeeId
+) {
+}

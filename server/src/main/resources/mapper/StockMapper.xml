@@ -193,7 +193,7 @@
         </include>
     </select>
 
-    <update id="increaseOnHandQuantityByItemId">
+    <update id="increaseOnHand">
         UPDATE stock
         SET on_hand_quantity = on_hand_quantity + #{delta}
         WHERE item_id = #{itemId}
@@ -201,11 +201,29 @@
         <include refid="frag.tenantGuard"/>
     </update>
 
-    <update id="decreaseOnHandQuantityByItemId">
+    <update id="decreaseOnHandIfEnough">
         UPDATE stock
         SET on_hand_quantity = on_hand_quantity - #{delta}
         WHERE item_id = #{itemId}
         AND on_hand_quantity >= #{delta}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <update id="increaseAllocatedIfEnoughOnHand">
+        UPDATE stock
+        SET allocated_quantity = allocated_quantity + #{quantity}
+        WHERE item_id = #{itemId}
+        AND on_hand_quantity >= #{quantity}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <update id="decreaseAllocatedIfEnough">
+        UPDATE stock
+        SET allocated_quantity = allocated_quantity - #{quantity}
+        WHERE item_id = #{itemId}
+        AND allocated_quantity >= #{quantity}
         AND
         <include refid="frag.tenantGuard"/>
     </update>
