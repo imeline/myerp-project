@@ -1,37 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="erp.report.stock.overview.mapper.StockOverviewMapper">
 
-    <select id="findStockOverviewRow" resultType="StockOverviewRow">
-        SELECT
-        /* 1) 삭제되지 않은 품목 종류 수 */
-        (SELECT COUNT(1)
-        FROM item i
-        WHERE i.deleted_at IS NULL
+    <!-- 품목별 집계: 입고/출고/현재재고 -->
+    <!-- 품목별 집계: 입고/출고/현재재고 -->
+    <select id="findAllItemRowByMonth" resultType="StockOverviewItemRow">
+        WITH
+        inbound_agg AS (
+        SELECT pi.item_id AS item_id, SUM(pi.quantity) AS in_qty
+        FROM inbound ib
+        JOIN purchase p ON p.purchase_id = ib.purchase_id
+        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+        WHERE ib.status = 'ACTIVE'
+        AND ib.inbound_date >= #{startDate}
+        AND #{endDate} >= ib.inbound_date
         AND
         <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="i"/>
+            <property name="alias" value="ib"/>
         </include>
-        ) AS totalItemCount,
-
-        /* 2) CONFIRMED 상태(= 입고 예정) 발주 수 */
-        (SELECT COUNT(1)
-        FROM purchase p
-        WHERE p.status = 'CONFIRMED'
         AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="p"/>
         </include>
-        ) AS confirmedPurchaseCount,
-
-        /* 3) 가용재고(on_hand - allocated) = 0 인 품목 수 */
-        (SELECT COUNT(1) FROM (
-        SELECT i.item_id
+        GROUP BY pi.item_id
+        ),
+        outbound_agg AS (
+        SELECT oi.item_id AS item_id, SUM(oi.quantity) AS out_qty
+        FROM outbound ob
+        JOIN orders o ON o.order_id = ob.order_id
+        JOIN order_item oi ON oi.order_id = o.order_id
+        WHERE ob.status = 'ACTIVE'
+        AND ob.outbound_date >= #{startDate}
+        AND #{endDate} >= ob.outbound_date
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="ob"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        GROUP BY oi.item_id
+        )
+        SELECT
+        i.item_id AS itemId,
+        i.name AS name,
+        i.unit AS unit,
+        NVL(ia.in_qty, 0) AS inboundQuantity,
+        NVL(oa.out_qty, 0) AS outboundQuantity,
+        NVL(s.on_hand_quantity, 0) AS onHandQuantity
         FROM item i
-        LEFT JOIN stock s
-        ON s.item_id = i.item_id
+        LEFT JOIN inbound_agg ia ON ia.item_id = i.item_id
+        LEFT JOIN outbound_agg oa ON oa.item_id = i.item_id
+        LEFT JOIN stock s ON s.item_id = i.item_id
         WHERE i.deleted_at IS NULL
         AND
         <include refid="frag.tenantGuardAlias">
@@ -41,26 +69,59 @@
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="s"/>
         </include>
-        GROUP BY i.item_id
-        HAVING (NVL(SUM(s.on_hand_quantity), 0) - NVL(SUM(s.allocated_quantity),
-        0)) = 0
-        )) AS zeroAvailableItemCount,
-
-        /* 4) 총 재고가치 = Σ(on_hand × 단가) */
-        (SELECT NVL(SUM(NVL(s.on_hand_quantity, 0) * i.price), 0)
-        FROM item i
-        JOIN stock s
-        ON s.item_id = i.item_id
-        WHERE i.deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="i"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="s"/>
-        </include>
-        ) AS totalInventoryValue
-        FROM dual
+        ORDER BY i.name ASC
     </select>
+
+
+    <!-- 전년 동월: 입고 총수량 -->
+    <select id="sumInboundQuantityByMonth" resultType="int">
+        SELECT NVL(SUM(pi.quantity), 0)
+        FROM inbound ib
+        JOIN purchase p ON p.purchase_id = ib.purchase_id
+        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+        JOIN item i ON i.item_id = pi.item_id
+        WHERE ib.status = 'ACTIVE'
+        AND ib.inbound_date >= #{startDate}
+        AND #{endDate} >= ib.inbound_date
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="ib"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+    </select>
+
+
+    <!-- 전년 동월: 출고 총수량 -->
+    <select id="sumOutboundQuantityByMonth" resultType="int">
+        SELECT NVL(SUM(oi.quantity), 0)
+        FROM outbound ob
+        JOIN orders o ON o.order_id = ob.order_id
+        JOIN order_item oi ON oi.order_id = o.order_id
+        JOIN item i ON i.item_id = oi.item_id
+        WHERE ob.status = 'ACTIVE'
+        AND ob.outbound_date >= #{startDate}
+        AND #{endDate} >= ob.outbound_date
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="ob"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+    </select>
+
 </mapper>

@@ -2,10 +2,13 @@ package erp.report.stock.overview.controller;
 
 import erp.global.response.ApiResponse;
 import erp.global.tenant.TenantContext;
-import erp.report.stock.overview.dto.response.StockOverviewFindResponse;
-import erp.report.stock.overview.service.StockOverviewServiceImpl;
+import erp.report.stock.overview.dto.request.StockOverviewFindRequest;
+import erp.report.stock.overview.dto.response.StockOverviewResponse;
+import erp.report.stock.overview.service.StockOverviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/user/report/stock/overview")
 public class StockOverviewController {
 
-    private final StockOverviewServiceImpl stockOverviewService;
+    private final StockOverviewService stockOverviewService;
 
     @GetMapping
-    public ApiResponse<StockOverviewFindResponse> findOverview() {
+    public ApiResponse<StockOverviewResponse> getOverview(
+            @Valid @RequestBody StockOverviewFindRequest request
+    ) {
         long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(stockOverviewService.findOverview(tenantId));
+        return ApiResponse.onSuccess(stockOverviewService.findStockOverview(request, tenantId));
     }
 }

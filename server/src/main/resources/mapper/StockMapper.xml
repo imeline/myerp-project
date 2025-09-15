@@ -44,26 +44,26 @@
         WHERE 1 = 1
 
         <!-- 검색 조건 -->
-        <if test="query.itemName != null">
-            AND UPPER(i.name) LIKE '%' || UPPER(#{query.itemName}) || '%'
+        <if test="filter.itemName != null">
+            AND UPPER(i.name) LIKE '%' || UPPER(#{filter.itemName}) || '%'
         </if>
 
-        <if test="query.itemCategory != null">
-            AND i.category = #{query.itemCategory}
+        <if test="filter.itemCategory != null">
+            AND i.category = #{filter.itemCategory}
         </if>
 
-        <if test="query.warehouseName != null">
-            AND UPPER(s.warehouse) LIKE '%' || UPPER(#{query.warehouseName}) ||
+        <if test="filter.warehouseName != null">
+            AND UPPER(s.warehouse) LIKE '%' || UPPER(#{filter.warehouseName}) ||
             '%'
         </if>
 
-        <if test="query.availableQuantityFrom != null">
+        <if test="filter.availableQuantityFrom != null">
             AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) >=
-            #{query.availableQuantityFrom}
+            #{filter.availableQuantityFrom}
         </if>
 
-        <if test="query.availableQuantityTo != null">
-            AND #{query.availableQuantityTo} >= (NVL(s.on_hand_quantity, 0) -
+        <if test="filter.availableQuantityTo != null">
+            AND #{filter.availableQuantityTo} >= (NVL(s.on_hand_quantity, 0) -
             NVL(s.allocated_quantity, 0))
         </if>
 
@@ -78,43 +78,43 @@
         </include>
 
         <choose>
-            <when test="query.sortBy.name() == 'AVAILABLE'">
+            <when test="filter.sortBy.name() == 'AVAILABLE'">
                 ORDER BY (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity,
-                0)) ${query.sortDirection},
+                0)) ${filter.sortDirection},
                 i.name ASC,
                 i.item_id DESC
             </when>
-            <when test="query.sortBy.name() == 'ON_HAND'">
-                ORDER BY NVL(s.on_hand_quantity, 0) ${query.sortDirection},
+            <when test="filter.sortBy.name() == 'ON_HAND'">
+                ORDER BY NVL(s.on_hand_quantity, 0) ${filter.sortDirection},
                 i.name ASC,
                 i.item_id DESC
             </when>
-            <when test="query.sortBy.name() == 'ALLOCATED'">
-                ORDER BY NVL(s.allocated_quantity, 0) ${query.sortDirection},
+            <when test="filter.sortBy.name() == 'ALLOCATED'">
+                ORDER BY NVL(s.allocated_quantity, 0) ${filter.sortDirection},
                 i.name ASC,
                 i.item_id DESC
             </when>
-            <when test="query.sortBy.name() == 'ITEM_NAME'">
-                ORDER BY i.name ${query.sortDirection},
+            <when test="filter.sortBy.name() == 'ITEM_NAME'">
+                ORDER BY i.name ${filter.sortDirection},
                 i.item_id DESC
             </when>
-            <when test="query.sortBy.name() == 'ITEM_CODE'">
-                ORDER BY i.code ${query.sortDirection},
+            <when test="filter.sortBy.name() == 'ITEM_CODE'">
+                ORDER BY i.code ${filter.sortDirection},
                 i.item_id DESC
             </when>
-            <when test="query.sortBy.name() == 'UNIT_PRICE'">
-                ORDER BY CAST(i.price AS NUMBER(10,0)) ${query.sortDirection},
+            <when test="filter.sortBy.name() == 'UNIT_PRICE'">
+                ORDER BY CAST(i.price AS NUMBER(10,0)) ${filter.sortDirection},
                 i.name ASC,
                 i.item_id DESC
             </when>
-            <when test="query.sortBy.name() == 'INVENTORY_VALUE'">
+            <when test="filter.sortBy.name() == 'INVENTORY_VALUE'">
                 ORDER BY (NVL(s.on_hand_quantity, 0) * CAST(i.price AS
-                NUMBER(10,0))) ${query.sortDirection},
+                NUMBER(10,0))) ${filter.sortDirection},
                 i.name ASC,
                 i.item_id DESC
             </when>
-            <when test="query.sortBy.name() == 'CREATED_AT'">
-                ORDER BY i.created_at ${query.sortDirection},
+            <when test="filter.sortBy.name() == 'CREATED_AT'">
+                ORDER BY i.created_at ${filter.sortDirection},
                 i.item_id DESC
             </when>
             <otherwise>
@@ -125,8 +125,8 @@
             </otherwise>
         </choose>
 
-        OFFSET #{query.offset} ROWS
-        FETCH NEXT #{query.size} ROWS ONLY
+        OFFSET #{filter.offset} ROWS
+        FETCH NEXT #{filter.size} ROWS ONLY
     </select>
 
     <select id="findStockPriceFindRowByItemId" resultType="StockPriceFindRow">
@@ -167,26 +167,26 @@
         WHERE 1 = 1
 
         <!-- 검색 조건(목록과 동일) -->
-        <if test="query.itemName != null">
-            AND UPPER(i.name) LIKE '%' || UPPER(#{query.itemName}) || '%'
+        <if test="filter.itemName != null">
+            AND UPPER(i.name) LIKE '%' || UPPER(#{filter.itemName}) || '%'
         </if>
 
-        <if test="query.itemCategory != null">
-            AND i.category = #{query.itemCategory}
+        <if test="filter.itemCategory != null">
+            AND i.category = #{filter.itemCategory}
         </if>
 
-        <if test="query.warehouseName != null">
-            AND UPPER(s.warehouse) LIKE '%' || UPPER(#{query.warehouseName}) ||
+        <if test="filter.warehouseName != null">
+            AND UPPER(s.warehouse) LIKE '%' || UPPER(#{filter.warehouseName}) ||
             '%'
         </if>
 
-        <if test="query.availableQuantityFrom != null">
+        <if test="filter.availableQuantityFrom != null">
             AND (NVL(s.on_hand_quantity, 0) - NVL(s.allocated_quantity, 0)) >=
-            #{query.availableQuantityFrom}
+            #{filter.availableQuantityFrom}
         </if>
 
-        <if test="query.availableQuantityTo != null">
-            AND #{query.availableQuantityTo} >= (NVL(s.on_hand_quantity, 0) -
+        <if test="filter.availableQuantityTo != null">
+            AND #{filter.availableQuantityTo} >= (NVL(s.on_hand_quantity, 0) -
             NVL(s.allocated_quantity, 0))
         </if>
 
@@ -235,5 +235,350 @@
         AND
         <include refid="frag.tenantGuard"/>
     </update>
+
+    <!-- 상단 요약 -->
+    <select id="findMovementSummary" resultType="StockMovementSummaryRow">
+        SELECT
+        i.name AS itemName,
+        i.code AS itemCode,
+        s.on_hand_quantity AS onHandQuantity,
+        s.warehouse AS warehouse,
+        /* 입고 수량 합계 */
+        (
+        SELECT NVL(SUM(pi.quantity), 0)
+        FROM inbound inb
+        JOIN purchase p ON p.purchase_id = inb.purchase_id
+        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+        WHERE pi.item_id = i.item_id
+        <if test="filter.startDate != null">AND inb.inbound_date >=
+            #{filter.startDate}
+        </if>
+        <if test="filter.endDate != null">AND #{filter.endDate} >=
+            inb.inbound_date
+        </if>
+        <if test="filter.code != null">AND UPPER(inb.code) LIKE '%' ||
+            UPPER(#{filter.code}) || '%'
+        </if>
+        <choose>
+            <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
+                AND inb.status = 'ACTIVE'
+            </when>
+            <when test="filter.status != null and filter.status.name() == 'CANCELED'">
+                AND inb.status = 'CANCELED'
+            </when>
+        </choose>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="inb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
+        ) AS totalInboundCount,
+        /* 출고 수량 합계 */
+        (
+        SELECT NVL(SUM(oi.quantity), 0)
+        FROM outbound outb
+        JOIN orders o ON o.order_id = outb.order_id
+        JOIN order_item oi ON oi.order_id = o.order_id
+        WHERE oi.item_id = i.item_id
+        <if test="filter.startDate != null">AND outb.outbound_date >=
+            #{filter.startDate}
+        </if>
+        <if test="filter.endDate != null">AND #{filter.endDate} >=
+            outb.outbound_date
+        </if>
+        <if test="filter.code != null">AND UPPER(outb.code) LIKE '%' ||
+            UPPER(#{filter.code}) || '%'
+        </if>
+        <choose>
+            <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
+                AND outb.status = 'ACTIVE'
+            </when>
+            <when test="filter.status != null and filter.status.name() == 'CANCELED'">
+                AND outb.status = 'CANCELED'
+            </when>
+        </choose>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="outb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        ) AS totalOutboundCount
+        FROM item i
+        JOIN stock s ON s.item_id = i.item_id
+        WHERE i.item_id = #{filter.itemId}
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+    </select>
+
+    <!-- 상세 변동 목록 -->
+    <select id="findMovementRows" resultType="StockMovementFindRow">
+        SELECT *
+        FROM (
+        SELECT
+        inb.inbound_date AS movementDate,
+        'INBOUND' AS movementType,
+        SUM(pi.quantity) AS quantity,
+        e.name AS employeeName,
+        inb.code AS code,
+        inb.status AS status
+        FROM inbound inb
+        JOIN purchase p ON p.purchase_id = inb.purchase_id
+        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+        JOIN item i ON i.item_id = pi.item_id
+        JOIN employee e ON e.employee_id = inb.employee_id
+        WHERE i.item_id = #{filter.itemId}
+        <if test="filter.startDate != null">AND inb.inbound_date >=
+            #{filter.startDate}
+        </if>
+        <if test="filter.endDate != null">AND #{filter.endDate} >=
+            inb.inbound_date
+        </if>
+        <if test="filter.code != null">AND UPPER(inb.code) LIKE '%' ||
+            UPPER(#{filter.code}) || '%'
+        </if>
+        <choose>
+            <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
+                AND inb.status = 'ACTIVE'
+            </when>
+            <when test="filter.status != null and filter.status.name() == 'CANCELED'">
+                AND inb.status = 'CANCELED'
+            </when>
+        </choose>
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="inb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        GROUP BY inb.inbound_date, e.name, inb.code, inb.status
+
+        UNION ALL
+
+        SELECT
+        outb.outbound_date AS movementDate,
+        'OUTBOUND' AS movementType,
+        SUM(oi.quantity) AS quantity,
+        e.name AS employeeName,
+        outb.code AS code,
+        outb.status AS status
+        FROM outbound outb
+        JOIN orders o ON o.order_id = outb.order_id
+        JOIN order_item oi ON oi.order_id = o.order_id
+        JOIN item i ON i.item_id = oi.item_id
+        JOIN employee e ON e.employee_id = outb.employee_id
+        WHERE i.item_id = #{filter.itemId}
+        <if test="filter.startDate != null">AND outb.outbound_date >=
+            #{filter.startDate}
+        </if>
+        <if test="filter.endDate != null">AND #{filter.endDate} >=
+            outb.outbound_date
+        </if>
+        <if test="filter.code != null">AND UPPER(outb.code) LIKE '%' ||
+            UPPER(#{filter.code}) || '%'
+        </if>
+        <choose>
+            <when test="filter.status != null and filter.status.name() == 'ACTIVE'">
+                AND outb.status = 'ACTIVE'
+            </when>
+            <when test="filter.status != null and filter.status.name() == 'CANCELED'">
+                AND outb.status = 'CANCELED'
+            </when>
+        </choose>
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="outb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        GROUP BY outb.outbound_date, e.name, outb.code, outb.status
+        )
+        ORDER BY movementDate DESC, code DESC
+        OFFSET #{filter.offset} ROWS FETCH NEXT #{filter.size} ROWS ONLY
+    </select>
+
+    <!-- 총 개수 -->
+    <select id="countMovementRows" resultType="long">
+        SELECT COUNT(1)
+        FROM (
+        SELECT inb.inbound_id AS id
+        FROM inbound inb
+        JOIN purchase p ON p.purchase_id = inb.purchase_id
+        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+        JOIN item i ON i.item_id = pi.item_id
+        WHERE i.item_id = #{filter.itemId}
+        <if test="filter.startDate != null">AND inb.inbound_date >=
+            #{filter.startDate}
+        </if>
+        <if test="filter.endDate != null">AND #{filter.endDate} >=
+            inb.inbound_date
+        </if>
+        <if test="filter.code != null">AND UPPER(inb.code) LIKE '%' ||
+            UPPER(#{filter.code}) || '%'
+        </if>
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="inb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
+
+        UNION ALL
+
+        SELECT outb.outbound_id AS id
+        FROM outbound outb
+        JOIN orders o ON o.order_id = outb.order_id
+        JOIN order_item oi ON oi.order_id = o.order_id
+        JOIN item i ON i.item_id = oi.item_id
+        WHERE i.item_id = #{filter.itemId}
+        <if test="filter.startDate != null">AND outb.outbound_date >=
+            #{filter.startDate}
+        </if>
+        <if test="filter.endDate != null">AND #{filter.endDate} >=
+            outb.outbound_date
+        </if>
+        <if test="filter.code != null">AND UPPER(outb.code) LIKE '%' ||
+            UPPER(#{filter.code}) || '%'
+        </if>
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="outb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        )
+    </select>
+
+    <select id="findStockSummaryRow" resultType="StockSummaryRow">
+        SELECT
+        /* 1) 삭제되지 않은 품목 종류 수 */
+        (SELECT COUNT(1)
+        FROM item i
+        WHERE i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        ) AS totalItemCount,
+
+        /* 2) CONFIRMED 상태(= 입고 예정) 발주 수 */
+        (SELECT COUNT(1)
+        FROM purchase p
+        WHERE p.status = 'CONFIRMED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        ) AS confirmedPurchaseCount,
+
+        /* 3) 가용재고(on_hand - allocated) = 0 인 품목 수 */
+        (SELECT COUNT(1) FROM (
+        SELECT i.item_id
+        FROM item i
+        LEFT JOIN stock s
+        ON s.item_id = i.item_id
+        WHERE i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+        GROUP BY i.item_id
+        HAVING (NVL(SUM(s.on_hand_quantity), 0) - NVL(SUM(s.allocated_quantity),
+        0)) = 0
+        )) AS zeroAvailableItemCount,
+
+        /* 4) 총 재고가치 = Σ(on_hand × 단가) */
+        (SELECT NVL(SUM(NVL(s.on_hand_quantity, 0) * i.price), 0)
+        FROM item i
+        JOIN stock s
+        ON s.item_id = i.item_id
+        WHERE i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+        ) AS totalInventoryValue
+        FROM dual
+    </select>
 
 </mapper>

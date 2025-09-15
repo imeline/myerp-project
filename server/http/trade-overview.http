@@ -1,0 +1,53 @@
+@base = {{host}}/api/v1/user/report/trade/overview
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc5MTc0MzYsImV4cCI6MTc1Nzk1MzQzNiwidGVuYW50X2lkIjoyfQ.1FWxvuz_AWNXpTIqHRe9CN6nW1rnmR4nGNFNvMJ_vUo
+@json = application/json
+
+### 매출·매입 리포트(Trade Overview) — 전체 연도
+# year=2025, 1월~12월
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "year": 2025,
+  "fromMonth": 1,
+  "toMonth": 12
+}
+
+### 매출·매입 리포트 — 특정 구간(3~6월)
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "year": 2025,
+  "fromMonth": 3,
+  "toMonth": 6
+}
+
+### 매출·매입 리포트 — 분기 구간(7~9월)
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "year": 2024,
+  "fromMonth": 7,
+  "toMonth": 9
+}
+
+### (검증 확인) 잘못된 월 범위(fromMonth > toMonth) → 400 기대
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "year": 2025,
+  "fromMonth": 8,
+  "toMonth": 2
+}
+

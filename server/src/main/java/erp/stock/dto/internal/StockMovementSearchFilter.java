@@ -1,7 +1,7 @@
-package erp.report.stock.movement.dto.internal;
+package erp.stock.dto.internal;
 
 import erp.global.util.PageParam;
-import erp.report.stock.movement.enums.MovementStatusFilter;
+import erp.stock.enums.MovementStatusFilter;
 import lombok.Builder;
 
 import java.time.LocalDate;
