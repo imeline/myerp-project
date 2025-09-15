@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.order.mapper.OrderItemMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT order_item_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO order_item (order_item_id,
+                                quantity,
+                                order_id,
+                                item_id,
+                                company_id)
+        VALUES (#{orderItem.orderItemId},
+                #{orderItem.quantity},
+                #{orderItem.orderId},
+                #{orderItem.itemId},
+                #{tenantId})
+    </insert>
+
+    <select id="findAllOrderItemStockFindRow"
+            resultType="OrderItemStockFindRow">
+        SELECT
+        i.code AS code,
+        i.name AS name,
+        oi.quantity AS quantity,
+        i.price AS unitPrice,
+        (oi.quantity * i.price) AS subtotal,
+        (s.on_hand_quantity - s.allocated_quantity) AS availableQuantity,
+        s.on_hand_quantity AS onHandQuantity,
+        s.allocated_quantity AS allocatedQuantity,
+        ((s.on_hand_quantity - s.allocated_quantity) - oi.quantity) AS
+        availableStockAfterOutbound
+        FROM order_item oi
+        JOIN orders o
+        ON o.order_id = oi.order_id
+        JOIN item i
+        ON i.item_id = oi.item_id
+        JOIN stock s
+        ON s.item_id = oi.item_id
+        WHERE 1 = 1
+        AND oi.order_id = #{orderId}
+        AND o.status != 'CANCELLED'
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+
+        ORDER BY i.code ASC, oi.order_item_id ASC
+    </select>
+
+    <select id="findAllOrderItemDetailRow" resultType="OrderItemDetailRow">
+        SELECT
+        i.name AS name,
+        i.code AS code,
+        i.unit AS unit,
+        oi.quantity AS quantity,
+        i.price AS unitPrice,
+        (oi.quantity * i.price) AS subtotal
+        FROM order_item oi
+        JOIN orders o
+        ON o.order_id = oi.order_id
+        JOIN item i
+        ON i.item_id = oi.item_id
+        WHERE oi.order_id = #{orderId}
+        AND o.status != 'CANCELLED'
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        ORDER BY i.name ASC, oi.order_item_id ASC
+    </select>
+
+    <select id="findAllOrderItemQuantityRow" resultType="OrderItemQuantityRow">
+        SELECT
+        item_id AS itemId,
+        quantity AS quantity
+        FROM order_item
+        WHERE order_id = #{orderId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+</mapper>

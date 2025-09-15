@@ -48,7 +48,7 @@ public class ItemServiceImpl implements ItemService {
 
         long newItemId = itemMapper.nextId();
 
-        Item item = Item.of(
+        Item item = Item.register(
                 newItemId,
                 name,
                 code,
@@ -124,18 +124,15 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void updateItem(long itemId, ItemUpdateRequest request, long tenantId) {
-        // todo: 입고, 출고, 주문, 판매, 재고 등 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
         String name = normalizeOrNull(request.name());
-        String code = normalizeOrNull(request.code());
         ItemCategory category = request.category();
 
+        itemValidator.validItemIdsIfPresent(List.of(itemId), tenantId);
         itemValidator.validNameUnique(name, itemId, tenantId);
-        itemValidator.validCodeUnique(code, itemId, tenantId);
 
-        Item item = Item.of(
+        Item item = Item.update(
                 itemId,
                 name,
-                code,
                 request.price(),
                 request.unit(),
                 category,
@@ -144,6 +141,8 @@ public class ItemServiceImpl implements ItemService {
 
         int affectedRowCount = itemMapper.updateById(tenantId, item);
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_ITEM_FAIL);
+
+        stockService.updateStockWarehouse(itemId, request.warehouse(), tenantId);
     }
 
     @Override

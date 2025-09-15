@@ -7,19 +7,14 @@ import erp.purchase.dto.request.PurchaseFindAllRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
 import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;
 import erp.purchase.dto.response.PurchaseDetailResponse;
-import erp.purchase.dto.response.PurchaseFindResponse;
+import erp.purchase.dto.response.PurchaseFindAllResponse;
 import erp.purchase.dto.response.PurchaseItemsSummaryResponse;
 import erp.purchase.service.PurchaseService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,21 +29,20 @@ public class PurchaseController {
     @PostMapping
     public ApiResponse<Long> savePurchaseAndItems(@Valid @RequestBody PurchaseSaveRequest request) {
         long tenantId = TenantContext.get();
-        long newPurchaseId = purchaseService.savePurchaseAndPurchaseItems(request, tenantId);
-        return ApiResponse.onSuccess(newPurchaseId);
+        return ApiResponse.onSuccess(
+                purchaseService.savePurchaseAndPurchaseItems(request, tenantId));
     }
 
     /**
      * 발주 목록 조회 (기간/상태/코드 검색 + 페이징, 삭제 제외)
      */
     @GetMapping
-    public ApiResponse<PageResponse<PurchaseFindResponse>> findAllPurchases(
-        @Valid @RequestBody PurchaseFindAllRequest request
+    public ApiResponse<PageResponse<PurchaseFindAllResponse>> findAllPurchases(
+            @Valid @RequestBody PurchaseFindAllRequest request
     ) {
         long tenantId = TenantContext.get();
-        PageResponse<PurchaseFindResponse> page = purchaseService.findAllPurchase(request,
-            tenantId);
-        return ApiResponse.onSuccess(page);
+        return ApiResponse.onSuccess(
+                purchaseService.findAllPurchase(request, tenantId));
     }
 
     /**
@@ -56,11 +50,10 @@ public class PurchaseController {
      */
     @GetMapping("/{purchaseId}/items/summary")
     public ApiResponse<PurchaseItemsSummaryResponse> findPurchaseItemsSummary(
-        @PathVariable long purchaseId) {
+            @PathVariable long purchaseId) {
         long tenantId = TenantContext.get();
-        PurchaseItemsSummaryResponse response = purchaseService.findPurchaseItemsSummary(purchaseId,
-            tenantId);
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(
+                purchaseService.findPurchaseItemsSummary(purchaseId, tenantId));
     }
 
     /**
@@ -69,9 +62,8 @@ public class PurchaseController {
     @GetMapping("/code-suppliers")
     public ApiResponse<List<PurchaseCodeAndSupplierResponse>> findAllPurchaseCodeAndSupplier() {
         long tenantId = TenantContext.get();
-        List<PurchaseCodeAndSupplierResponse> responses = purchaseService.findAllPurchaseCodeAndSupplier(
-            tenantId);
-        return ApiResponse.onSuccess(responses);
+        return ApiResponse.onSuccess(
+                purchaseService.findAllPurchaseCodeAndSupplier(tenantId));
     }
 
     /**
@@ -80,8 +72,8 @@ public class PurchaseController {
     @GetMapping("/{purchaseId}")
     public ApiResponse<PurchaseDetailResponse> findPurchaseDetail(@PathVariable Long purchaseId) {
         long tenantId = TenantContext.get();
-        PurchaseDetailResponse response = purchaseService.findPurchaseDetail(purchaseId, tenantId);
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(
+                purchaseService.findPurchaseDetail(purchaseId, tenantId));
     }
 
     /**

@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/user/purchase
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTczMjY3NzAsImV4cCI6MTc1NzM2Mjc3MCwidGVuYW50X2lkIjoyfQ.Qk9qNXRuBALmZNhK1mIdVVh2D1bIuoxTfUwy7TZT2KY
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc2NTk1MjIsImV4cCI6MTc1NzY5NTUyMiwidGVuYW50X2lkIjoyfQ.pQ6DGNBqyAuoF8HsW7EYIth7WiJzJc23Vs_jhfSyePA
 
 
 ### 발주 등록 (발주 + 발주아이템 저장)

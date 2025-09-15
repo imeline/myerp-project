@@ -43,7 +43,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse dto = authService.login(request);
-        return ApiResponse.onSuccess(dto);
+        return ApiResponse.onSuccess(authService.login(request));
     }
 }

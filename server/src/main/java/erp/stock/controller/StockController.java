@@ -26,9 +26,8 @@ public class StockController {
             @Valid @RequestBody StockFindAllRequest request
     ) {
         long tenantId = TenantContext.get();
-        PageResponse<StockFindAllResponse> response =
-                stockService.findAllStock(request, tenantId);
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(
+                stockService.findAllStock(request, tenantId));
     }
 
     /**
@@ -39,8 +38,8 @@ public class StockController {
             @PathVariable long itemId
     ) {
         long tenantId = TenantContext.get();
-        StockPriceFindResponse response = stockService.findStockPrice(itemId, tenantId);
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(
+                stockService.findStockPrice(itemId, tenantId));
     }
 
 }

@@ -17,7 +17,13 @@ public interface StockService {
 
     StockPriceFindResponse findStockPrice(long itemId, long tenantId);
 
-    void increaseOnHandQuantity(long itemId, int delta, long tenantId);
+    void updateStockWarehouse(long itemId, String warehouse, long tenantId);
 
-    void decreaseOnHandQuantity(long itemId, int delta, long tenantId);
+    void increaseOnHand(long itemId, int delta, long tenantId);
+
+    void decreaseOnHand(long itemId, int delta, long tenantId);
+
+    void increaseAllocatedIfEnoughOnHand(long tenantId, long itemId, int quantity);
+
+    void decreaseAllocated(long tenantId, long itemId, int quantity);
 }

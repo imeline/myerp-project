@@ -5,10 +5,7 @@ import erp.employee.validation.EmployeeValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import erp.global.response.PageResponse;
-import erp.global.util.Codes;
-import erp.global.util.PageParam;
-import erp.global.util.Strings;
-import erp.global.util.Totals;
+import erp.global.util.*;
 import erp.global.util.time.DatePeriod;
 import erp.global.util.time.DateRange;
 import erp.global.util.time.Periods;
@@ -32,7 +29,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static erp.global.util.Codes.DEFAULT_MAX_TRY;
@@ -60,7 +59,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<PurchaseItemSaveRequest> requestItems = request.items();
 
         // 1) 요청 DTO 내 itemId 중복 검사 (동일 품목 중복 방지)
-        validItemIdsUniqueInRequest(requestItems);
+        purchaseValidator.validItemIdsUniqueInRequest(requestItems);
 
         // 2) 직원 존재, 활성 유효성 검사 (회사 스코프 내)
         employeeValidator.validEmployeeIdIfPresent(employeeId, tenantId);
@@ -79,7 +78,11 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .collect(Collectors.toMap(ItemPriceRow::itemId, ItemPriceRow::price));
 
         // 5) 합계 계산(총수량, 총금액)
-        Totals totals = computeTotals(requestItems, priceMap);
+        Totals totals = TotalCalculators.computeTotals(
+                requestItems,
+                PurchaseItemSaveRequest::quantity,
+                PurchaseItemSaveRequest::itemId,
+                priceMap);
         int totalQuantity = totals.totalQuantity();
         int totalAmount = totals.totalAmount();
 
@@ -121,11 +124,52 @@ public class PurchaseServiceImpl implements PurchaseService {
         throw new GlobalException(ErrorStatus.CREATE_PURCHASE_FAIL);
     }
 
+    // Purchase 저장
+    private long savePurchase(String purchaseCode,
+                              String supplier,
+                              LocalDate purchaseDate,
+                              int totalQuantity,
+                              int totalAmount,
+                              Long employeeId,
+                              long tenantId) {
+        long newPurchaseId = purchaseMapper.nextId();
+        Purchase purchase = Purchase.register(
+                newPurchaseId,
+                purchaseCode,
+                supplier,
+                purchaseDate,
+                totalQuantity,
+                totalAmount,
+                employeeId,
+                tenantId
+        );
+        int affectedRowCount = purchaseMapper.save(tenantId, purchase);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_PURCHASE_FAIL);
+        return newPurchaseId;
+    }
+
+    // PurchaseItem 배치 저장
+    private void savePurchaseItems(long newPurchaseId,
+                                   List<PurchaseItemSaveRequest> requestItems,
+                                   long tenantId) {
+        List<PurchaseItem> items = new ArrayList<>(requestItems.size());
+        for (PurchaseItemSaveRequest itemSaveRequest : requestItems) {
+            long newPurchaseItemId = purchaseItemMapper.nextId();
+            items.add(PurchaseItem.register(
+                    newPurchaseItemId, newPurchaseId,
+                    itemSaveRequest.itemId(), itemSaveRequest.quantity(), tenantId
+            ));
+        }
+        int affectedItems = purchaseItemMapper.saveAll(tenantId, items);
+        if (affectedItems != items.size()) {
+            throw new GlobalException(ErrorStatus.CREATE_PURCHASE_ITEM_FAIL);
+        }
+    }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<PurchaseFindResponse> findAllPurchase(PurchaseFindAllRequest request,
-                                                              long tenantId) {
+    public PageResponse<PurchaseFindAllResponse> findAllPurchase(PurchaseFindAllRequest request,
+                                                                 long tenantId) {
         PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
 
         DatePeriod datePeriod = request.period();
@@ -149,8 +193,8 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_PURCHASE);
         }
 
-        List<PurchaseFindResponse> responses = rows.stream()
-                .map(PurchaseFindResponse::from)
+        List<PurchaseFindAllResponse> responses = rows.stream()
+                .map(PurchaseFindAllResponse::from)
                 .toList();
 
         long total = purchaseMapper.countByPeriodAndCodeAndStatus(
@@ -267,7 +311,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             return; // 성공
         }
 
-        // 실패 사유 단일 조회로 판정
+        // 실패 사유 판정
         PurchaseStatus status = purchaseMapper.findStatusById(tenantId, purchaseId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE));
 
@@ -298,75 +342,5 @@ public class PurchaseServiceImpl implements PurchaseService {
                     throw new GlobalException(ErrorStatus.ALREADY_CONFIRMED_PURCHASE);
         }
         throw new GlobalException(ErrorStatus.UPDATE_PURCHASE_STATUS_FAIL);
-    }
-
-    // Purchase 저장
-    private long savePurchase(String purchaseCode,
-                              String supplier,
-                              LocalDate purchaseDate,
-                              int totalQuantity,
-                              int totalAmount,
-                              Long employeeId,
-                              long tenantId) {
-        long newPurchaseId = purchaseMapper.nextId();
-        Purchase purchase = Purchase.register(
-                newPurchaseId,
-                purchaseCode,
-                supplier,
-                purchaseDate,
-                totalQuantity,
-                totalAmount,
-                employeeId,
-                tenantId
-        );
-        int affectedRowCount = purchaseMapper.save(tenantId, purchase);
-        requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_PURCHASE_FAIL);
-        return newPurchaseId;
-    }
-
-    // PurchaseItem 배치 저장
-    private void savePurchaseItems(long newPurchaseId,
-                                   List<PurchaseItemSaveRequest> requestItems,
-                                   long tenantId) {
-        List<PurchaseItem> items = new ArrayList<>(requestItems.size());
-        for (PurchaseItemSaveRequest itemSaveRequest : requestItems) {
-            long newPurchaseItemId = purchaseItemMapper.nextId();
-            items.add(PurchaseItem.register(
-                    newPurchaseItemId, newPurchaseId,
-                    itemSaveRequest.itemId(), itemSaveRequest.quantity(), tenantId
-            ));
-        }
-        int affectedItems = purchaseItemMapper.saveAll(tenantId, items);
-        if (affectedItems != items.size()) {
-            throw new GlobalException(ErrorStatus.CREATE_PURCHASE_ITEM_FAIL);
-        }
-    }
-
-    // 요청 DTO 내 itemId 중복 검사 (동일 품목 중복 방지)
-    private void validItemIdsUniqueInRequest(List<PurchaseItemSaveRequest> requestItems) {
-        Set<Long> set = new HashSet<>();
-        for (PurchaseItemSaveRequest requestItem : requestItems) {
-            if (!set.add(requestItem.itemId())) {
-                throw new GlobalException(ErrorStatus.DUPLICATE_ITEM);
-            }
-        }
-    }
-
-    // 합계 계산(총수량, 총금액)
-    private Totals computeTotals(List<PurchaseItemSaveRequest> requestItems,
-                                 Map<Long, Integer> priceMap) {
-        int totalQuantity = 0;
-        int totalAmount = 0;
-        for (PurchaseItemSaveRequest itemSaveRequest : requestItems) {
-            int quantity = itemSaveRequest.quantity();
-            Integer unitPrice = priceMap.get(itemSaveRequest.itemId());
-            if (unitPrice == null) { // 방어: 가격 매핑 누락 시 차단
-                throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM);
-            }
-            totalQuantity += quantity;
-            // 오버플로우 방지 메서드 사용
-            totalAmount = Math.addExact(totalAmount, Math.multiplyExact(quantity, unitPrice));
-        }
-        return new Totals(totalQuantity, totalAmount);
     }
 }

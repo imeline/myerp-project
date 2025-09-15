@@ -45,8 +45,7 @@ public class ItemController {
     @GetMapping("/options")
     public ApiResponse<List<ItemOptionResponse>> findAllItemOption() {
         long tenantId = TenantContext.get();
-        List<ItemOptionResponse> responses = itemService.findAllItemOption(tenantId);
-        return ApiResponse.onSuccess(responses);
+        return ApiResponse.onSuccess(itemService.findAllItemOption(tenantId));
     }
 
     @PutMapping("/{itemId}")

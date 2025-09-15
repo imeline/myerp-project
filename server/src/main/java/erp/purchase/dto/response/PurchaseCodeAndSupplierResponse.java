@@ -5,14 +5,16 @@ import lombok.Builder;
 
 @Builder
 public record PurchaseCodeAndSupplierResponse(
-    String code,
-    String supplier
+        long purchaseId,
+        String code,
+        String supplier
 ) {
 
     public static PurchaseCodeAndSupplierResponse from(PurchaseCodeAndSupplierRow row) {
         return PurchaseCodeAndSupplierResponse.builder()
-            .code(row.code())
-            .supplier(row.supplier())
-            .build();
+                .purchaseId(row.purchaseId())
+                .code(row.code())
+                .supplier(row.supplier())
+                .build();
     }
 }

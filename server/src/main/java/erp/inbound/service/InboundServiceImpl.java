@@ -93,7 +93,7 @@ public class InboundServiceImpl implements InboundService {
 
         // 3) 재고 on_hand 증가
         for (PurchaseItemQuantityRow row : itemRows) {
-            stockService.increaseOnHandQuantity(
+            stockService.increaseOnHand(
                     row.itemId(), row.quantity(), tenantId);
         }
 
@@ -166,7 +166,7 @@ public class InboundServiceImpl implements InboundService {
 
         // 3) 현재 재고 롤백 (입고 수량만큼 on_hand 감소)
         for (InboundCancelItemRow row : rows) {
-            stockService.decreaseOnHandQuantity(
+            stockService.decreaseOnHand(
                     row.itemId(),
                     row.quantity(),
                     tenantId

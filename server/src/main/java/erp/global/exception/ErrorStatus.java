@@ -83,6 +83,8 @@ public enum ErrorStatus {
     CREATE_STOCK_FAIL("STK802", "재고 생성에 실패했습니다."),
     NOT_REGISTERED_STOCK("STK803", "등록된 재고가 없습니다."),
     NOT_FOUND_STOCK("STK804", "존재하지 않는 재고입니다."),
+    DECREASE_STOCK_ALLOCATED_FAIL("STK806", "예약 재고 감소에 실패했습니다."),
+    INCREASE_STOCK_ALLOCATED_FAIL("STK807", "예약 재고 증가에 실패했습니다."),
 
     // PURCHASE
     CREATE_PURCHASE_FAIL("PUR901", "발주 생성에 실패했습니다."),
@@ -107,6 +109,26 @@ public enum ErrorStatus {
     NOT_FOUND_INBOUND("INB1003", "존재하지 않는 입고입니다."),
     INBOUND_NOT_ACTIVE("INB1004", "활성 상태가 아닌 입고입니다."),
     CANCEL_INBOUND_FAIL("INB1005", "입고 취소에 실패했습니다."),
+
+    // ORDER
+    CREATE_ORDER_FAIL("ORD1101", "주문 생성에 실패했습니다."),
+    CREATE_ORDER_ITEM_FAIL("ORD1102", "주문 품목 생성에 실패했습니다."),
+    NOT_REGISTERED_ORDER("ORD1103", "등록된 주문이 없습니다."),
+    NOT_FOUND_ORDER_ITEM("ORD1104", "존재하지 않는 주문 품목입니다."),
+    NOT_FOUND_ORDER("ORD1105", "존재하지 않는 주문입니다."),
+    CANNOT_CANCEL_SHIPPED_ORDER("ORD1106", "출고된 주문은 취소할 수 없습니다."),
+    CANCEL_ORDER_FAIL("ORD1107", "주문 취소에 실패했습니다."),
+    ALREADY_CANCELLED_ORDER("ORD1108", "이미 취소된 주문입니다."),
+    CANNOT_SHIP_CANCELLED_ORDER("ORD1109", "취소된 주문은 출고 처리할 수 없습니다."),
+    ALREADY_SHIPPED_ORDER("ORD1110", "이미 출고 처리된 주문입니다."),
+    UPDATE_ORDER_STATUS_FAIL("ORD1111", "주문 상태 변경에 실패했습니다."),
+    CANNOT_REVERT_CANCELLED_ORDER("ORD1112", "취소된 주문은 상태를 되돌릴 수 없습니다."), ALREADY_CONFIRMED_ORDER("ORD1113", "이미 확정 상태의 주문입니다."),
+
+    // OUTBOUND
+    CREATE_OUTBOUND_FAIL("OUT1201", "출고 생성에 실패했습니다."),
+    NOT_REGISTERED_OUTBOUND("OUT1202", "등록된 출고가 없습니다."),
+    UPDATE_OUTBOUND_STAUS_FAIL("OUT1203", "출고 상태 변경에 실패했습니다."),
+    NOT_FOUND_OUTBOUND("OUT1204", "존재하지 않는 출고입니다."),
     ;
 
 

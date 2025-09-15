@@ -36,30 +36,42 @@
         p.purchase_id AS purchaseId,
         p.code AS code,
         p.supplier AS supplier,
-        p.total_quantity AS totalQuantity,
+        COUNT(DISTINCT pi.item_id) AS itemCount, -- 총 품목 수
         p.total_amount AS totalAmount,
         p.purchase_date AS purchaseDate,
         p.status AS status,
         e.name AS employeeName
-        <!-- 담당 직원 이름 조회 -->
         FROM purchase p
         JOIN employee e
         ON e.employee_id = p.employee_id
-        WHERE 1=1
+        JOIN purchase_item pi
+        ON pi.purchase_id = p.purchase_id
+        WHERE 1 = 1
+
+        <!-- 기간 시작 -->
         <if test="startDate != null">
             AND p.purchase_date >= #{startDate}
         </if>
+
+        <!-- 기간 끝: <= 우회 -->
         <if test="endDate != null">
             AND #{endDate} >= p.purchase_date
         </if>
+
+        <!-- 코드 검색 -->
         <if test="code != null">
             AND p.code LIKE '%' || #{code} || '%'
         </if>
+
+        <!-- CANCELLED 제외(항상) -->
+        AND p.status != 'CANCELLED'
+
+        <!-- 상태 필터(선택) -->
         <if test="status != null">
             AND p.status = #{status}
         </if>
-        AND p.status != 'CANCELLED'
-        <!-- 다중 테이블이므로 둘 다 테넌트 가드 -->
+
+        <!-- 테넌트 가드: WHERE의 가장 마지막 -->
         AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="e"/>
@@ -68,13 +80,26 @@
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="p"/>
         </include>
-
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
+        <!--COUNT처럼 집계 함수를 쓰면, 집계되지 않은 컬럼을 모두 GROUP BY에 넣어야 함-->
+        GROUP BY
+        p.purchase_id,
+        p.code,
+        p.supplier,
+        p.total_amount,
+        p.purchase_date,
+        p.status,
+        e.name
         ORDER BY p.purchase_date DESC, p.purchase_id DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
     <select id="findAllCodeAndSupplier" resultType="PurchaseCodeAndSupplierRow">
         SELECT
+        purchase_id,
         code,
         supplier
         FROM purchase
@@ -118,6 +143,14 @@
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="e"/>
         </include>
+    </select>
+
+    <select id="findStatusById" resultType="PurchaseStatus">
+        SELECT status
+        FROM purchase
+        WHERE purchase_id = #{purchaseId}
+        AND
+        <include refid="frag.tenantGuard"/>
     </select>
 
     <!-- 현재가 CONFIRMED일 때만 목표 상태로 전이 -->
