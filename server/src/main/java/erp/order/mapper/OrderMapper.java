@@ -65,4 +65,9 @@ public interface OrderMapper {
             @Param("tenantId") long tenantId,
             @Param("orderId") long orderId
     );
+
+    boolean existsConfirmByItemId(
+            @Param("tenantId") long tenantId,
+            @Param("orderId") long orderId
+    );
 }

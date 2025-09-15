@@ -18,7 +18,10 @@ import erp.item.dto.response.ItemOptionResponse;
 import erp.item.enums.ItemCategory;
 import erp.item.mapper.ItemMapper;
 import erp.item.validation.ItemValidator;
+import erp.order.validation.OrderValidator;
+import erp.purchase.validation.PurchaseValidator;
 import erp.stock.service.StockService;
+import erp.stock.validation.StockValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,9 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final StockService stockService;
     private final ItemValidator itemValidator;
+    private final OrderValidator orderValidator;
+    private final PurchaseValidator purchaseValidator;
+    private final StockValidator stockValidator;
 
     @Override
     @Transactional
@@ -127,7 +133,7 @@ public class ItemServiceImpl implements ItemService {
         String name = normalizeOrNull(request.name());
         ItemCategory category = request.category();
 
-        itemValidator.validItemIdsIfPresent(List.of(itemId), tenantId);
+        itemValidator.validItemIdIfPresent(itemId, tenantId);
         itemValidator.validNameUnique(name, itemId, tenantId);
 
         Item item = Item.update(
@@ -148,7 +154,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void softDeleteItem(long itemId, long tenantId) {
-        // todo: 재고 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
+        // 활성 품목인지 우선 확인
+        itemValidator.validItemIdIfPresent(itemId, tenantId);
+        // 재고 보유 시 삭제 불가
+        stockValidator.validZeroStockByItemId(itemId, tenantId);
+        // 진행 중 발주(CONFIRMED) 참조 시 삭제 불가
+        purchaseValidator.validNoConfirmByItemId(itemId, tenantId);
+        // 진행 중 주문(CONFIRMED) 참조 시 삭제 불가
+        orderValidator.validNoConfirmByItemId(tenantId, itemId);
 
         int affectedRowCount = itemMapper.softDeleteById(tenantId, itemId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_ITEM_FAIL);

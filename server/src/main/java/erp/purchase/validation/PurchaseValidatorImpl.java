@@ -34,5 +34,12 @@ public class PurchaseValidatorImpl implements PurchaseValidator {
             }
         }
     }
+
+    @Override
+    public void validNoConfirmByItemId(long itemId, long tenantId) {
+        if (purchaseMapper.validConfirmIfPresent(tenantId, itemId)) {
+            throw new GlobalException(ErrorStatus.CANNOT_DELETE_ITEM_BY_CONFIRMED_PURCHASE);
+        }
+    }
 }
 

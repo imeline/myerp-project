@@ -136,7 +136,7 @@ public class StockServiceImpl implements StockService {
         if (delta <= 0) {
             throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
         }
-        itemValidator.validItemIdsIfPresent(List.of(itemId), tenantId);
+        itemValidator.validItemIdIfPresent(itemId, tenantId);
         int affectedRowCount = stockMapper.increaseOnHand(
                 tenantId, itemId, delta);
         requireOneRowAffected(affectedRowCount, ErrorStatus.NOT_FOUND_STOCK);
@@ -148,7 +148,7 @@ public class StockServiceImpl implements StockService {
         if (delta <= 0) {
             throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
         }
-        itemValidator.validItemIdsIfPresent(List.of(itemId), tenantId);
+        itemValidator.validItemIdIfPresent(itemId, tenantId);
         int affected = stockMapper.decreaseOnHandIfEnough(
                 tenantId, itemId, delta);
         requireOneRowAffected(affected, ErrorStatus.NOT_FOUND_STOCK);

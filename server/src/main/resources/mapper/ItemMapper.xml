@@ -146,4 +146,13 @@
         <include refid="frag.tenantGuard"/>
     </select>
 
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM item
+        WHERE item_id = #{itemId}
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
 </mapper>

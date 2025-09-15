@@ -210,4 +210,20 @@
         AND
         <include refid="frag.tenantGuard"/>
     </select>
+
+    <select id="validConfirmIfPresent" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM purchase p
+        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+        WHERE p.status = 'CONFIRMED'
+        AND pi.item_id = #{itemId}
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+    </select>
 </mapper>

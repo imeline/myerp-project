@@ -46,6 +46,7 @@ public enum ErrorStatus {
     DELETE_COMPANY_FAIL("COMP406", "회사를 찾을 수 없거나 이미 삭제된 회사입니다."),
     EXTERNAL_DATA_EXISTS("COMP407", "연관된 데이터가 존재하여 삭제할 수 없습니다."),
     NOT_REGISTERED_COMPANY("COMP408", "등록된 회사가 없습니다."),
+    CANNOT_DELETE_COMPANY_HAS_RELATION("COMP409", "연관된 데이터가 존재하여 회사를 삭제할 수 없습니다."),
 
     // DEPARTMENT
     DUPLICATE_DEPARTMENT_NAME("DPT501", "이미 등록된 부서명입니다."),
@@ -77,6 +78,7 @@ public enum ErrorStatus {
     NOT_REGISTERED_ITEM("ITEM707", "등록된 품목이 없습니다."),
     DUPLICATE_ITEM("ITEM708", "중복된 품목이 있습니다."),
     NOT_FOUND_ITEM_PRICE("ITEM709", "품목에 대한 가격 정보가 없습니다."),
+    CANNOT_DELETE_ITEM_STOCK_NOT_ZERO("ITEM710", "재고 수량이 0이 아닌 품목은 삭제할 수 없습니다."),
 
     // STOCK
     INVALID_STOCK_QUANTITY("STK801", "재고 수량은 0 이상이어야 합니다."),
@@ -129,6 +131,8 @@ public enum ErrorStatus {
     NOT_REGISTERED_OUTBOUND("OUT1202", "등록된 출고가 없습니다."),
     UPDATE_OUTBOUND_STAUS_FAIL("OUT1203", "출고 상태 변경에 실패했습니다."),
     NOT_FOUND_OUTBOUND("OUT1204", "존재하지 않는 출고입니다."),
+    CANNOT_DELETE_ITEM_BY_CONFIRMED_PURCHASE("ITEM711", "열린 상태 발주에서 참조된 품목은 삭제할 수 없습니다."),
+    CANNOT_DELETE_ITEM_BY_CONFIRMED_ORDER("ITEM712", "열린 상태 주문에서 참조된 품목은 삭제할 수 없습니다."),
     ;
 
 

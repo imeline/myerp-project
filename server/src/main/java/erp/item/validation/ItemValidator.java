@@ -8,4 +8,6 @@ public interface ItemValidator {
     void validCodeUnique(String code, Long excludeId, long tenantId);
 
     void validItemIdsIfPresent(List<Long> itemIds, long tenantId);
+
+    void validItemIdIfPresent(long itemId, long tenantId);
 }

@@ -34,4 +34,11 @@ public class ItemValidatorImpl implements ItemValidator {
             throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM);
         }
     }
+
+    @Override
+    public void validItemIdIfPresent(long itemId, long tenantId) {
+        if (!itemMapper.existsById(tenantId, itemId)) {
+            throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM);
+        }
+    }
 }

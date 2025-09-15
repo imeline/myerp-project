@@ -15,6 +15,7 @@ Content-Type: application/json
   "positionId": 2,
   "companyId": 1
 }
+
 ### ADMIN 회원가입
 POST {{base}}/signup/admin
 Content-Type: application/json

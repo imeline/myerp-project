@@ -63,4 +63,7 @@ public interface PurchaseMapper {
     boolean existsShippedById(@Param("tenantId") long tenantId,
                               @Param("purchaseId") long purchaseId);
 
+    boolean validConfirmIfPresent(@Param("tenantId") long tenantId,
+                                  @Param("itemId") long itemId);
+
 }
