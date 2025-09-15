@@ -5,21 +5,25 @@ import erp.global.exception.GlobalException;
 import erp.global.response.PageResponse;
 import erp.global.util.PageParam;
 import erp.global.util.Strings;
+import erp.global.util.time.DateRange;
+import erp.global.util.time.Periods;
 import erp.item.enums.ItemCategory;
 import erp.item.validation.ItemValidator;
 import erp.stock.domain.Stock;
-import erp.stock.dto.internal.StockFindAllRow;
-import erp.stock.dto.internal.StockFindFilterRow;
-import erp.stock.dto.internal.StockPriceFindRow;
+import erp.stock.dto.internal.*;
 import erp.stock.dto.request.StockFindAllRequest;
+import erp.stock.dto.request.StockMovementFindRequest;
 import erp.stock.dto.response.StockFindAllResponse;
+import erp.stock.dto.response.StockMovementFindAllResponse;
 import erp.stock.dto.response.StockPriceFindResponse;
+import erp.stock.dto.response.StockSummaryFindResponse;
 import erp.stock.enums.StockSortBy;
 import erp.stock.mapper.StockMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static erp.global.util.RowCountGuards.requireOneRowAffected;
@@ -71,7 +75,7 @@ public class StockServiceImpl implements StockService {
         StockSortBy sortBy = request.sortBy();
         String sortDirection = resolveDefaultSortDirection(sortBy);
 
-        StockFindFilterRow query = StockFindFilterRow.of(
+        StockFindFilterRow filter = StockFindFilterRow.of(
                 normalizedItemName,
                 itemCategory,
                 normalizedWarehouseName,
@@ -85,14 +89,14 @@ public class StockServiceImpl implements StockService {
 
         List<StockFindAllRow> rows = stockMapper.findAllStockFindAllRow(
                 tenantId,
-                query
+                filter
         );
         if (rows.isEmpty())
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_STOCK);
 
         long totalCount = stockMapper.countByStock(
                 tenantId,
-                query
+                filter
         );
         List<StockFindAllResponse> responseList = rows.stream()
                 .map(StockFindAllResponse::from)
@@ -166,6 +170,56 @@ public class StockServiceImpl implements StockService {
                 tenantId, itemId, quantity
         );
         requireOneRowAffected(affectedRowCount, ErrorStatus.DECREASE_STOCK_ALLOCATED_FAIL);
+    }
+
+    /**
+     * 재고 변동 내역 조회 (팝업)
+     * <p>
+     * - 기간/상태/코드 필터 적용
+     * - 요약(onHand)은 현재 재고 기준, 집계(입고/출고 건수)는 필터 기준
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public StockMovementFindAllResponse findAllMovement(
+            long itemId,
+            StockMovementFindRequest request,
+            long tenantId
+    ) {
+        DateRange dateRange = Periods.resolve(request.period(), LocalDate.now());
+        String normalizedCode = Strings.normalizeOrNull(request.code());
+        PageParam pageParameter = PageParam.of(request.page(), request.size(), 20);
+
+        StockMovementSearchFilter filter = StockMovementSearchFilter.of(
+                itemId,
+                dateRange.startDate(),
+                dateRange.endDate(),
+                normalizedCode,
+                request.status(),
+                pageParameter
+        );
+
+        StockMovementSummaryRow summaryFromDatabase =
+                stockMapper.findMovementSummary(tenantId, filter);
+        StockMovementSummaryRow summary = StockMovementSummaryRow.from(summaryFromDatabase);
+
+
+        List<StockMovementFindRow> rows = stockMapper.findMovementRows(tenantId, filter);
+        long totalCount = stockMapper.countMovementRows(tenantId, filter);
+
+        return StockMovementFindAllResponse.of(
+                summary,
+                rows,
+                filter.page(),
+                totalCount,
+                filter.size()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StockSummaryFindResponse findSummary(long tenantId) {
+        StockSummaryRow row = stockMapper.findStockSummaryRow(tenantId);
+        return StockSummaryFindResponse.from(row);
     }
 
 

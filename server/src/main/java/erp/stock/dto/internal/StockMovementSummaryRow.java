@@ -1,4 +1,4 @@
-package erp.report.stock.movement.dto.internal;
+package erp.stock.dto.internal;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;

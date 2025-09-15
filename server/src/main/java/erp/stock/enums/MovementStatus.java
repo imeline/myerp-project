@@ -1,4 +1,4 @@
-package erp.report.stock.movement.enums;
+package erp.stock.enums;
 
 public enum MovementStatus {
     ACTIVE,

@@ -1,9 +1,7 @@
 package erp.stock.mapper;
 
 import erp.stock.domain.Stock;
-import erp.stock.dto.internal.StockFindAllRow;
-import erp.stock.dto.internal.StockFindFilterRow;
-import erp.stock.dto.internal.StockPriceFindRow;
+import erp.stock.dto.internal.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,7 +17,7 @@ public interface StockMapper {
 
 
     List<StockFindAllRow> findAllStockFindAllRow(@Param("tenantId") long tenantId,
-                                                 @Param("query") StockFindFilterRow query);
+                                                 @Param("filter") StockFindFilterRow filter);
 
     Optional<StockPriceFindRow> findStockPriceFindRowByItemId(
             @Param("tenantId") long tenantId,
@@ -47,5 +45,16 @@ public interface StockMapper {
                                   @Param("quantity") int quantity);
 
     long countByStock(@Param("tenantId") long tenantId,
-                      @Param("query") StockFindFilterRow query);
+                      @Param("filter") StockFindFilterRow filter);
+
+    StockMovementSummaryRow findMovementSummary(@Param("tenantId") long tenantId,
+                                                @Param("filter") StockMovementSearchFilter filter);
+
+    List<StockMovementFindRow> findMovementRows(@Param("tenantId") long tenantId,
+                                                @Param("filter") StockMovementSearchFilter filter);
+
+    long countMovementRows(@Param("tenantId") long tenantId,
+                           @Param("filter") StockMovementSearchFilter filter);
+
+    StockSummaryRow findStockSummaryRow(@Param("tenantId") long tenantId);
 }

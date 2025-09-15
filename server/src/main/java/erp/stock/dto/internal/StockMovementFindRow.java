@@ -1,7 +1,7 @@
-package erp.report.stock.movement.dto.internal;
+package erp.stock.dto.internal;
 
-import erp.report.stock.movement.enums.MovementStatus;
-import erp.report.stock.movement.enums.StockMovementType;
+import erp.stock.enums.MovementStatus;
+import erp.stock.enums.StockMovementType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 

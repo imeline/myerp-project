@@ -1,8 +1,8 @@
-package erp.report.stock.movement.dto.response;
+package erp.stock.dto.response;
 
 import erp.global.response.PageResponse;
-import erp.report.stock.movement.dto.internal.StockMovementFindRow;
-import erp.report.stock.movement.dto.internal.StockMovementSummaryRow;
+import erp.stock.dto.internal.StockMovementFindRow;
+import erp.stock.dto.internal.StockMovementSummaryRow;
 import lombok.Builder;
 
 import java.util.List;

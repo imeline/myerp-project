@@ -1,21 +1,21 @@
-package erp.report.stock.overview.dto.response;
+package erp.stock.dto.response;
 
-import erp.report.stock.overview.dto.internal.StockOverviewRow;
+import erp.stock.dto.internal.StockSummaryRow;
 import lombok.Builder;
 
 /**
  * 재고 현황 조회 응답 (Find)
  */
 @Builder
-public record StockOverviewFindResponse(
+public record StockSummaryFindResponse(
 
         Integer totalItemCount,
         Integer confirmedPurchaseCount,
         Integer zeroAvailableItemCount,
         Integer totalInventoryValue
 ) {
-    public static StockOverviewFindResponse from(StockOverviewRow row) {
-        return StockOverviewFindResponse.builder()
+    public static StockSummaryFindResponse from(StockSummaryRow row) {
+        return StockSummaryFindResponse.builder()
                 .totalItemCount(row.totalItemCount())
                 .confirmedPurchaseCount(row.confirmedPurchaseCount())
                 .zeroAvailableItemCount(row.zeroAvailableItemCount())

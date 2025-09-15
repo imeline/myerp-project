@@ -1,7 +1,7 @@
-package erp.report.stock.movement.dto.request;
+package erp.stock.dto.request;
 
 import erp.global.util.time.DatePeriod;
-import erp.report.stock.movement.enums.MovementStatusFilter;
+import erp.stock.enums.MovementStatusFilter;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;

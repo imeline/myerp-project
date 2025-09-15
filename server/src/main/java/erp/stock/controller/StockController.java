@@ -4,8 +4,11 @@ import erp.global.response.ApiResponse;
 import erp.global.response.PageResponse;
 import erp.global.tenant.TenantContext;
 import erp.stock.dto.request.StockFindAllRequest;
+import erp.stock.dto.request.StockMovementFindRequest;
 import erp.stock.dto.response.StockFindAllResponse;
+import erp.stock.dto.response.StockMovementFindAllResponse;
 import erp.stock.dto.response.StockPriceFindResponse;
+import erp.stock.dto.response.StockSummaryFindResponse;
 import erp.stock.service.StockService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +43,27 @@ public class StockController {
         long tenantId = TenantContext.get();
         return ApiResponse.onSuccess(
                 stockService.findStockPrice(itemId, tenantId));
+    }
+
+    /**
+     * 단일 품목 재고 변동 내역 조회
+     */
+    @GetMapping("{itemId}/movement")
+    public ApiResponse<StockMovementFindAllResponse> findMovements(
+            @PathVariable long itemId,
+            @Valid @RequestBody StockMovementFindRequest request
+    ) {
+        long tenantId = TenantContext.get();
+        return ApiResponse.onSuccess(stockService.findAllMovement(itemId, request, tenantId));
+    }
+
+    /**
+     * 재고 현황 조회
+     */
+    @GetMapping("/summary")
+    public ApiResponse<StockSummaryFindResponse> findSummary() {
+        long tenantId = TenantContext.get();
+        return ApiResponse.onSuccess(stockService.findSummary(tenantId));
     }
 
 }
