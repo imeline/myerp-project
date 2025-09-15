@@ -148,7 +148,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void softDeleteItem(long itemId, long tenantId) {
-        // todo: 주문, 판매, 재고 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
+        // todo: 재고 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
 
         int affectedRowCount = itemMapper.softDeleteById(tenantId, itemId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_ITEM_FAIL);
