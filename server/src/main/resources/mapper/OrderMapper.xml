@@ -148,6 +148,15 @@
         <include refid="frag.tenantGuard"/>
     </update>
 
+    <update id="updateStatusToConfirmedIfShipped">
+        UPDATE orders
+        SET status = 'CONFIRMED'
+        WHERE order_id = #{orderId}
+        AND status = 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
     <select id="countByPeriodAndCodeAndStatus" resultType="long">
         SELECT COUNT(DISTINCT o.order_id)
         FROM orders o

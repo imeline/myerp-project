@@ -122,9 +122,13 @@ public enum ErrorStatus {
     CANNOT_SHIP_CANCELLED_ORDER("ORD1109", "취소된 주문은 출고 처리할 수 없습니다."),
     ALREADY_SHIPPED_ORDER("ORD1110", "이미 출고 처리된 주문입니다."),
     UPDATE_ORDER_STATUS_FAIL("ORD1111", "주문 상태 변경에 실패했습니다."),
+    CANNOT_REVERT_CANCELLED_ORDER("ORD1112", "취소된 주문은 상태를 되돌릴 수 없습니다."), ALREADY_CONFIRMED_ORDER("ORD1113", "이미 확정 상태의 주문입니다."),
 
     // OUTBOUND
     CREATE_OUTBOUND_FAIL("OUT1201", "출고 생성에 실패했습니다."),
+    NOT_REGISTERED_OUTBOUND("OUT1202", "등록된 출고가 없습니다."),
+    UPDATE_OUTBOUND_STAUS_FAIL("OUT1203", "출고 상태 변경에 실패했습니다."),
+    NOT_FOUND_OUTBOUND("OUT1204", "존재하지 않는 출고입니다."),
     ;
 
 

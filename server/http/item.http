@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/user/item
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc2NTk1MjIsImV4cCI6MTc1NzY5NTUyMiwidGVuYW50X2lkIjoyfQ.pQ6DGNBqyAuoF8HsW7EYIth7WiJzJc23Vs_jhfSyePA
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc5MDA3MzAsImV4cCI6MTc1NzkzNjczMCwidGVuYW50X2lkIjoyfQ.fSRP8liK3WlO-5eF_7YnWIs3-XCyLDQ1OkyI2d8wkMQ
 
 ### 품목 등록
 POST {{base}}
@@ -66,17 +66,17 @@ Authorization: {{token}}
 Accept: application/json
 
 ### 품목 수정 (전체 수정: PUT) - 123을 실제 item_id로 교체
-PUT {{base}}/1
+PUT {{base}}/5
 Authorization: {{token}}
 Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "프리미엄 볼펜",
-  "code": "ITM-0001-PRM",
-  "price": 1500,
-  "unit": "EA",
-  "category": "MERCHANDISE"
+  "name": "의자",
+  "price": 50000,
+  "unit": "개",
+  "category": "MERCHANDISE",
+  "warehouse": "B창고"
 }
 
 ### 품목 소프트 삭제 - 123을 실제 item_id로 교체

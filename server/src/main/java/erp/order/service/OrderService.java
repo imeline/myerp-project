@@ -33,4 +33,6 @@ public interface OrderService {
     List<OrderItemQuantityRow> findAllOrderItemQuantityRow(long orderId, long tenantId);
 
     void updateStatusToShippedIfConfirmed(long orderId, long tenantId);
+
+    void updateStatusToConfirmedIfShipped(long orderId, long tenantId);
 }

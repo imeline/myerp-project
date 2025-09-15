@@ -50,6 +50,7 @@
             AND i.code LIKE '%' || #{code} || '%'
         </if>
         AND i.status != 'CANCELED'
+        AND p.status = 'SHIPPED'
         AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="i"/>
@@ -120,6 +121,7 @@
             AND i.code LIKE '%' || #{code} || '%'
         </if>
         AND i.status != 'CANCELED'
+        AND p.status = 'SHIPPED'
         AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="i"/>

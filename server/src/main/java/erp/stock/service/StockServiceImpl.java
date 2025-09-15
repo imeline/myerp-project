@@ -118,6 +118,16 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
+    public void updateStockWarehouse(long itemId, String warehouse, long tenantId) {
+        String normalizedWarehouse = Strings.normalizeOrNull(warehouse);
+
+        int affectedRowCount = stockMapper.updateWarehouse(
+                tenantId, itemId, normalizedWarehouse);
+        requireOneRowAffected(affectedRowCount, ErrorStatus.NOT_FOUND_STOCK);
+    }
+
+    @Override
+    @Transactional
     public void increaseOnHand(long itemId, int delta, long tenantId) {
         if (delta <= 0) {
             throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);

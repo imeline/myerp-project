@@ -151,6 +151,14 @@
         GROUP BY i.price
     </select>
 
+    <update id="updateWarehouse">
+        UPDATE stock
+        SET warehouse = #{warehouse}
+        WHERE item_id = #{itemId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
     <!-- 총 개수 -->
     <select id="countByStock" resultType="long">
         SELECT COUNT(1)

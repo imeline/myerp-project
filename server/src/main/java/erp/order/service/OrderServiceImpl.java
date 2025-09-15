@@ -313,4 +313,27 @@ public class OrderServiceImpl implements OrderService {
         }
         throw new GlobalException(ErrorStatus.UPDATE_ORDER_STATUS_FAIL);
     }
+
+    @Override
+    @Transactional
+    public void updateStatusToConfirmedIfShipped(long orderId, long tenantId) {
+        int affectedRowCount = orderMapper.updateStatusToConfirmedIfShipped(tenantId, orderId);
+        if (affectedRowCount == 1) {
+            return; // 성공
+        }
+
+        // 실패 사유 판정
+        OrderStatus status = orderMapper.findStatusById(tenantId, orderId)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ORDER));
+
+        switch (status) {
+            case CANCELLED ->
+                    throw new GlobalException(ErrorStatus.CANNOT_REVERT_CANCELLED_ORDER);
+            case CONFIRMED ->
+                    throw new GlobalException(ErrorStatus.ALREADY_CONFIRMED_ORDER);
+            // SHIPPED가 아니면서 업데이트가 안 된 케이스
+            default ->
+                    throw new GlobalException(ErrorStatus.UPDATE_ORDER_STATUS_FAIL);
+        }
+    }
 }

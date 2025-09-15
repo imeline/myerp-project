@@ -43,6 +43,11 @@ public interface OrderMapper {
             @Param("toStatus") OrderStatus toStatus
     );
 
+    int updateStatusToConfirmedIfShipped(
+            @Param("tenantId") long tenantId,
+            @Param("orderId") long orderId
+    );
+
     Optional<OrderStatus> findStatusById(
             @Param("tenantId") long tenantId,
             @Param("orderId") long orderId

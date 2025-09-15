@@ -1,5 +1,5 @@
 @base = {{host}}/api/v1/user/report/stock/overview
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI5YzI0MDRkOTI4NTM0YjE4YWEzZDVmNGNjZWU3NjBmMCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU3NDEyOTg1LCJleHAiOjE3NTc0NDg5ODUsInRlbmFudF9pZCI6Mn0.SzPcMxKZTUfJdFd4U7F-_Ots8hmAmtbUsTIkcozoirU
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc5MDA3MzAsImV4cCI6MTc1NzkzNjczMCwidGVuYW50X2lkIjoyfQ.fSRP8liK3WlO-5eF_7YnWIs3-XCyLDQ1OkyI2d8wkMQ
 
 ### 재고 현황 조회 (전체 스냅샷)
 GET {{base}}

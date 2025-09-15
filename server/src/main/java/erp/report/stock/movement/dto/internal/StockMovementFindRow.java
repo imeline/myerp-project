@@ -25,9 +25,6 @@ public record StockMovementFindRow(
         String code,
 
         @NotNull
-        MovementStatus status,
-
-        @NotNull
-        String warehouse
+        MovementStatus status
 ) {
 }

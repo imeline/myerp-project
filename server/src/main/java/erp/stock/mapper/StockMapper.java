@@ -26,6 +26,10 @@ public interface StockMapper {
             @Param("itemId") long itemId
     );
 
+    int updateWarehouse(@Param("tenantId") long tenantId,
+                        @Param("itemId") long itemId,
+                        @Param("warehouse") String warehouse);
+
     int increaseOnHand(@Param("tenantId") long tenantId,
                        @Param("itemId") long itemId,
                        @Param("delta") int delta);

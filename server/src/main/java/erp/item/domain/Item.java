@@ -21,12 +21,24 @@ public class Item extends TimeStamped {
     private long companyId;
     private LocalDateTime deletedAt;
 
-    public static Item of(Long itemId, String name, String code, BigDecimal price,
-                          String unit, ItemCategory category, long companyId) {
+    public static Item register(Long itemId, String name, String code, BigDecimal price,
+                                String unit, ItemCategory category, long companyId) {
         return Item.builder()
                 .itemId(itemId)
                 .name(name)
                 .code(code)
+                .price(price)
+                .unit(unit)
+                .category(category)
+                .companyId(companyId)
+                .build();
+    }
+
+    public static Item update(Long itemId, String name, BigDecimal price,
+                              String unit, ItemCategory category, long companyId) {
+        return Item.builder()
+                .itemId(itemId)
+                .name(name)
                 .price(price)
                 .unit(unit)
                 .category(category)

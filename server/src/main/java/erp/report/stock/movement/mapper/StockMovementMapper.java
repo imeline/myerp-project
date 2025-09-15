@@ -10,10 +10,13 @@ import java.util.List;
 
 @Mapper
 public interface StockMovementMapper {
-    StockMovementSummaryRow findMovementSummary(@Param("tenantId") long tenantId, @Param("filter") StockMovementSearchFilter filter);
+    StockMovementSummaryRow findMovementSummary(@Param("tenantId") long tenantId,
+                                                @Param("filter") StockMovementSearchFilter filter);
 
-    List<StockMovementFindRow> findMovementRows(@Param("tenantId") long tenantId, @Param("filter") StockMovementSearchFilter filter);
+    List<StockMovementFindRow> findMovementRows(@Param("tenantId") long tenantId,
+                                                @Param("filter") StockMovementSearchFilter filter);
 
-    long countMovementRows(@Param("tenantId") long tenantId, @Param("filter") StockMovementSearchFilter filter);
+    long countMovementRows(@Param("tenantId") long tenantId,
+                           @Param("filter") StockMovementSearchFilter filter);
 
 }

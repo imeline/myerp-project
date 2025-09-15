@@ -73,7 +73,6 @@
     <update id="updateById">
         UPDATE item
         SET name = #{item.name},
-        code = #{item.code},
         price = #{item.price},
         unit = #{item.unit},
         category = #{item.category}
