@@ -33,4 +33,11 @@ public class OrderValidatorImpl implements OrderValidator {
             throw new GlobalException(ErrorStatus.NOT_FOUND_ORDER);
         }
     }
+
+    @Override
+    public void validNoConfirmByItemId(long itemId, long tenantId) {
+        if (orderMapper.existsConfirmByItemId(tenantId, itemId)) {
+            throw new GlobalException(ErrorStatus.CANNOT_DELETE_ITEM_BY_CONFIRMED_ORDER);
+        }
+    }
 }

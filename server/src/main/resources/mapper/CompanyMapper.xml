@@ -98,4 +98,36 @@
           AND deleted_at IS NULL
     </select>
 
+    <!-- 회사 하위 엔터티 존재 여부 (하나라도 존재하면 true) -->
+    <select id="existsRelationData" resultType="boolean">
+        SELECT CASE
+                   WHEN (
+                       EXISTS (SELECT 1
+                               FROM employee e
+                               WHERE e.status = 'ACTIVE'
+                                 AND e.company_id = #{companyId})
+                           OR EXISTS (SELECT 1
+                                      FROM item i
+                                      WHERE i.deleted_at IS NULL
+                                        AND i.company_id = #{companyId})
+                           OR EXISTS (SELECT 1
+                                      FROM stock s
+                                      WHERE s.company_id = #{companyId})
+                           OR EXISTS (SELECT 1
+                                      FROM orders o
+                                      WHERE o.company_id = #{companyId})
+                           OR EXISTS (SELECT 1
+                                      FROM purchase p
+                                      WHERE p.company_id = #{companyId})
+                           OR EXISTS (SELECT 1
+                                      FROM inbound ib
+                                      WHERE ib.company_id = #{companyId})
+                           OR EXISTS (SELECT 1
+                                      FROM outbound ob
+                                      WHERE ob.company_id = #{companyId})
+                       ) THEN 1
+                   ELSE 0 END
+        FROM dual
+    </select>
+
 </mapper>

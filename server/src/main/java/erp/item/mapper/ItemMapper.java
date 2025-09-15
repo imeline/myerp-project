@@ -51,4 +51,7 @@ public interface ItemMapper {
 
     boolean existsByIds(@Param("tenantId") long tenantId,
                         @Param("itemIds") List<Long> itemIds);
+
+    boolean existsById(@Param("tenantId") long tenantId,
+                       @Param("itemId") long itemId);
 }

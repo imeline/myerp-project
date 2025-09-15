@@ -581,4 +581,13 @@
         FROM dual
     </select>
 
+    <select id="existsPositiveByItemId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM stock
+        WHERE item_id = #{itemId}
+        AND (on_hand_quantity > 0 OR allocated_quantity > 0)
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
 </mapper>

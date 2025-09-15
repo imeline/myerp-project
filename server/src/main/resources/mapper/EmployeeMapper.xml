@@ -178,12 +178,20 @@
         <include refid="frag.tenantGuard"/>
     </select>
 
-    <select id="existsById" resultType="boolean">
+    <select id="existsActiveById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE employee_id = #{employeeId}
         AND
-        status != 'RETIRED'
+        status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsAnyById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE employee_id = #{employeeId}
         AND
         <include refid="frag.tenantGuard"/>
     </select>

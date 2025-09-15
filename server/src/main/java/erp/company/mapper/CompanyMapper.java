@@ -36,4 +36,6 @@ public interface CompanyMapper {
     boolean isActiveById(@Param("companyId") Long companyId);
 
     boolean existsCompanyById(@Param("companyId") Long companyId);
+
+    boolean existsRelationData(@Param("companyId") Long companyId);
 }

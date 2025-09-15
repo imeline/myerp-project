@@ -57,4 +57,7 @@ public interface StockMapper {
                            @Param("filter") StockMovementSearchFilter filter);
 
     StockSummaryRow findStockSummaryRow(@Param("tenantId") long tenantId);
+
+    boolean existsPositiveByItemId(@Param("tenantId") long tenantId,
+                                   @Param("itemId") long itemId);
 }

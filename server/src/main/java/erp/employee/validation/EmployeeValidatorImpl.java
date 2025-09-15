@@ -15,7 +15,7 @@ public class EmployeeValidatorImpl implements EmployeeValidator {
     @Override
     public void validEmployeeIdIfPresent(Long employeeId, long tenantId) {
         if (employeeId == null) return;
-        if (!employeeMapper.existsById(tenantId, employeeId)) {
+        if (!employeeMapper.existsActiveById(tenantId, employeeId)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_EMPLOYEE);
         }
     }

@@ -97,13 +97,9 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public void softDeleteCompany(long companyId) {
-        // todo: 연관 데이터(삭제된건 제외) 존재 여부 체크 추가 필요
-//        long related = companyMapper.countEmployees(companyId) // 직원 다 삭제해야 삭제 가능
-//                + companyMapper.countOrders(companyId)
-//                + companyMapper.countOutbounds(companyId);
-//        if (related > 0)
-//            throw new GlobalException(ErrorStatus.EXTERNAL_DATA_EXISTS);
-
+        if (companyMapper.existsRelationData(companyId)) {
+            throw new GlobalException(ErrorStatus.CANNOT_DELETE_COMPANY_HAS_RELATION);
+        }
         int affectedRowCount = companyMapper.softDeleteById(companyId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_COMPANY_FAIL);
     }

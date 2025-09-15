@@ -8,4 +8,6 @@ public interface OrderValidator {
     void validItemIdsUniqueInRequest(List<OrderItemSaveRequest> requestItems);
 
     void validOrderIdIfPresent(long orderId, long tenantId);
+
+    void validNoConfirmByItemId(long itemId, long tenantId);
 }

@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/admin/employee
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI5YzI0MDRkOTI4NTM0YjE4YWEzZDVmNGNjZWU3NjBmMCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU3Mjk4ODQxLCJleHAiOjE3NTczMzQ4NDEsInRlbmFudF9pZCI6Mn0.WY67bx5jSb4R5iPw0Baboa6YmCwXvjNuKohvVcBFIXA
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI5YzI0MDRkOTI4NTM0YjE4YWEzZDVmNGNjZWU3NjBmMCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU3OTM0MzI3LCJleHAiOjE3NTc5NzAzMjcsInRlbmFudF9pZCI6Mn0.of21ZGYWxcm2pTwYgOHfTRIsIz_YhaTgw65Hz4x2HSo
 @employeeId = 7
 
 ### 직원 ID·이름 전체 조회 (ACTIVE만)
@@ -70,6 +70,6 @@ Accept: application/json
 
 
 ### 직원 퇴사 처리
-POST {{base}}/5/retire
+POST {{base}}/7/retire
 Authorization: {{token}}
 Accept: application/json

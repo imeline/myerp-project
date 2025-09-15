@@ -189,4 +189,20 @@
         AND
         <include refid="frag.tenantGuard"/>
     </select>
+
+    <select id="existsConfirmByItemId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM orders o
+        JOIN order_item oi ON oi.order_id = o.order_id
+        WHERE o.status = 'CONFIRMED'
+        AND oi.item_id = #{itemId}
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+    </select>
 </mapper>
