@@ -1,4 +1,4 @@
-package erp.global.tenant;
+package erp.global.context;
 
 // ThreadLocal을 써서 현재 스레드(=이번 HTTP 요청) 안에서만 tenantId를 저장
 // JWT 필터가 토큰에서 tenantId를 꺼내서 TenantContext.set(tenantId)로 심어줌

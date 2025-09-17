@@ -1,8 +1,8 @@
 package erp.stock.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.global.response.PageResponse;
-import erp.global.tenant.TenantContext;
 import erp.stock.dto.request.StockFindAllRequest;
 import erp.stock.dto.request.StockMovementFindRequest;
 import erp.stock.dto.response.StockFindAllResponse;

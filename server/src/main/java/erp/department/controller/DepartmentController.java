@@ -5,8 +5,8 @@ import erp.department.dto.request.DepartmentUpdateRequest;
 import erp.department.dto.request.TopDepartmentSaveRequest;
 import erp.department.dto.response.DepartmentInfoResponse;
 import erp.department.service.DepartmentService;
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
-import erp.global.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

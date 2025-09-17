@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.log.mapper.LogMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT log_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO log (
+        log_id,
+        company_id,
+        type,
+        success,
+        employee_uuid,
+        employee_name,
+        message,
+        ip_address,
+        request_id,
+        payload
+        ) VALUES (
+        #{log.logId},
+        #{tenantId,         jdbcType=NUMERIC}, <!-- NULL 가능 -->
+        #{log.type},
+        #{log.success,      typeHandler=erp.global.mybatis.BooleanYnTypeHandler},
+        #{log.employeeUuid, jdbcType=VARCHAR},
+        #{log.employeeName, jdbcType=VARCHAR},
+        #{log.message},
+        #{log.ipAddress,    jdbcType=VARCHAR},
+        #{log.requestId,    jdbcType=VARCHAR},
+        #{log.payloadJson,  jdbcType=CLOB}
+        )
+    </insert>
+
+    <delete id="deleteOlderThan">
+        DELETE FROM erp_log
+        WHERE type = #{type}
+        AND SYSTIMESTAMP - NUMTODSINTERVAL(#{days}, 'DAY') > created_at
+    </delete>
+
+</mapper>

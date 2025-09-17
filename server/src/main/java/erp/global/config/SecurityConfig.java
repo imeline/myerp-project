@@ -1,8 +1,6 @@
 package erp.global.config;
 
-import erp.auth.security.filter.CompanyActiveGuardFilter;
-import erp.auth.security.filter.JwtAuthenticationFilter;
-import erp.auth.security.filter.TenantScopeGuardFilter;
+import erp.auth.security.filter.*;
 import erp.global.exception.RestAccessDeniedHandler;
 import erp.global.exception.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 @Configuration
 @EnableWebSecurity // 시큐리티 활성화
@@ -34,6 +33,8 @@ public class SecurityConfig {
     // 회사가 활성 상태인지 검사하는 필터
     private final CompanyActiveGuardFilter companyActiveGuardFilter;
     private final CorsConfig corsConfig;
+    private final RequestIdFilter requestIdFilter;
+    private final AccessLogFilter accessLogFilter;
     // 401 error 처리 핸들러
     private final RestAccessDeniedHandler restAccessDeniedHandler;
     // 403 error 처리 핸들러
@@ -59,11 +60,16 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                // 제일 먼저 있어야 모든 로그/예외에 붙음
+                .addFilterBefore(requestIdFilter, SecurityContextHolderFilter.class)
+                // access log 기록 필터
+                // -> finally에서 쓰기 때문에, 체인 도는 동안 JWT/테넌트가 세팅되고, 그걸 사용해 DB에 기록 가능
                 // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
                 //→ 그래야 로그인 요청이 아니라도 JWT 인증을 먼저 처리할 수 있음
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(tenantScopeGuardFilter, JwtAuthenticationFilter.class)
-                .addFilterAfter(companyActiveGuardFilter, JwtAuthenticationFilter.class)
+                .addFilterAfter(companyActiveGuardFilter, TenantScopeGuardFilter.class)
+                .addFilterBefore(accessLogFilter, CompanyActiveGuardFilter.class)
                 // CORS 허용 필터 추가 (프론트에서 토큰 보낼 수 있게)
                 .addFilter(corsConfig.corsFilter());
 

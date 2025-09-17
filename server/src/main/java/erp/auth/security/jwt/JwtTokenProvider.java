@@ -25,6 +25,8 @@ public class JwtTokenProvider {
 
     public static final String CLAIM_ROLE = "role";
     public static final String CLAIM_TENANT_ID = "tenant_id";
+    public static final String CLAIM_EMPLOYEE_UUID = "employee_uuid";
+    public static final String CLAIM_EMPLOYEE_NAME = "employee_name";
     public static final String BEARER_PREFIX = "Bearer ";
     private final Environment env;
 
@@ -38,15 +40,22 @@ public class JwtTokenProvider {
 
         JwtBuilder builder = Jwts.builder()
                 .setSubject(userDetails.getUsername())
-                .claim(CLAIM_ROLE, userDetails.getAuthorities().iterator().next().getAuthority())
+                .claim(CLAIM_ROLE, userDetails.getAuthorities()
+                        .iterator().next().getAuthority())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + expMillis))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256);
 
         // UserPrincipal 객체 타입이면 tenant_id 넣기
         if (userDetails instanceof UserPrincipal principal) {
-            Long tenantId = principal.getTenantId();
-            builder.claim(CLAIM_TENANT_ID, tenantId);
+            builder.claim(CLAIM_TENANT_ID, principal.getTenantId());
+            // 있으면 싣고, null이면 생략
+            if (principal.getEmployeeUuid() != null) {
+                builder.claim(CLAIM_EMPLOYEE_UUID, principal.getEmployeeUuid());
+            }
+            if (principal.getEmployeeName() != null) {
+                builder.claim(CLAIM_EMPLOYEE_NAME, principal.getEmployeeName());
+            }
         }
 
         return BEARER_PREFIX + builder.compact();
@@ -70,6 +79,14 @@ public class JwtTokenProvider {
         return extractAllClaims(token).get(CLAIM_TENANT_ID, Long.class);
     }
 
+    public String extractEmployeeUuid(String token) {
+        return extractAllClaims(token).get(CLAIM_EMPLOYEE_UUID, String.class);
+    }
+
+    public String extractEmployeeName(String token) {
+        return extractAllClaims(token).get(CLAIM_EMPLOYEE_NAME, String.class);
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -82,11 +99,6 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token) // 토큰 파싱 + 서명 검증이 동시에 일어남
                 .getBody();
     }
-
-//    public boolean validateToken(String token, UserDetails userDetails) {
-//        final String uuid = extractUuid(token);
-//        return (uuid.equals(userDetails.getUsername()) && !isTokenExpired(token));
-//    }
 
     // 만료 검증
     public boolean validateToken(String token) {

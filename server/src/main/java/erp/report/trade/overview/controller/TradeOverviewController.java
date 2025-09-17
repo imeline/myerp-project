@@ -1,7 +1,7 @@
 package erp.report.trade.overview.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
-import erp.global.tenant.TenantContext;
 import erp.report.trade.overview.dto.request.TradeOverviewReportFindRequest;
 import erp.report.trade.overview.dto.response.TradeOverviewReportResponse;
 import erp.report.trade.overview.service.TradeOverviewService;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TradeOverviewController {
 
     private final TradeOverviewService tradeOverviewService;
-    
+
     @GetMapping
     public ApiResponse<TradeOverviewReportResponse> getOverview(
             @Valid @RequestBody TradeOverviewReportFindRequest request

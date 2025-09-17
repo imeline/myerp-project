@@ -1,7 +1,7 @@
 package erp.report.stock.overview.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
-import erp.global.tenant.TenantContext;
 import erp.report.stock.overview.dto.request.StockOverviewFindRequest;
 import erp.report.stock.overview.dto.response.StockOverviewResponse;
 import erp.report.stock.overview.service.StockOverviewService;

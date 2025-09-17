@@ -15,6 +15,8 @@ import erp.employee.dto.request.EmployeeSaveRequest;
 import erp.employee.service.EmployeeService;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -60,6 +62,7 @@ public class AuthServiceImpl implements AuthService {
         erpAccountService.saveErpAccount(erpAccountSaveRequest, request.companyId());
     }
 
+    @Auditable(type = LogType.LOGIN, messageEl = "'로그인 처리: ' + #args[0].loginEmail()")
     @Override
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
@@ -79,6 +82,8 @@ public class AuthServiceImpl implements AuthService {
                 row.uuid(),
                 row.role(),
                 null, // 사용되지 않는 민감정보 제거
+                row.uuid(),
+                row.name(),
                 row.tenantId()
         );
         String token = jwtTokenProvider.generateToken(userDetails);

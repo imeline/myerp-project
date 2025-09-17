@@ -133,7 +133,10 @@ public enum ErrorStatus {
     NOT_FOUND_OUTBOUND("OUT1204", "존재하지 않는 출고입니다."),
     CANNOT_DELETE_ITEM_BY_CONFIRMED_PURCHASE("ITEM711", "열린 상태 발주에서 참조된 품목은 삭제할 수 없습니다."),
     CANNOT_DELETE_ITEM_BY_CONFIRMED_ORDER("ITEM712", "열린 상태 주문에서 참조된 품목은 삭제할 수 없습니다."),
-    ;
+
+    // LOG
+    LOG_SAVE_FAIL("LOG1301", "로그 저장에 실패했습니다."),
+    LOG_PAYLOAD_INVALID_JSON("LOG1302", "로그 페이로드가 유효한 JSON 형식이 아닙니다.");
 
 
     private final String status;

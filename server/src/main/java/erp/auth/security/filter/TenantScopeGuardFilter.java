@@ -2,9 +2,9 @@ package erp.auth.security.filter;
 
 import erp.account.service.ErpAccountService;
 import erp.auth.security.model.UserPrincipal;
+import erp.global.context.TenantContext;
 import erp.global.exception.GlobalException;
 import erp.global.exception.RestAccessDeniedHandler;
-import erp.global.tenant.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
