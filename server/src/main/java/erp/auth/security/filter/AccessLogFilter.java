@@ -30,11 +30,13 @@ public class AccessLogFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.startsWith("/actuator/health")
+        if (uri.startsWith("/actuator/health")
                 || uri.startsWith("/swagger-ui")
                 || uri.startsWith("/v3/api-docs")
-                || uri.startsWith("/public/")
-                || uri.startsWith("/api/v1/auth"); // 로그인 관련은 ACCESS 로그 스킵
+                || uri.startsWith("/public/")) {
+            return true;
+        }
+        return uri.equals("/api/v1/auth/login");
     }
 
     @Override

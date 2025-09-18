@@ -14,6 +14,8 @@ import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import erp.global.response.PageResponse;
 import erp.global.util.PageParam;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final CompanyMapper companyMapper;
     private final CompanyValidator companyValidator;
 
+    @Auditable(type = LogType.WORK, messageEl = "'회사 등록: ' + #args[0].name() + ' (' + #args[0].bizNo() + ')' ")
     @Override
     @Transactional
     public Long saveCompany(CompanySaveRequest request) {
@@ -75,9 +78,11 @@ public class CompanyServiceImpl implements CompanyService {
         return PageResponse.of(responses, pageParam.page(), total, pageParam.size());
     }
 
+    @Auditable(type = LogType.WORK, messageEl = "'회사 수정: id=' + #args[0] + ', name=' + #args[1].name() + ', bizNo=' + #args[1].bizNo()")
     @Override
     @Transactional
     public void updateCompany(Long companyId, CompanyUpdateRequest request) {
+        companyValidator.validCompanyIdIfPresent(companyId);
         // 중복 여부 체크
         companyValidator.validBizNoUnique(request.bizNo(), companyId);
         companyValidator.validNameUnique(request.name(), companyId);
@@ -94,6 +99,7 @@ public class CompanyServiceImpl implements CompanyService {
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_COMPANY_FAIL);
     }
 
+    @Auditable(type = LogType.WORK, messageEl = "'회사 삭제(소프트): id=' + #args[0]")
     @Override
     @Transactional
     public void softDeleteCompany(long companyId) {

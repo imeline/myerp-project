@@ -33,6 +33,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
+    // 회원가입은 계정/직원 생성이라 WORK로 기록
+    @Auditable(type = LogType.WORK, messageEl = "'회원가입 처리: ' + #args[0].loginEmail() + ' / ' + #args[0].name()")
     @Override
     @Transactional
     public void signup(SignupRequest request, ErpAccountRole role) {

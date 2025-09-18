@@ -11,6 +11,8 @@ import erp.global.util.time.Periods;
 import erp.item.dto.internal.ItemPriceRow;
 import erp.item.service.ItemService;
 import erp.item.validation.ItemValidator;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import erp.order.domain.Order;
 import erp.order.domain.OrderItem;
 import erp.order.dto.internal.*;
@@ -50,6 +52,8 @@ public class OrderServiceImpl implements OrderService {
     private final EmployeeValidator employeeValidator;
     private final ItemValidator itemValidator;
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'주문 등록: customer=' + #args[0].customer() + ', items=' + #args[0].items().size()")
     @Override
     @Transactional
     public long saveOrderAndOrderItems(OrderSaveRequest request, long tenantId) {
@@ -248,6 +252,8 @@ public class OrderServiceImpl implements OrderService {
         return OrderDetailResponse.of(header, itemRows);
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'주문 취소: orderId=' + #args[0]")
     @Override
     @Transactional
     public void cancelOrder(long orderId, long tenantId) {

@@ -20,6 +20,7 @@
             address = #{address},
             phone   = #{phone}
         WHERE company_id = #{companyId}
+          AND deleted_at IS NULL
     </update>
 
     <select id="findById" resultType="Company">

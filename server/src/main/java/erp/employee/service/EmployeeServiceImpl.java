@@ -19,6 +19,8 @@ import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
 import erp.global.response.PageResponse;
 import erp.global.util.PageParam;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import erp.position.validation.PositionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final DepartmentValidator departmentValidator;
     private final PositionValidator positionValidator;
     private final EmployeeValidator employeeValidator;
-
+    
     @Override
     @Transactional
     public Long saveEmployee(EmployeeSaveRequest request, long companyId) {
@@ -116,6 +118,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_EMPLOYEE));
     }
 
+    @Auditable(type = LogType.WORK, messageEl = "'직원 수정: id=' + #args[0] + ', empNo=' + #args[1].empNo() + ', name=' + #args[1].name() + ', tenant=' + #args[2]")
     @Override
     @Transactional
     public void updateEmployee(long employeeId, EmployeeUpdateRequest request,
@@ -145,6 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_EMPLOYEE_FAIL);
     }
 
+    @Auditable(type = LogType.WORK, messageEl = "'직원 퇴사 처리: id=' + #args[0] + ', tenant=' + #args[1]")
     @Override
     @Transactional
     public void retireEmployee(long employeeId, long tenantId) {

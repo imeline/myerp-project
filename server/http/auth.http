@@ -6,14 +6,14 @@ POST {{base}}/signup/sys
 Content-Type: application/json
 
 {
-  "loginEmail": "sys1@naver.com",
+  "loginEmail": "sys2@naver.com",
   "password": "123456",
-  "empNo": "DF123",
-  "name": "sys1",
-  "phone": "010-1234-5678",
-  "departmentId": 2,
-  "positionId": 2,
-  "companyId": 1
+  "empNo": "DF234",
+  "name": "sys2",
+  "phone": "010-3872-5678",
+  "departmentId": 3,
+  "positionId": 4,
+  "companyId": 2
 }
 
 ### ADMIN 회원가입
@@ -21,11 +21,11 @@ POST {{base}}/signup/admin
 Content-Type: application/json
 
 {
-  "loginEmail": "admin2@naver.com",
+  "loginEmail": "admin3@naver.com",
   "password": "123456",
-  "empNo": "AD234",
-  "name": "admin2",
-  "phone": "010-2222-5678",
+  "empNo": "AD345",
+  "name": "admin3",
+  "phone": "010-3333-5678",
   "departmentId": 3,
   "positionId": 4,
   "companyId": 2
@@ -36,13 +36,13 @@ POST {{base}}/signup/user
 Content-Type: application/json
 
 {
-  "loginEmail": "user1@naver.com",
+  "loginEmail": "user2@naver.com",
   "password": "123456",
-  "empNo": "US123",
-  "name": "user1",
-  "phone": "010-1122-5678",
+  "empNo": "US234",
+  "name": "user2",
+  "phone": "010-2344-5678",
   "departmentId": 3,
-  "positionId": 3,
+  "positionId": 4,
   "companyId": 2
 }
 
@@ -51,7 +51,7 @@ POST {{base}}/login
 Content-Type: application/json
 
 {
-  "loginEmail": "sys1@naver.com",
+  "loginEmail": "sys2@naver.com",
   "password": "123456"
 }
 

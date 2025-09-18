@@ -11,6 +11,8 @@ import erp.department.validation.DepartmentValidator;
 import erp.employee.validation.EmployeeValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +29,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentValidator departmentValidator;
     private final EmployeeValidator employeeValidator;
 
+    @Auditable(type = LogType.WORK, messageEl = "'부서 등록(자식): name=' + #args[0].name() + ', parentId=' + #args[0].parentId() + ', tenant=' + #args[1]")
     @Override
     @Transactional
-    // 부모가 있는 부서 생성
+    // 부모가 있는 자식 부서 생성
     public long saveChildDepartment(ChildDepartmentSaveRequest request,
                                     long tenantId) {
         long newDepartmentId = departmentMapper.nextId();
@@ -49,6 +52,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         return newDepartmentId;
     }
 
+    @Auditable(type = LogType.WORK, messageEl = "'부서 등록(루트): name=' + #args[0].name() + ', tenant=' + #args[1]")
     @Override
     @Transactional
     // 부모가 없는 루트 부서 생성
@@ -101,6 +105,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         return list;
     }
 
+    @Auditable(type = LogType.WORK, messageEl = "'부서명 변경: id=' + #args[0] + ' → ' + #args[1].name() + ', tenant=' + #args[2]")
     @Override
     @Transactional
     public void updateDepartment(Long departmentId,
@@ -119,6 +124,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_DEPARTMENT_FAIL);
     }
 
+    @Auditable(type = LogType.WORK, messageEl = "'부서 삭제: id=' + #args[0] + ', tenant=' + #args[1]")
     @Override
     @Transactional
     public void deleteDepartment(Long departmentId, long tenantId) {

@@ -12,6 +12,8 @@ import erp.global.util.time.Periods;
 import erp.item.dto.internal.ItemPriceRow;
 import erp.item.service.ItemService;
 import erp.item.validation.ItemValidator;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import erp.purchase.domain.Purchase;
 import erp.purchase.domain.PurchaseItem;
 import erp.purchase.dto.internal.*;
@@ -50,6 +52,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final ItemValidator itemValidator;
     private final PurchaseValidator purchaseValidator;
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'발주 등록: supplier=' + #args[0].supplier() + ', items=' + #args[0].items().size()")
     @Override
     @Transactional
     public long savePurchaseAndPurchaseItems(PurchaseSaveRequest request, long tenantId) {
@@ -263,6 +267,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         return PurchaseDetailResponse.of(header, itemRows);
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'발주 취소: purchaseId=' + #args[0]")
     @Override
     @Transactional
     public void cancelPurchase(long purchaseId, long tenantId) {

@@ -1,5 +1,6 @@
 package erp.log.audit;
 
+import erp.global.exception.GlobalException;
 import erp.log.dto.request.LogSaveRequest;
 import erp.log.enums.LogType;
 import erp.log.service.LogService;
@@ -38,8 +39,13 @@ public class AuditingAspect {
 
             payload.put("result", "SUCCESS");
             String msg = resolveMessage(aud, pjp, result, null);
-            safeSave(aud.type(), true, msg, payload);
 
+            // 정책: WORK는 성공일 때만 기록
+            if (aud.type() == LogType.WORK) {
+                safeSave(LogType.WORK, true, msg, payload);
+            } else {
+                safeSave(aud.type(), true, msg, payload);
+            }
             return result;
 
         } catch (Throwable ex) {
@@ -47,10 +53,16 @@ public class AuditingAspect {
             payload.put("exception", ex.getClass().getSimpleName());
             payload.put("errorMessage", ex.getMessage());
 
-            String msg = resolveMessage(aud, pjp, null, ex);
-            safeSave(aud.type(), false, msg, payload);
-            markBusinessFailureAudited(); // 중복(ERROR) 차단 플래그
+            // 정책: WORK 실패는 기록하지 않음
+            if (aud.type() != LogType.WORK) {
+                String msg = resolveMessage(aud, pjp, null, ex);
+                safeSave(aud.type(), false, msg, payload);
+            }
 
+            // 비즈니스 예외(4xx)는 ERROR 중복 방지 플래그만
+            if (ex instanceof GlobalException) {
+                markBusinessFailureAudited();
+            }
             throw ex;
         }
     }
@@ -64,25 +76,23 @@ public class AuditingAspect {
     }
 
     private String resolveMessage(Auditable aud, ProceedingJoinPoint pjp, Object result, Throwable ex) {
-        // 1) SpEL 우선
         String el = aud.messageEl();
         if (el != null && !el.isBlank()) {
             try {
                 StandardEvaluationContext ctx = new StandardEvaluationContext();
-                ctx.setVariable("args", pjp.getArgs());                   // #args[0]...
-                ctx.setVariable("result", result);                        // #result
-                ctx.setVariable("ex", ex);                                // #ex
-                ctx.setVariable("method", pjp.getSignature().getName());  // #method
+                ctx.setVariable("args", pjp.getArgs());
+                ctx.setVariable("result", result);
+                ctx.setVariable("ex", ex);
+                ctx.setVariable("method", pjp.getSignature().getName());
                 Expression expression = parser.parseExpression(el);
                 Object value = expression.getValue(ctx);
                 if (value != null) return String.valueOf(value);
-            } catch (Exception ignore) { /* SpEL 실패 시 아래 fallback */ }
+            } catch (Exception ignore) {
+            }
         }
-        // 2) 고정 메시지
         if (aud.message() != null && !aud.message().isBlank()) {
             return aud.message();
         }
-        // 3) 기본 포맷
         return aud.type().name() + (ex == null ? " success" : " fail");
     }
 }
