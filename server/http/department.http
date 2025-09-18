@@ -1,0 +1,57 @@
+### 환경 변수 (필요하면 값만 바꿔)
+@base = {{host}}/api/v1/admin/department
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZmM1MDY4OTUzMzY0ZjEzOWZmZGFjNWNiODE3N2I5YiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU4MTYzMzIwLCJleHAiOjE3NTgxOTkzMjAsInRlbmFudF9pZCI6MiwiZW1wbG95ZWVfdXVpZCI6IjNmYzUwNjg5NTMzNjRmMTM5ZmZkYWM1Y2I4MTc3YjliIiwiZW1wbG95ZWVfbmFtZSI6ImFkbWluMiJ9.qQ8rtjD3dkOKRu25AbmVkfcwM6cKYXRT6lI-uGHfKY4
+@rootId = 3
+@childId = 6
+
+### 또 다른 루트 부서 생성
+POST {{base}}/top
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "안전관리팀"
+}
+
+
+### 자식 부서 생성
+POST {{base}}/child
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "전략기획팀",
+  "parentId": {{rootId}}
+}
+
+
+### 최상위 부서 목록 (parent_id IS NULL)
+GET {{base}}/top
+Authorization: {{token}}
+Accept: application/json
+
+
+### 특정 부모의 직계 자식 목록 조회 (위 @rootId 기준)
+GET {{base}}/child/{{rootId}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+
+### 부서 이름 수정
+PUT {{base}}/{{childId}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "전략기획팀"
+}
+
+### 부서 삭제
+DELETE {{base}}/{{childId}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json

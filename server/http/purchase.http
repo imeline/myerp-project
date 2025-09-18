@@ -1,0 +1,85 @@
+### 환경 변수
+@base = {{host}}/api/v1/user/purchase
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZmM1MDY4OTUzMzY0ZjEzOWZmZGFjNWNiODE3N2I5YiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU4MTYzMzIwLCJleHAiOjE3NTgxOTkzMjAsInRlbmFudF9pZCI6MiwiZW1wbG95ZWVfdXVpZCI6IjNmYzUwNjg5NTMzNjRmMTM5ZmZkYWM1Y2I4MTc3YjliIiwiZW1wbG95ZWVfbmFtZSI6ImFkbWluMiJ9.qQ8rtjD3dkOKRu25AbmVkfcwM6cKYXRT6lI-uGHfKY4
+
+
+### 발주 등록 (발주 + 발주아이템 저장)
+POST {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "purchaseDate": "2025-09-02",
+  "supplier": "위메프",
+  "employeeId": 8,
+  "items": [
+    {
+      "itemId": 5,
+      "quantity": 10
+    }
+  ]
+}
+
+
+### 발주 목록 조회 (기간/상태/코드 검색 + 페이징)
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "page": 0,
+  "size": 20,
+  "period": "LAST_30_DAYS",
+  "status": "CONFIRMED",
+  "code": "PO-2025-"
+}
+
+
+### 발주 목록 조회 (상태만 필터)
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "page": 0,
+  "size": 10,
+  "status": "SHIPPED"
+}
+
+
+### 발주 목록 조회 (코드 검색만)
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "page": 0,
+  "size": 10,
+  "code": "PO-2025-"
+}
+
+
+### 특정 발주의 발주아이템 목록 요약 조회
+GET {{base}}/35/items/summary
+Authorization: {{token}}
+Accept: application/json
+
+### 발주번호·공급사 목록 (CONFIRMED만)
+GET {{base}}/code-suppliers
+Authorization: {{token}}
+Accept: application/json
+
+### 특정 발주 상세 조회
+GET {{base}}/34
+Authorization: {{token}}
+Accept: application/json
+
+
+### 발주 취소(삭제) — status를 CANCELLED로 변경 (아래 1을 실제 purchase_id로 교체)
+DELETE {{base}}/34
+Authorization: {{token}}
+Accept: application/json

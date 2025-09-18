@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.purchase.mapper.PurchaseMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT purchase_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO purchase (purchase_id,
+                              code,
+                              supplier,
+                              purchase_date,
+                              total_quantity,
+                              total_amount,
+                              status,
+                              employee_id,
+                              company_id)
+        VALUES (#{purchase.purchaseId},
+                #{purchase.code},
+                #{purchase.supplier},
+                #{purchase.purchaseDate},
+                #{purchase.totalQuantity},
+                #{purchase.totalAmount},
+                #{purchase.status},
+                #{purchase.employeeId},
+                #{tenantId})
+    </insert>
+
+    <!-- 목록 조회: 삭제 제외, 기간/상태/코드 필터, 페이징 -->
+    <select id="findAllPurchaseFindRow" resultType="PurchaseFindRow">
+        SELECT
+        p.purchase_id AS purchaseId,
+        p.code AS code,
+        p.supplier AS supplier,
+        COUNT(DISTINCT pi.item_id) AS itemCount, -- 총 품목 수
+        p.total_amount AS totalAmount,
+        p.purchase_date AS purchaseDate,
+        p.status AS status,
+        e.name AS employeeName
+        FROM purchase p
+        JOIN employee e
+        ON e.employee_id = p.employee_id
+        JOIN purchase_item pi
+        ON pi.purchase_id = p.purchase_id
+        WHERE 1 = 1
+
+        <!-- 기간 시작 -->
+        <if test="startDate != null">
+            AND p.purchase_date >= #{startDate}
+        </if>
+
+        <!-- 기간 끝: <= 우회 -->
+        <if test="endDate != null">
+            AND #{endDate} >= p.purchase_date
+        </if>
+
+        <!-- 코드 검색 -->
+        <if test="code != null">
+            AND p.code LIKE '%' || #{code} || '%'
+        </if>
+
+        <!-- CANCELLED 제외(항상) -->
+        AND p.status != 'CANCELLED'
+
+        <!-- 상태 필터(선택) -->
+        <if test="status != null">
+            AND p.status = #{status}
+        </if>
+
+        <!-- 테넌트 가드: WHERE의 가장 마지막 -->
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
+        <!--COUNT처럼 집계 함수를 쓰면, 집계되지 않은 컬럼을 모두 GROUP BY에 넣어야 함-->
+        GROUP BY
+        p.purchase_id,
+        p.code,
+        p.supplier,
+        p.total_amount,
+        p.purchase_date,
+        p.status,
+        e.name
+        ORDER BY p.purchase_date DESC, p.purchase_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="findAllCodeAndSupplier" resultType="PurchaseCodeAndSupplierRow">
+        SELECT
+        purchase_id,
+        code,
+        supplier
+        FROM purchase
+        WHERE status = 'CONFIRMED'
+        AND
+        <include refid="frag.tenantGuard"/>
+        ORDER BY purchase_id DESC
+    </select>
+
+    <select id="findPurchaseDetailRow" resultType="PurchaseDetailRow">
+        SELECT
+        p.code,
+        p.supplier,
+        p.purchase_date AS purchaseDate,
+        p.status,
+        e.name AS employeeName,
+        /* 총 품목 수: purchase_item 기준 */
+        (SELECT COUNT(1)
+        FROM purchase_item pi
+        WHERE pi.purchase_id = p.purchase_id
+        AND pi.company_id = #{tenantId}
+        ) AS totalItemCount,
+        /* 총 수량: purchase_item.quantity 합계 (NULL 방지 NVL) */
+        (SELECT NVL(SUM(pi.quantity), 0)
+        FROM purchase_item pi
+        WHERE pi.purchase_id = p.purchase_id
+        AND pi.company_id = #{tenantId}
+        ) AS totalQuantity,
+        /* 총 금액은 purchase.total_amount 사용 */
+        p.total_amount AS totalAmount
+        FROM purchase p
+        JOIN employee e
+        ON e.employee_id = p.employee_id
+        WHERE p.purchase_id = #{purchaseId}
+        AND p.status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+    </select>
+
+    <select id="findStatusById" resultType="PurchaseStatus">
+        SELECT status
+        FROM purchase
+        WHERE purchase_id = #{purchaseId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <!-- 현재가 CONFIRMED일 때만 목표 상태로 전이 -->
+    <update id="updateStatusToIfConfirmed">
+        UPDATE purchase
+        SET status = #{to}
+        WHERE purchase_id = #{purchaseId}
+        AND status = 'CONFIRMED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <update id="updateStatusToConfirmedIfShipped">
+        UPDATE purchase
+        SET status = 'CONFIRMED'
+        WHERE purchase_id = #{purchaseId}
+        AND status = 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <select id="countByPeriodAndCodeAndStatus" resultType="long">
+        SELECT COUNT(1)
+        FROM purchase
+        WHERE 1=1
+        <if test="startDate != null">
+            AND purchase_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= purchase_date
+        </if>
+        <if test="code != null">
+            AND code LIKE '%' || #{code} || '%'
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        AND status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM purchase
+        WHERE purchase_id = #{purchaseId}
+        AND status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsShippedById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM purchase
+        WHERE purchase_id = #{purchaseId}
+        AND status = 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="validConfirmIfPresent" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM purchase p
+        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+        WHERE p.status = 'CONFIRMED'
+        AND pi.item_id = #{itemId}
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+    </select>
+</mapper>

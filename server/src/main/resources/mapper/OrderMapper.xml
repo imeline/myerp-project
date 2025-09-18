@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.order.mapper.OrderMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT orders_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO orders (order_id,
+                            code,
+                            customer,
+                            order_date,
+                            total_quantity,
+                            total_amount,
+                            status,
+                            employee_id,
+                            company_id)
+        VALUES (#{order.orderId},
+                #{order.code},
+                #{order.customer},
+                #{order.orderDate},
+                #{order.totalQuantity},
+                #{order.totalAmount},
+                #{order.status},
+                #{order.employeeId},
+                #{tenantId})
+    </insert>
+
+    <select id="findAllOrderFindRow" resultType="OrderFindRow">
+        SELECT
+        o.order_id AS orderId,
+        o.order_date AS orderDate,
+        o.customer AS customer,
+        COUNT(DISTINCT oi.item_id) AS itemCount,
+        o.total_amount AS totalAmount,
+        o.status AS status,
+        e.name AS employeeName
+        FROM orders o
+        JOIN order_item oi
+        ON oi.order_id = o.order_id
+        JOIN employee e
+        ON e.employee_id = o.employee_id
+        WHERE 1 = 1
+
+        <if test="startDate != null">
+            AND o.order_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= o.order_date
+        </if>
+        <if test="code != null">
+            AND o.code LIKE '%' || #{code} || '%'
+        </if>
+        AND o.status != 'CANCELLED'
+        <if test="status != null">
+            AND o.status = #{status}
+        </if>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+
+        GROUP BY
+        o.order_id,
+        o.order_date,
+        o.customer,
+        o.total_amount,
+        o.status,
+        e.name
+        ORDER BY
+        o.order_date DESC,
+        o.order_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="findAllCodeAndCustomer" resultType="OrderCodeAndCustomerRow">
+        SELECT
+        order_id,
+        code,
+        customer
+        FROM orders
+        WHERE status = 'CONFIRMED'
+        AND
+        <include refid="frag.tenantGuard"/>
+        ORDER BY order_id DESC
+    </select>
+
+    <select id="findOrderDetailRow" resultType="OrderDetailRow">
+        SELECT
+        o.code AS code,
+        o.customer AS customer,
+        o.order_date AS orderDate,
+        o.status AS status,
+        e.name AS employeeName,
+        COUNT(DISTINCT oi.item_id) AS totalItemCount,
+        o.total_quantity AS totalQuantity,
+        o.total_amount AS totalAmount
+        FROM orders o
+        JOIN employee e
+        ON e.employee_id = o.employee_id
+        LEFT JOIN order_item oi
+        ON oi.order_id = o.order_id
+        WHERE o.order_id = #{orderId}
+        AND o.status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        GROUP BY
+        o.code, o.customer, o.order_date, o.status, e.name, o.total_quantity,
+        o.total_amount
+    </select>
+
+    <select id="findStatusById" resultType="OrderStatus">
+        SELECT status
+        FROM orders
+        WHERE order_id = #{orderId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <update id="updateStatusToIfConfirmed">
+        UPDATE orders
+        SET status = #{toStatus}
+        WHERE order_id = #{orderId}
+        AND status = 'CONFIRMED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <update id="updateStatusToConfirmedIfShipped">
+        UPDATE orders
+        SET status = 'CONFIRMED'
+        WHERE order_id = #{orderId}
+        AND status = 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <select id="countByPeriodAndCodeAndStatus" resultType="long">
+        SELECT COUNT(DISTINCT o.order_id)
+        FROM orders o
+        WHERE 1 = 1
+
+        <if test="startDate != null">
+            AND o.order_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= o.order_date
+        </if>
+        <if test="code != null">
+            AND o.code LIKE '%' || #{code} || '%'
+        </if>
+        AND o.status != 'CANCELLED'
+        <if test="status != null">
+            AND o.status = #{status}
+        </if>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+    </select>
+
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM orders
+        WHERE order_id = #{orderId}
+        AND status != 'CANCELLED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsConfirmByItemId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM orders o
+        JOIN order_item oi ON oi.order_id = o.order_id
+        WHERE o.status = 'CONFIRMED'
+        AND oi.item_id = #{itemId}
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+    </select>
+</mapper>

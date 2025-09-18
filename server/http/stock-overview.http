@@ -1,0 +1,13 @@
+@base = {{host}}/api/v1/user/report/stock/overview
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc5MjUxMjUsImV4cCI6MTc1Nzk2MTEyNSwidGVuYW50X2lkIjoyfQ.tzytTty1Eu3qYRcPOmWS-feh6ZuXcGpqbpobsVXueOY
+
+### 재고 리포트(월별) — 2024년 12월
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "year": 2024,
+  "month": 12
+}

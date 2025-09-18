@@ -1,0 +1,39 @@
+@base = {{host}}/api/v1/user/stock
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc5MjIzMDUsImV4cCI6MTc1Nzk1ODMwNSwidGVuYW50X2lkIjoyfQ.fgMa3EPJfgzGtBzOUsBMJ5S8mAwVW5J5DWT24J5zjcc
+
+### 재고 목록 조회
+GET {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "name": "의",
+  "category": "MERCHANDISE",
+  "warehouse": "A창고",
+  "availableQuantityFrom": 0,
+  "availableQuantityTo": 1000,
+  "sortBy": "AVAILABLE",
+  "page": 0,
+  "size": 20
+}
+
+### 단일 품목 재고/단가 조회
+GET {{base}}/5
+Authorization: {{token}}
+
+### 재고 변동 내역 조회(팝업)
+GET {{base}}/5/movement
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "period": "ALL",
+  "status": "ALL",
+  "page": 0,
+  "size": 20
+}
+
+### 재고 현황 요약 조회
+GET {{base}}/summary
+Authorization: {{token}}
+Content-Type: application/json

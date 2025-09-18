@@ -1,0 +1,74 @@
+### 환경 변수
+@base = {{host}}/api/v1/auth
+
+### SYS 회원가입
+POST {{base}}/signup/sys
+Content-Type: application/json
+
+{
+  "loginEmail": "sys2@naver.com",
+  "password": "123456",
+  "empNo": "DF234",
+  "name": "sys2",
+  "phone": "010-3872-5678",
+  "departmentId": 3,
+  "positionId": 4,
+  "companyId": 2
+}
+
+### ADMIN 회원가입
+POST {{base}}/signup/admin
+Content-Type: application/json
+
+{
+  "loginEmail": "admin3@naver.com",
+  "password": "123456",
+  "empNo": "AD345",
+  "name": "admin3",
+  "phone": "010-3333-5678",
+  "departmentId": 3,
+  "positionId": 4,
+  "companyId": 2
+}
+
+### USER 회원가입
+POST {{base}}/signup/user
+Content-Type: application/json
+
+{
+  "loginEmail": "user2@naver.com",
+  "password": "123456",
+  "empNo": "US234",
+  "name": "user2",
+  "phone": "010-2344-5678",
+  "departmentId": 3,
+  "positionId": 4,
+  "companyId": 2
+}
+
+### SYS 로그인
+POST {{base}}/login
+Content-Type: application/json
+
+{
+  "loginEmail": "sys2@naver.com",
+  "password": "123456"
+}
+
+### ADMIN 로그인
+POST {{base}}/login
+Content-Type: application/json
+
+{
+  "loginEmail": "admin2@naver.com",
+  "password": "123456"
+}
+
+### USER 로그인
+POST {{base}}/login
+Content-Type: application/json
+
+{
+  "loginEmail": "user1@naver.com",
+  "password": "123456"
+}

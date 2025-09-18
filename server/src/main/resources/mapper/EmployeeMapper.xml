@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.employee.mapper.EmployeeMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT employee_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save" parameterType="Employee">
+        INSERT INTO employee (employee_id, emp_no, name, phone, status,
+                              department_id, position_id, company_id)
+        VALUES (#{employeeId}, #{empNo}, #{name}, #{phone}, #{status},
+                #{departmentId}, #{positionId}, #{companyId})
+    </insert>
+
+    <select id="findAllIdAndName" resultType="EmployeeIdAndNameRow">
+        SELECT employee_id, name
+        FROM employee
+        WHERE
+        status != 'RETIRED'
+        AND
+        <include refid="frag.tenantGuard"/>
+        ORDER BY name
+    </select>
+
+    <select id="findAllEmployeeFindRow" resultType="EmployeeFindAllRow">
+        SELECT
+        e.employee_id AS employeeId,
+        e.emp_no AS empNo,
+        e.name AS name,
+        d.name AS departmentName,
+        p.name AS positionName,
+        e.phone AS phone,
+        a.login_email AS email,
+        e.created_at AS createdAt
+        FROM employee e
+        LEFT JOIN department d
+        ON d.department_id = e.department_id
+        AND d.company_id = e.company_id
+        LEFT JOIN position p
+        ON p.position_id = e.position_id
+        AND p.company_id = e.company_id
+        LEFT JOIN erp_account a
+        ON a.employee_id = e.employee_id
+        AND a.company_id = e.company_id
+        WHERE e.status != 'RETIRED'
+        <if test="departmentId != null">
+            AND e.department_id = #{departmentId}
+        </if>
+        <if test="positionId != null">
+            AND e.position_id = #{positionId}
+        </if>
+        <if test="name != null">
+            AND e.name LIKE '%' || #{name} || '%'
+        </if>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        ORDER BY e.created_at DESC, e.employee_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+
+    <select id="findEmployeeFindRowById" resultType="EmployeeFindRow">
+        SELECT
+        e.emp_no AS empNo,
+        e.name AS name,
+        d.department_id AS departmentId,
+        d.name AS departmentName,
+        p.position_id AS positionId,
+        p.name AS positionName,
+        e.phone AS phone
+        FROM employee e
+        LEFT JOIN department d
+        ON d.department_id = e.department_id
+        AND d.company_id = e.company_id
+        LEFT JOIN position p
+        ON p.position_id = e.position_id
+        AND p.company_id = e.company_id
+        LEFT JOIN erp_account a
+        ON a.employee_id = e.employee_id
+        AND a.company_id = e.company_id
+        WHERE e.employee_id = #{employeeId}
+        AND e.status != 'RETIRED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+    </select>
+
+
+    <update id="updateById">
+        UPDATE employee
+        SET emp_no = #{employee.empNo},
+        name = #{employee.name},
+        phone = #{employee.phone},
+        department_id = #{employee.departmentId},
+        position_id = #{employee.positionId}
+        WHERE employee_id = #{employee.employeeId}
+        AND status != 'RETIRED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <update id="updateStatusToRetired">
+        UPDATE employee
+        SET status = 'RETIRED'
+        WHERE employee_id = #{employeeId}
+        AND status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <select id="countByFilters" resultType="long">
+        SELECT COUNT(1)
+        FROM employee
+        WHERE status != 'RETIRED'
+        <if test="departmentId != null">
+            AND department_id = #{departmentId}
+        </if>
+        <if test="positionId != null">
+            AND position_id = #{positionId}
+        </if>
+        <if test="name != null">
+            AND name LIKE '%' || #{name} || '%'
+        </if>
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByDepartmentId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE department_id = #{departmentId}
+        AND
+        status != 'RETIRED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByPositionId" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE position_id = #{positionId}
+        AND
+        status != 'RETIRED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByEmpNo" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE emp_no = #{empNo}
+        <if test="excludeId != null">
+            AND employee_id != #{excludeId}
+        </if>
+        AND
+        status != 'RETIRED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByPhone" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE phone = #{phone}
+        <if test="excludeId != null">
+            AND employee_id != #{excludeId}
+        </if>
+        AND
+        status != 'RETIRED'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsActiveById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE employee_id = #{employeeId}
+        AND
+        status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsAnyById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM employee
+        WHERE employee_id = #{employeeId}
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+</mapper>

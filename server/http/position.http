@@ -1,0 +1,43 @@
+@base = {{host}}/api/v1/admin/position
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyZDhlYjc4NzI1Yjk0MzNmOGY4MTI2MTc0YjczYTI2OCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU2NjkwMTAxLCJleHAiOjE3NTY3MjYxMDEsInRlbmFudF9pZCI6Mn0.Kjf2PzGsX-VTmeUgnClCFjS7Xug-XSKa7CrHIyfRJ4Q
+
+
+### 직급 생성
+POST {{base}}
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "사장"
+}
+
+### 직급 목록 조회 (level_no 오름차순)
+GET {{base}}
+Authorization: {{token}}
+Accept: application/json
+
+### 직급 이름 수정
+PUT {{base}}/5/name
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "차장"
+}
+
+### 직급 순서 변경
+PUT {{base}}/5/level-no
+Authorization: {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "levelNo": 3
+}
+
+### 직급 삭제
+DELETE {{base}}/5
+Authorization: {{token}}
+Accept: application/json

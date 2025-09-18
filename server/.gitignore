@@ -1,0 +1,28 @@
+# --- Build outputs ---
+target/
+
+# --- Maven noise ---
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Maven Wrapper는 커밋 유지 → 일부 템플릿이 jar를 무시하길래 재포함 처리
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# --- JVM / Merge leftovers ---
+hs_err_pid*
+replay_pid*
+*.orig
+
+
+# properties files
+src/main/resources/application-*.properties
+
+# --- Misc ---
+HELP.md

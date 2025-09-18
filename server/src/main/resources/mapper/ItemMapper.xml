@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="erp.item.mapper.ItemMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT ITEM_SEQ.NEXTVAL
+        FROM DUAL
+    </select>
+
+    <insert id="save">
+        INSERT INTO item (item_id, name, code, price, unit, category,
+                          company_id)
+        VALUES (#{item.itemId}, #{item.name}, #{item.code}, #{item.price},
+                #{item.unit}, #{item.category}, #{tenantId})
+    </insert>
+
+    <select id="findById" resultType="Item">
+        SELECT *
+        FROM item
+        WHERE item_id = #{itemId}
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="findAllItemFindRow" resultType="ItemFindRow">
+        SELECT
+        item_id AS itemId,
+        code AS code,
+        name AS name,
+        price AS price,
+        unit AS unit,
+        category AS category,
+        created_at AS createdAt
+        FROM item
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND INSTR(LOWER(name), LOWER(#{name})) > 0
+        </if>
+        <if test="category != null">
+            AND category = #{category}
+        </if>
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+        ORDER BY created_at DESC, item_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="findAllItemOptionRow" resultType="ItemOptionRow">
+        SELECT item_id, name, code
+        FROM item
+        WHERE
+        <include refid="frag.tenantGuard"/>
+        AND deleted_at IS NULL
+        ORDER BY name
+    </select>
+
+    <select id="findAllPriceByIds" resultType="ItemPriceRow">
+        SELECT item_id, price
+        FROM item
+        WHERE item_id IN
+        <foreach item="id" collection="itemIds" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <update id="updateById">
+        UPDATE item
+        SET name = #{item.name},
+        price = #{item.price},
+        unit = #{item.unit},
+        category = #{item.category}
+        WHERE item_id = #{item.itemId}
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <update id="softDeleteById">
+        UPDATE item
+        SET deleted_at = SYSTIMESTAMP
+        WHERE item_id = #{itemId}
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <select id="countByNameAndCategory" resultType="long">
+        SELECT COUNT(*)
+        FROM item
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND INSTR(LOWER(name), LOWER(#{name})) > 0
+        </if>
+        <if test="category != null">
+            AND category = #{category}
+        </if>
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByName" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM item
+        WHERE LOWER(name) = LOWER(#{name})
+        <if test="excludeId != null">
+            AND item_id != #{excludeId}
+        </if>
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByCode" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM item
+        WHERE LOWER(code) = LOWER(#{code})
+        <if test="excludeId != null">
+            AND item_id != #{excludeId}
+        </if>
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsByIds" resultType="boolean">
+        <bind name="idsSize" value="itemIds != null ? itemIds.size() : 0"/>
+
+        SELECT CASE WHEN COUNT(DISTINCT item_id) = #{idsSize} THEN 1 ELSE 0
+        END
+        FROM item
+        WHERE item_id IN
+        <foreach item="id" collection="itemIds" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
+        FROM item
+        WHERE item_id = #{itemId}
+        AND deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+</mapper>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.outbound.mapper.OutboundMapper">
+
+    <select id="nextId" resultType="long">
+        SELECT outbound_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="save">
+        INSERT INTO outbound (outbound_id,
+                              code,
+                              outbound_date,
+                              status,
+                              employee_id,
+                              order_id,
+                              company_id)
+        VALUES (#{outbound.outboundId},
+                #{outbound.code},
+                #{outbound.outboundDate},
+                #{outbound.status},
+                #{outbound.employeeId},
+                #{outbound.orderId},
+                #{tenantId})
+    </insert>
+
+    <select id="findAllOutboundFindRow" resultType="OutboundFindRow">
+        SELECT
+        ob.outbound_id AS outboundId,
+        ob.code AS code,
+        od.customer AS customer,
+        COUNT(DISTINCT oi.item_id) AS itemCount,
+        od.total_amount AS totalAmount,
+        ob.outbound_date AS outboundDate,
+        od.order_id AS orderId,
+        od.code AS orderCode,
+        e.name AS employeeName
+        FROM outbound ob
+        JOIN orders od
+        ON od.order_id = ob.order_id
+        JOIN employee e
+        ON e.employee_id = ob.employee_id
+        LEFT JOIN order_item oi
+        ON oi.order_id = od.order_id
+        WHERE ob.status != 'CANCELED'
+        <if test="startDate != null">
+            AND ob.outbound_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= ob.outbound_date
+        </if>
+        <if test="code != null">
+            AND ob.code LIKE '%' || #{code} || '%'
+        </if>
+        AND od.status = 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="ob"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="od"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+
+        GROUP BY
+        ob.outbound_id, ob.code, od.customer, od.total_amount,
+        ob.outbound_date, od.order_id, od.code, e.name
+
+        ORDER BY ob.outbound_date DESC, ob.outbound_id DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="countByPeriodAndCode" resultType="long">
+        SELECT COUNT(1)
+        FROM outbound ob
+        JOIN orders od
+        ON od.order_id = ob.order_id
+        JOIN employee e
+        ON e.employee_id = ob.employee_id
+        WHERE ob.status != 'CANCELED'
+        <if test="startDate != null">
+            AND ob.outbound_date >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= ob.outbound_date
+        </if>
+        <if test="code != null">
+            AND ob.code LIKE '%' || #{code} || '%'
+        </if>
+        AND od.status = 'SHIPPED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="ob"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="od"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
+    </select>
+
+    <select id="findAllCancelItemRowById" resultType="OutboundCancelItemRow">
+        SELECT
+        oi.item_id AS itemId,
+        oi.quantity AS quantity,
+        o.order_id AS orderId
+        FROM outbound ob
+        JOIN orders o
+        ON o.order_id = ob.order_id
+        JOIN order_item oi
+        ON oi.order_id = o.order_id
+        WHERE ob.outbound_id = #{outboundId}
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="ob"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        ORDER BY oi.item_id ASC
+    </select>
+
+    <update id="updateStatusToCanceledIfActive">
+        UPDATE outbound
+        SET status = 'CANCELED'
+        WHERE outbound_id = #{outboundId}
+        AND status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </update>
+
+    <select id="existsById" resultType="boolean">
+        SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
+        FROM outbound
+        WHERE outbound_id = #{outboundId}
+        AND status = 'ACTIVE'
+        AND
+        <include refid="frag.tenantGuard"/>
+    </select>
+
+</mapper>

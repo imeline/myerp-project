@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="erp.purchase.mapper.PurchaseItemMapper">
+    <select id="nextId" resultType="long"
+            useCache="false" flushCache="true">
+        SELECT purchase_item_seq.NEXTVAL
+        FROM dual
+    </select>
+
+    <insert id="saveAll">
+        INSERT ALL
+        <foreach collection="items" item="it">
+            INTO purchase_item (
+            purchase_item_id,
+            purchase_id,
+            item_id,
+            quantity,
+            company_id
+            ) VALUES (
+            #{it.purchaseItemId},
+            #{it.purchaseId},
+            #{it.itemId},
+            #{it.quantity},
+            #{tenantId}
+            )
+        </foreach>
+        SELECT 1 FROM dual
+    </insert>
+
+    <select id="findAllPurchaseItemStockFindRow"
+            resultType="PurchaseItemStockFindRow">
+        SELECT
+        i.code AS code,
+        i.name AS name,
+        pi.quantity AS quantity,
+        i.price AS unitPrice,
+        (pi.quantity * i.price) AS subtotal,
+        s.on_hand_quantity AS onHandStock,
+        s.allocated_quantity AS allocatedStock,
+        (s.on_hand_quantity - s.allocated_quantity) AS availableStock,
+        ((s.on_hand_quantity - s.allocated_quantity)
+        + pi.quantity) AS availableStockAfterInbound
+        FROM purchase_item pi
+        JOIN purchase p
+        ON p.purchase_id = pi.purchase_id
+        JOIN item i
+        ON i.item_id = pi.item_id
+        JOIN stock s
+        ON s.item_id = pi.item_id
+        WHERE pi.purchase_id = #{purchaseId}
+        AND p.status = 'CONFIRMED'
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+        ORDER BY i.name ASC, pi.purchase_item_id ASC
+    </select>
+
+    <select id="findAllPurchaseItemDetailRow"
+            resultType="PurchaseItemDetailRow">
+        SELECT
+        i.name,
+        i.code,
+        pi.quantity,
+        i.unit,
+        i.price AS unitPrice,
+        (pi.quantity * i.price) AS subtotal
+        FROM purchase_item pi
+        JOIN purchase p
+        ON p.purchase_id = pi.purchase_id
+        JOIN item i
+        ON i.item_id = pi.item_id
+        WHERE pi.purchase_id = #{purchaseId}
+        AND p.status != 'CANCELLED'
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        ORDER BY pi.purchase_item_id ASC
+    </select>
+
+    <select id="findAllPurchaseItemQuantityRow"
+            resultType="PurchaseItemQuantityRow">
+        SELECT
+        pi.purchase_item_id AS purchaseItemId,
+        pi.item_id AS itemId,
+        pi.quantity AS quantity
+        FROM purchase_item pi
+        JOIN purchase p ON p.purchase_id = pi.purchase_id
+        JOIN item i ON i.item_id = pi.item_id
+        WHERE pi.purchase_id = #{purchaseId}
+        AND p.status != 'CANCELLED'
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+    </select>
+
+</mapper>
