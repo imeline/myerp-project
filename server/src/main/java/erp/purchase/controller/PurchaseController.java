@@ -1,8 +1,8 @@
 package erp.purchase.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.global.response.PageResponse;
-import erp.global.tenant.TenantContext;
 import erp.purchase.dto.request.PurchaseFindAllRequest;
 import erp.purchase.dto.request.PurchaseSaveRequest;
 import erp.purchase.dto.response.PurchaseCodeAndSupplierResponse;

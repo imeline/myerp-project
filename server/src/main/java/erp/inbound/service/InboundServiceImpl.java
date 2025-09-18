@@ -18,6 +18,8 @@ import erp.inbound.dto.request.InboundSaveRequest;
 import erp.inbound.dto.response.InboundFindAllResponse;
 import erp.inbound.mapper.InboundMapper;
 import erp.inbound.validation.InboundValidator;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import erp.purchase.dto.internal.PurchaseItemQuantityRow;
 import erp.purchase.service.PurchaseService;
 import erp.purchase.validation.PurchaseValidator;
@@ -44,6 +46,8 @@ public class InboundServiceImpl implements InboundService {
     private final EmployeeValidator employeeValidator;
     private final PurchaseValidator purchaseValidator;
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'입고 등록: purchaseId=' + #args[0].purchaseId() + ', date=' + #args[0].inboundDate() + ', emp=' + #args[0].employeeId()")
     @Override
     @Transactional
     public long saveInbound(InboundSaveRequest request, long tenantId) {
@@ -150,6 +154,8 @@ public class InboundServiceImpl implements InboundService {
         );
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'입고 취소: inboundId=' + #args[0]")
     @Override
     @Transactional
     public void cancelInbound(long inboundId, long tenantId) {

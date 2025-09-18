@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/sys/company
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjOTJlM2Q5MjA1NzE0YzNiOGQzOWQwNDNhNGQ5MTQxNCIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc1NzkzMzk3OSwiZXhwIjoxNzU3OTY5OTc5LCJ0ZW5hbnRfaWQiOjF9.JWDLbugRPslK4NaYEBYhA35JCO-7KcwUPNr4EPTKjDw
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlMjk4ODIwZDE3MGU0NWMyYWVhMWFhODk0ZDJkOThjMyIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc1ODE1MzgxMywiZXhwIjoxNzU4MTg5ODEzLCJ0ZW5hbnRfaWQiOjIsImVtcGxveWVlX3V1aWQiOiJlMjk4ODIwZDE3MGU0NWMyYWVhMWFhODk0ZDJkOThjMyIsImVtcGxveWVlX25hbWUiOiJzeXMyIn0.66qaf25aTQu8B_GCkarryMJ87uEcE3M9e1D2jF7QT2M
 
 ### 회사 생성
 POST {{base}}
@@ -30,7 +30,7 @@ Content-Type: application/json
 }
 
 ### 회사 수정
-PUT {{base}}/3
+PUT {{base}}/6
 Authorization: {{token}}
 Content-Type: application/json
 
@@ -43,6 +43,6 @@ Content-Type: application/json
 
 
 ### 회사 삭제(연관 데이터 존재시 삭제 안됨)
-DELETE {{base}}/2
+DELETE {{base}}/6
 Authorization: {{token}}
 Content-Type: application/json

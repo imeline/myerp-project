@@ -1,8 +1,8 @@
 package erp.auth.security.filter;
 
 import erp.company.mapper.CompanyMapper;
+import erp.global.context.TenantContext;
 import erp.global.exception.RestAccessDeniedHandler;
-import erp.global.tenant.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 /** 회사가 활성 상태인지 검사하는 필터 */
 public class CompanyActiveGuardFilter extends OncePerRequestFilter {
-    
+
     private final CompanyMapper companyMapper;
     private final RestAccessDeniedHandler accessDeniedHandler;
 

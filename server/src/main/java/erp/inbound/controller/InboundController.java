@@ -1,8 +1,8 @@
 package erp.inbound.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.global.response.PageResponse;
-import erp.global.tenant.TenantContext;
 import erp.inbound.dto.request.InboundFindAllRequest;
 import erp.inbound.dto.request.InboundSaveRequest;
 import erp.inbound.dto.response.InboundFindAllResponse;

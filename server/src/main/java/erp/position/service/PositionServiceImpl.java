@@ -4,6 +4,8 @@ package erp.position.service;
 import erp.employee.validation.EmployeeValidator;
 import erp.global.exception.ErrorStatus;
 import erp.global.exception.GlobalException;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import erp.position.domain.Position;
 import erp.position.dto.request.PositionLevelNoRequest;
 import erp.position.dto.request.PositionNameRequest;
@@ -27,6 +29,8 @@ public class PositionServiceImpl implements PositionService {
     private final PositionValidator positionValidator;
     private final EmployeeValidator employeeValidator;
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'직급 등록: name=' + #args[0].name()")
     @Override
     @Transactional
     public long savePosition(PositionNameRequest request, long tenantId) {
@@ -57,6 +61,8 @@ public class PositionServiceImpl implements PositionService {
         return list;
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'직급명 변경: id=' + #args[0] + ' → ' + #args[1].name()")
     @Override
     @Transactional
     public void updatePositionName(long positionId, PositionNameRequest request, long tenantId) {
@@ -67,6 +73,8 @@ public class PositionServiceImpl implements PositionService {
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_POSITION_FAIL);
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'직급 레벨 변경: id=' + #args[0] + ', newLevel=' + #args[1].levelNo()")
     @Override
     @Transactional
     public void updatePositionLevelNo(long positionId, PositionLevelNoRequest request, long tenantId) {
@@ -83,6 +91,8 @@ public class PositionServiceImpl implements PositionService {
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_POSITION_FAIL);
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'직급 삭제: id=' + #args[0]")
     @Override
     @Transactional
     public void deletePosition(long positionId, long tenantId) {

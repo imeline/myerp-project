@@ -1,7 +1,7 @@
 package erp.position.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
-import erp.global.tenant.TenantContext;
 import erp.position.dto.request.PositionLevelNoRequest;
 import erp.position.dto.request.PositionNameRequest;
 import erp.position.dto.response.PositionFindAllResponse;

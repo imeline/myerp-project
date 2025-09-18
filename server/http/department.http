@@ -1,6 +1,6 @@
 ### 환경 변수 (필요하면 값만 바꿔)
 @base = {{host}}/api/v1/admin/department
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyZDhlYjc4NzI1Yjk0MzNmOGY4MTI2MTc0YjczYTI2OCIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU2NjkwMTAxLCJleHAiOjE3NTY3MjYxMDEsInRlbmFudF9pZCI6Mn0.Kjf2PzGsX-VTmeUgnClCFjS7Xug-XSKa7CrHIyfRJ4Q
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZmM1MDY4OTUzMzY0ZjEzOWZmZGFjNWNiODE3N2I5YiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU4MTYzMzIwLCJleHAiOjE3NTgxOTkzMjAsInRlbmFudF9pZCI6MiwiZW1wbG95ZWVfdXVpZCI6IjNmYzUwNjg5NTMzNjRmMTM5ZmZkYWM1Y2I4MTc3YjliIiwiZW1wbG95ZWVfbmFtZSI6ImFkbWluMiJ9.qQ8rtjD3dkOKRu25AbmVkfcwM6cKYXRT6lI-uGHfKY4
 @rootId = 3
 @childId = 6
 
@@ -11,7 +11,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "개발본부"
+  "name": "안전관리팀"
 }
 
 
@@ -22,7 +22,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "기획팀",
+  "name": "전략기획팀",
   "parentId": {{rootId}}
 }
 

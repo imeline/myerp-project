@@ -18,6 +18,8 @@ import erp.item.dto.response.ItemOptionResponse;
 import erp.item.enums.ItemCategory;
 import erp.item.mapper.ItemMapper;
 import erp.item.validation.ItemValidator;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import erp.order.validation.OrderValidator;
 import erp.purchase.validation.PurchaseValidator;
 import erp.stock.service.StockService;
@@ -42,6 +44,8 @@ public class ItemServiceImpl implements ItemService {
     private final PurchaseValidator purchaseValidator;
     private final StockValidator stockValidator;
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'품목+재고 등록: name=' + #args[0].name() + ', code=' + #args[0].code() + ', qty=' + #args[0].initialQuantity()")
     @Override
     @Transactional
     public Long saveItemAndStock(ItemSaveRequest request, long tenantId) {
@@ -127,6 +131,8 @@ public class ItemServiceImpl implements ItemService {
         return priceRows;
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'품목 수정: id=' + #args[0] + ', name=' + #args[1].name() + ', price=' + #args[1].price()")
     @Override
     @Transactional
     public void updateItem(long itemId, ItemUpdateRequest request, long tenantId) {
@@ -151,6 +157,8 @@ public class ItemServiceImpl implements ItemService {
         stockService.updateStockWarehouse(itemId, request.warehouse(), tenantId);
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'품목 삭제(소프트): id=' + #args[0]")
     @Override
     @Transactional
     public void softDeleteItem(long itemId, long tenantId) {

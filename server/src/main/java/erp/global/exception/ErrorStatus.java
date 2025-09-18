@@ -1,21 +1,20 @@
 package erp.global.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
-@RequiredArgsConstructor
 public enum ErrorStatus {
 
     // 공통
-    BAD_REQUEST("BAD_REQUEST_400", "잘못된 요청입니다."),
-    NOT_READABLE("NOT_READABLE_400", "요청 본문을 해석할 수 없습니다."),
-    UNAUTHORIZED("UNAUTHORIZED_401", "인증이 필요합니다."),
-    FORBIDDEN("FORBIDDEN_403", "접근 권한이 없습니다."),
-    NOT_FOUND("NOT_FOUND_404", "리소스를 찾을 수 없습니다."),
-    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR_500",
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "BAD_REQUEST", "잘못된 요청입니다."),
+    NOT_READABLE(HttpStatus.BAD_REQUEST, "NOT_READABLE", "요청 본문을 해석할 수 없습니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "인증이 필요합니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "접근 권한이 없습니다."),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "NOT_FOUND", "리소스를 찾을 수 없습니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR",
             "서버 내부 오류가 발생했습니다."),
-    NULL_TENANT_ID("TENANT001", "테넌트 ID가 설정되지 않았습니다."),
+    NULL_TENANT_ID(HttpStatus.INTERNAL_SERVER_ERROR, "TENANT001", "테넌트 ID가 설정되지 않았습니다."),
 
     // AUTH
     DUPLICATE_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
@@ -133,9 +132,25 @@ public enum ErrorStatus {
     NOT_FOUND_OUTBOUND("OUT1204", "존재하지 않는 출고입니다."),
     CANNOT_DELETE_ITEM_BY_CONFIRMED_PURCHASE("ITEM711", "열린 상태 발주에서 참조된 품목은 삭제할 수 없습니다."),
     CANNOT_DELETE_ITEM_BY_CONFIRMED_ORDER("ITEM712", "열린 상태 주문에서 참조된 품목은 삭제할 수 없습니다."),
-    ;
+
+    // LOG
+    LOG_SAVE_FAIL("LOG1301", "로그 저장에 실패했습니다."),
+    LOG_PAYLOAD_INVALID_JSON("LOG1302", "로그 페이로드가 유효한 JSON 형식이 아닙니다.");
 
 
+    private final HttpStatus httpStatus;
     private final String status;
     private final String message;
+
+    ErrorStatus(String status, String message) {
+        this.httpStatus = HttpStatus.BAD_REQUEST; // 커스텀 에러의 상태 코드 기본값
+        this.status = status;
+        this.message = message;
+    }
+
+    ErrorStatus(HttpStatus httpStatus, String status, String message) {
+        this.httpStatus = httpStatus;
+        this.status = status;
+        this.message = message;
+    }
 }

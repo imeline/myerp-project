@@ -1,8 +1,8 @@
 package erp.outbound.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.global.response.PageResponse;
-import erp.global.tenant.TenantContext;
 import erp.outbound.dto.request.OutboundFindAllRequest;
 import erp.outbound.dto.request.OutboundSaveRequest;
 import erp.outbound.dto.response.OutboundFindAllResponse;

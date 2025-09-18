@@ -10,6 +10,8 @@ import erp.global.util.Strings;
 import erp.global.util.time.DatePeriod;
 import erp.global.util.time.DateRange;
 import erp.global.util.time.Periods;
+import erp.log.audit.Auditable;
+import erp.log.enums.LogType;
 import erp.order.dto.internal.OrderItemQuantityRow;
 import erp.order.service.OrderService;
 import erp.order.validation.OrderValidator;
@@ -46,6 +48,8 @@ public class OutboundServiceImpl implements OutboundService {
     private final EmployeeValidator employeeValidator;
     private final OrderValidator orderValidator;
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'출고 등록: orderId=' + #args[0].orderId() + ', date=' + #args[0].outboundDate() + ', emp=' + #args[0].employeeId()")
     @Override
     @Transactional
     public long saveOutbound(OutboundSaveRequest request, long tenantId) {
@@ -154,6 +158,8 @@ public class OutboundServiceImpl implements OutboundService {
         );
     }
 
+    @Auditable(type = LogType.WORK,
+            messageEl = "'출고 취소: outboundId=' + #args[0]")
     @Override
     @Transactional
     public void cancelOutbound(long outboundId, long tenantId) {
