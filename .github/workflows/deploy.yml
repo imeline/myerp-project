@@ -10,6 +10,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
 
     env:
       APP_IMAGE: imline/myerp
@@ -75,3 +78,4 @@ jobs:
             docker compose exec -T nginx nginx -t && docker compose exec -T nginx nginx -s reload || true
 
             docker image prune -f || true
+
