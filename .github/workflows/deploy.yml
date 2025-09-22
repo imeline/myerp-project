@@ -43,6 +43,16 @@ jobs:
           docker push $APP_IMAGE:$TAG
           docker push $APP_IMAGE:latest
 
+      - name: Ensure target dir on EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo mkdir -p /opt/myerp
+            sudo chown -R ubuntu:ubuntu /opt/myerp
+
       - name: Upload compose & nginx to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -51,6 +61,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "server/docker-compose.yml,server/nginx/**"
           target: "/opt/myerp"
+          strip_components: 1    # ← server/ 접두어 제거
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.2.0
@@ -74,4 +85,5 @@ jobs:
             docker compose up -d
             docker compose exec -T nginx nginx -t && docker compose exec -T nginx nginx -s reload || true
             docker compose ps
+
 
