@@ -49,7 +49,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "../docker-compose.yml,../nginx/**"
+          source: "server/docker-compose.yml,server/nginx/**"
           target: "/opt/myerp"
 
       - name: Deploy on EC2
@@ -74,3 +74,4 @@ jobs:
             docker compose up -d
             docker compose exec -T nginx nginx -t && docker compose exec -T nginx nginx -s reload || true
             docker compose ps
+
