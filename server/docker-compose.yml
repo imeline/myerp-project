@@ -8,8 +8,7 @@ services:
         soft: -1
         hard: -1
     cap_add:
-      - IPC_LOCK               
-    ipc: host               
+      - IPC_LOCK          
     environment:
       ORACLE_PASSWORD: ${ORACLE_PASSWORD}
       APP_USER: ${DB_USERNAME}
