@@ -2,11 +2,14 @@ services:
   oracle:
     image: gvenzl/oracle-xe:21-slim
     container_name: oracle-xe
-    shm_size: "1g"
+    shm_size: "2g"              
     ulimits:
       memlock:
         soft: -1
         hard: -1
+    cap_add:
+      - IPC_LOCK               
+    ipc: host               
     environment:
       ORACLE_PASSWORD: ${ORACLE_PASSWORD}
       APP_USER: ${DB_USERNAME}
