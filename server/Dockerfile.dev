@@ -1,0 +1,14 @@
+# 빌드/실행 겸용 개발 컨테이너
+FROM maven:3.9-eclipse-temurin-17 AS dev
+WORKDIR /app
+
+# 의존성 캐시용
+COPY pom.xml .
+RUN mvn -q -e -DskipTests dependency:go-offline
+
+# 소스
+COPY src ./src
+
+# DevTools 켜서 소스 변경 시 즉시 반영(IDE 저장→자동 리스타트)
+# 컨테이너 안에서 실행하되, 볼륨 마운트로 코드 변경 감지
+CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.profiles=local"]
