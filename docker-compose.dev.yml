@@ -1,0 +1,35 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: myerp-server
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    volumes:
+      - ./server:/app
+      - ~/.m2:/root/.m2
+    networks: [ appnet ]
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: myerp-client
+    ports:
+      - "5173:5173"
+    environment:
+      # 브라우저에서 /api 로만 호출(프록시)
+      VITE_API_PREFIX: /api
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - server
+    networks: [ appnet ]
+
+networks:
+  appnet:
+    driver: bridge
