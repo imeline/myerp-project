@@ -1,9 +1,9 @@
-### OS ###
+# OS
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-### Editors / IDEs ###
+# Editors / IDEs
 # IntelliJ / JetBrains
 .idea/
 *.iml
@@ -30,5 +30,8 @@ nbbuild/
 dist/
 nbdist/
 
-### Misc ###
+# Misc
 *.log
+
+# properties files
+**/src/main/resources/application-*.properties
