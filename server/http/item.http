@@ -1,6 +1,6 @@
 ### 환경 변수
 @base = {{host}}/api/v1/user/item
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTgxMDc4NDAsImV4cCI6MTc1ODE0Mzg0MCwidGVuYW50X2lkIjoyLCJlbXBsb3llZV91dWlkIjoiMDczOTI2Y2E4MTZmNDg2NWE1ZjA1NmFhYTBiZTliZjMiLCJlbXBsb3llZV9uYW1lIjoidXNlcjEifQ.jzi0JlyqgYxic24F64Ff3fFxoYM0L9NhaLHhG6gFWc4
+@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZmM1MDY4OTUzMzY0ZjEzOWZmZGFjNWNiODE3N2I5YiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzYxMDk3Mzg4LCJleHAiOjE3NjExMzMzODgsInRlbmFudF9pZCI6MiwidXVpZCI6IjNmYzUwNjg5NTMzNjRmMTM5ZmZkYWM1Y2I4MTc3YjliIiwibmFtZSI6ImFkbWluMiJ9.9k8QKSuzIL-MYDeCGQV3lA_2O1EwFCsbR0CdghtzrW8
 
 ### 품목 등록
 POST {{base}}
@@ -9,13 +9,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "담요",
-  "code": "ITM-0005",
-  "price": 50000,
+  "name": "마우스",
+  "code": "ITM-0006",
+  "price": 15000,
   "unit": "개",
   "category": "MERCHANDISE",
-  "initialQuantity": 500,
-  "warehouse": "M창고"
+  "initialQuantity": 100,
+  "warehouse": "H창고"
 }
 
 ### 품목 상세 조회 (여기 123을 실제 item_id로 바꿔서 사용)

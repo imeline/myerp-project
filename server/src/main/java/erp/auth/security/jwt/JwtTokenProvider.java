@@ -23,10 +23,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
+    public static final String CLAIM_UUID = "uuid";
     public static final String CLAIM_ROLE = "role";
+    public static final String CLAIM_NAME = "name";
     public static final String CLAIM_TENANT_ID = "tenant_id";
-    public static final String CLAIM_EMPLOYEE_UUID = "employee_uuid";
-    public static final String CLAIM_EMPLOYEE_NAME = "employee_name";
     public static final String BEARER_PREFIX = "Bearer ";
     private final Environment env;
 
@@ -50,11 +50,11 @@ public class JwtTokenProvider {
         if (userDetails instanceof UserPrincipal principal) {
             builder.claim(CLAIM_TENANT_ID, principal.getTenantId());
             // 있으면 싣고, null이면 생략
-            if (principal.getEmployeeUuid() != null) {
-                builder.claim(CLAIM_EMPLOYEE_UUID, principal.getEmployeeUuid());
+            if (principal.getUuid() != null) {
+                builder.claim(CLAIM_UUID, principal.getUuid());
             }
-            if (principal.getEmployeeName() != null) {
-                builder.claim(CLAIM_EMPLOYEE_NAME, principal.getEmployeeName());
+            if (principal.getName() != null) {
+                builder.claim(CLAIM_NAME, principal.getName());
             }
         }
 
@@ -75,16 +75,12 @@ public class JwtTokenProvider {
         return extractAllClaims(token).get(CLAIM_ROLE, String.class);
     }
 
+    public String extractName(String token) {
+        return extractAllClaims(token).get(CLAIM_NAME, String.class);
+    }
+
     public Long extractTenantId(String token) {
         return extractAllClaims(token).get(CLAIM_TENANT_ID, Long.class);
-    }
-
-    public String extractEmployeeUuid(String token) {
-        return extractAllClaims(token).get(CLAIM_EMPLOYEE_UUID, String.class);
-    }
-
-    public String extractEmployeeName(String token) {
-        return extractAllClaims(token).get(CLAIM_EMPLOYEE_NAME, String.class);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

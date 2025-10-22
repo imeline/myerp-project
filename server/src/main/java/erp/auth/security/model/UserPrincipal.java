@@ -18,10 +18,9 @@ public class UserPrincipal implements UserDetails {
     private final String uuid;
     // GrantedAuthority가 String 기반이라 String으로 사용
     private final String role;
+    private final String name;
     @JsonIgnore // 외부에 노출되지 않게 보안
     private final String password;
-    private final String employeeUuid;
-    private final String employeeName;
     private final Long tenantId;
 
 
@@ -60,30 +59,10 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-//    public static UserPrincipal of(String uuid, String role,
-//                                   String password, Long tenantId) {
-//
-//        // null/공백 방어 + 접두사 정규화
-//        String r = (role == null || role.isBlank()) ? "USER" : role.trim();
-//        String normalized = r.startsWith("ROLE_") ? r : "ROLE_" + r;
-//
-//        return UserPrincipal.builder()
-//                .uuid(uuid)
-//                // security에서는 ROLE_ 접두사를 붙여야 인식하므로 (ex) ROLE_ADMIN 등)
-//                // ErpAccountRole의 이름에 ROLE_ 접두사를 붙임
-//                .role(normalized)
-//                .password(password)
-//                .tenantId(tenantId)
-//                .employeeUuid(null)
-//                .employeeName(null)
-//                .build();
-//    }
-
     public static UserPrincipal of(String uuid,
                                    String role,
+                                   String name,
                                    String password,
-                                   String employeeUuid,
-                                   String employeeName,
                                    Long tenantId) {
         // null/공백 방어 + 접두사 정규화
         String r = (role == null || role.isBlank()) ? "USER" : role.trim();
@@ -94,9 +73,8 @@ public class UserPrincipal implements UserDetails {
                 // security에서는 ROLE_ 접두사를 붙여야 인식하므로 (ex) ROLE_ADMIN 등)
                 // ErpAccountRole의 이름에 ROLE_ 접두사를 붙임
                 .role(normalized)
+                .name(name)
                 .password(password)
-                .employeeUuid(employeeUuid)
-                .employeeName(employeeName)
                 .tenantId(tenantId)
                 .build();
     }
