@@ -83,9 +83,8 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails = UserPrincipal.of(
                 row.uuid(),
                 row.role(),
-                null, // 사용되지 않는 민감정보 제거
-                row.uuid(),
                 row.name(),
+                null, // 사용되지 않는 민감정보 제거
                 row.tenantId()
         );
         String token = jwtTokenProvider.generateToken(userDetails);

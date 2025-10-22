@@ -39,8 +39,8 @@ public class LogServiceImpl implements LogService {
         String ip = RequestContext.ip();
         String requestId = RequestContext.requestId();
 
-        String employeeUuid = principal != null ? principal.getEmployeeUuid() : null;
-        String employeeName = principal != null ? principal.getEmployeeName() : null;
+        String employeeUuid = principal != null ? principal.getUuid() : null;
+        String employeeName = principal != null ? principal.getName() : null;
 
         String json = toSafeJson(request.payload());
 

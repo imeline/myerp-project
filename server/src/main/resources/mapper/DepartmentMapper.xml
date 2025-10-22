@@ -133,31 +133,4 @@
         <include refid="frag.tenantGuard"/>
     </select>
 
-
-    <!-- 전체 부서 한번에 조회 (참고용: 필요 시 활성화) -->
-    <!--
-    <select id="findAllDepartmentRow" resultType="DepartmentRowResponse">
-        SELECT
-            d.department_id,
-            d.name,
-            d.parent_id,
-            NVL(cc.cnt, 0) AS children_cnt
-        FROM DEPARTMENT d
-        부모별 자식 수를 미리 집계
-        LEFT JOIN (
-            SELECT c.parent_id, COUNT(1) AS cnt
-            FROM DEPARTMENT c
-            WHERE <include refid="frag.tenantGuardAlias">
-                      <property name="alias" value="c"/>
-                  </include>
-            GROUP BY c.parent_id
-        ) cc ON cc.parent_id = d.department_id
-        WHERE <include refid="frag.tenantGuardAlias">
-                  <property name="alias" value="d"/>
-              </include>
-        부모가 NULL인 행을 먼저
-        ORDER BY NVL(d.parent_id, -1), d.department_id
-    </select>
-    -->
-
 </mapper>
