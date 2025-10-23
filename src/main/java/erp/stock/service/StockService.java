@@ -10,31 +10,26 @@ import erp.stock.dto.response.StockSummaryFindResponse;
 
 public interface StockService {
 
-    long saveStock(long itemId, int initialQuantity, String warehouse,
-                   long tenantId);
+    long saveStock(long itemId, int initialQuantity, String warehouse);
 
-    PageResponse<StockFindAllResponse> findAllStock(
-            StockFindAllRequest request,
-            long tenantId
-    );
+    PageResponse<StockFindAllResponse> findAllStock(StockFindAllRequest request);
 
-    StockPriceFindResponse findStockPrice(long itemId, long tenantId);
+    StockPriceFindResponse findStockPrice(long itemId);
 
-    void updateStockWarehouse(long itemId, String warehouse, long tenantId);
+    void updateStockWarehouse(long itemId, String warehouse);
 
-    void increaseOnHand(long itemId, int delta, long tenantId);
+    void increaseOnHand(long itemId, int delta);
 
-    void decreaseOnHand(long itemId, int delta, long tenantId);
+    void decreaseOnHand(long itemId, int delta);
 
-    void increaseAllocatedIfEnoughOnHand(long tenantId, long itemId, int quantity);
+    void increaseAllocatedIfEnoughOnHand(long itemId, int quantity);
 
-    void decreaseAllocated(long tenantId, long itemId, int quantity);
+    void decreaseAllocated(long itemId, int quantity);
 
     StockMovementFindAllResponse findAllMovement(
             long itemId,
-            StockMovementFindRequest request,
-            long tenantId
+            StockMovementFindRequest request
     );
 
-    StockSummaryFindResponse findSummary(long tenantId);
+    StockSummaryFindResponse findSummary();
 }

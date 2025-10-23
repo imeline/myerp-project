@@ -15,15 +15,13 @@
                              inbound_date,
                              status,
                              employee_id,
-                             purchase_id,
-                             company_id)
+                             purchase_id)
         VALUES (#{inbound.inboundId},
                 #{inbound.code},
                 #{inbound.inboundDate},
                 #{inbound.status},
                 #{inbound.employeeId},
-                #{inbound.purchaseId},
-                #{tenantId})
+                #{inbound.purchaseId})
     </insert>
 
     <select id="findAllInboundFindAllRow" resultType="InboundFindAllRow">
@@ -51,18 +49,6 @@
         </if>
         AND i.status != 'CANCELED'
         AND p.status = 'SHIPPED'
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="i"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="p"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="e"/>
-        </include>
         ORDER BY i.inbound_id DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
@@ -70,37 +56,22 @@
     <!-- 취소용 단일 조회: inboundId로 purchaseId/상태/품목수량 조회 -->
     <select id="findAllCancelItemRowById"
             resultType="InboundCancelItemRow">
-        SELECT
-        inb.purchase_id AS purchaseId,
-        inb.status AS inboundStatus,
-        pi.item_id AS itemId,
-        pi.quantity AS quantity
+        SELECT inb.purchase_id AS purchaseId,
+               inb.status      AS inboundStatus,
+               pi.item_id      AS itemId,
+               pi.quantity     AS quantity
         FROM inbound inb
-        JOIN purchase p ON p.purchase_id = inb.purchase_id
-        JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
-        JOIN item i ON i.item_id = pi.item_id
+                 JOIN purchase p ON p.purchase_id = inb.purchase_id
+                 JOIN purchase_item pi ON pi.purchase_id = p.purchase_id
+                 JOIN item i ON i.item_id = pi.item_id
         WHERE inb.inbound_id = #{inboundId}
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="inb"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="p"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="i"/>
-        </include>
     </select>
 
     <update id="updateStatusToCanceledIfActive">
         UPDATE inbound
         SET status = 'CANCELED'
         WHERE inbound_id = #{inboundId}
-        AND status = 'ACTIVE'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status = 'ACTIVE'
     </update>
 
     <select id="countByPeriodAndCode" resultType="long">
@@ -122,18 +93,6 @@
         </if>
         AND i.status != 'CANCELED'
         AND p.status = 'SHIPPED'
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="i"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="p"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="e"/>
-        </include>
         )
     </select>
 
@@ -141,18 +100,14 @@
         SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
         FROM inbound
         WHERE inbound_id = #{inboundId}
-        AND status != 'CANCELED'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status != 'CANCELED'
     </select>
 
     <select id="existsActiveById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
         FROM inbound
         WHERE inbound_id = #{inboundId}
-        AND status = 'ACTIVE'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status = 'ACTIVE'
     </select>
 
 </mapper>

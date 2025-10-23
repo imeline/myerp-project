@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
             messageEl = "'주문 등록: customer=' + #args[0].customer() + ', items=' + #args[0].items().size()")
     @Override
     @Transactional
-    public long saveOrderAndOrderItems(OrderSaveRequest request, long tenantId) {
+    public long saveOrderAndOrderItems(OrderSaveRequest request) {
         String customer = Strings.normalizeOrNull(request.customer());
         LocalDate orderDate = request.orderDate();
         long employeeId = request.employeeId();
@@ -66,18 +66,18 @@ public class OrderServiceImpl implements OrderService {
         orderValidator.validItemIdsUniqueInRequest(requestItems);
 
         // 2) 존재성 검증
-        employeeValidator.validEmployeeIdIfPresent(employeeId, tenantId);
+        employeeValidator.validEmployeeIdIfPresent(employeeId);
         List<Long> itemIds = requestItems.stream().map(OrderItemSaveRequest::itemId).toList();
-        itemValidator.validItemIdsIfPresent(itemIds, tenantId);
+        itemValidator.validItemIdsIfPresent(itemIds);
 
         // 3) 단가 일괄 조회
-        List<ItemPriceRow> priceRows = itemService.findAllItemPriceByIds(itemIds, tenantId);
+        List<ItemPriceRow> priceRows = itemService.findAllItemPriceByIds(itemIds);
         Map<Long, Integer> priceMap = priceRows.stream()
                 .collect(Collectors.toMap(ItemPriceRow::itemId, ItemPriceRow::price));
 
         // 4) 재고 규칙: onHand >= qty 일 때만, allocated += qty (가용재고 초과 허용)
         for (OrderItemSaveRequest it : requestItems) {
-            stockService.increaseAllocatedIfEnoughOnHand(tenantId, it.itemId(), it.quantity()); // 실패 시 내부에서 예외
+            stockService.increaseAllocatedIfEnoughOnHand(it.itemId(), it.quantity()); // 실패 시 내부에서 예외
         }
 
         // 5) 합계 계산
@@ -96,10 +96,10 @@ public class OrderServiceImpl implements OrderService {
                 long newOrderId = saveOrder(
                         orderCode, customer, orderDate,
                         totals.totalQuantity(), totals.totalAmount(),
-                        employeeId, tenantId
+                        employeeId
                 );
 
-                saveOrderItems(newOrderId, requestItems, tenantId);
+                saveOrderItems(newOrderId, requestItems);
                 return newOrderId;
 
             } catch (DuplicateKeyException e) {
@@ -118,8 +118,7 @@ public class OrderServiceImpl implements OrderService {
                            LocalDate orderDate,
                            int totalQuantity,
                            int totalAmount,
-                           long employeeId,
-                           long tenantId) {
+                           long employeeId) {
         long newOrderId = orderMapper.nextId();
 
         Order order = Order.register(
@@ -129,11 +128,10 @@ public class OrderServiceImpl implements OrderService {
                 orderDate,
                 totalQuantity,
                 totalAmount,
-                employeeId,
-                tenantId
+                employeeId
         );
 
-        int affectedRowCount = orderMapper.save(tenantId, order);
+        int affectedRowCount = orderMapper.save(order);
         requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_ORDER_FAIL);
         return newOrderId;
     }
@@ -142,8 +140,7 @@ public class OrderServiceImpl implements OrderService {
      * 주문 품목 배치 저장
      */
     private void saveOrderItems(long orderId,
-                                List<OrderItemSaveRequest> requestItems,
-                                long tenantId) {
+                                List<OrderItemSaveRequest> requestItems) {
         for (OrderItemSaveRequest it : requestItems) {
             long newOrderItemId = orderItemMapper.nextId();
 
@@ -151,18 +148,17 @@ public class OrderServiceImpl implements OrderService {
                     newOrderItemId,
                     it.quantity(),
                     orderId,
-                    it.itemId(),
-                    tenantId
+                    it.itemId()
             );
 
-            int affectedRowCount = orderItemMapper.save(tenantId, row);
+            int affectedRowCount = orderItemMapper.save(row);
             requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_ORDER_ITEM_FAIL);
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<OrderFindAllResponse> findAllOrder(OrderFindAllRequest request, long tenantId) {
+    public PageResponse<OrderFindAllResponse> findAllOrder(OrderFindAllRequest request) {
 
         PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
 
@@ -174,7 +170,6 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus status = request.status();
 
         List<OrderFindRow> rows = orderMapper.findAllOrderFindRow(
-                tenantId,
                 startDate,
                 endDate,
                 code,
@@ -191,7 +186,6 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         long total = orderMapper.countByPeriodAndCodeAndStatus(
-                tenantId,
                 startDate,
                 endDate,
                 code,
@@ -208,11 +202,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderItemsSummaryResponse findOrderItemsSummary(long orderId, long tenantId) {
-        orderValidator.validOrderIdIfPresent(orderId, tenantId);
+    public OrderItemsSummaryResponse findOrderItemsSummary(long orderId) {
+        orderValidator.validOrderIdIfPresent(orderId);
 
         List<OrderItemStockFindRow> rows =
-                orderItemMapper.findAllOrderItemStockFindRow(tenantId, orderId);
+                orderItemMapper.findAllOrderItemStockFindRow(orderId);
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_ORDER_ITEM);
         }
@@ -226,8 +220,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderCodeAndCustomerResponse> findAllOrderCodeAndCustomer(long tenantId) {
-        List<OrderCodeAndCustomerRow> rows = orderMapper.findAllCodeAndCustomer(tenantId);
+    public List<OrderCodeAndCustomerResponse> findAllOrderCodeAndCustomer() {
+        List<OrderCodeAndCustomerRow> rows = orderMapper.findAllCodeAndCustomer();
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_ORDER);
         }
@@ -238,14 +232,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderDetailResponse findOrderDetail(long orderId, long tenantId) {
-        orderValidator.validOrderIdIfPresent(orderId, tenantId);
+    public OrderDetailResponse findOrderDetail(long orderId) {
+        orderValidator.validOrderIdIfPresent(orderId);
 
-        OrderDetailRow header = orderMapper.findOrderDetailRow(tenantId, orderId)
+        OrderDetailRow header = orderMapper.findOrderDetailRow(orderId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ORDER));
 
         List<OrderItemDetailRow> itemRows =
-                orderItemMapper.findAllOrderItemDetailRow(tenantId, orderId);
+                orderItemMapper.findAllOrderItemDetailRow(orderId);
         if (itemRows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_ORDER_ITEM);
         }
@@ -256,16 +250,16 @@ public class OrderServiceImpl implements OrderService {
             messageEl = "'주문 취소: orderId=' + #args[0]")
     @Override
     @Transactional
-    public void cancelOrder(long orderId, long tenantId) {
-        orderValidator.validOrderIdIfPresent(orderId, tenantId);
+    public void cancelOrder(long orderId) {
+        orderValidator.validOrderIdIfPresent(orderId);
 
         // 1) 상태 변경: CONFIRMED → CANCELLED
         int affectedRowCount = orderMapper.updateStatusToIfConfirmed(
-                tenantId, orderId, OrderStatus.CANCELLED
+                orderId, OrderStatus.CANCELLED
         );
         if (affectedRowCount != 1) {
             // 2) 실패 사유 판정
-            OrderStatus status = findStatusById(orderId, tenantId);
+            OrderStatus status = findStatusById(orderId);
 
             switch (status) {
                 case SHIPPED ->
@@ -278,23 +272,23 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 3) 예약재고 롤백: 주문 품목 목록 조회 → allocated -= quantity
-        List<OrderItemQuantityRow> rows = findAllOrderItemQuantityRow(orderId, tenantId);
+        List<OrderItemQuantityRow> rows = findAllOrderItemQuantityRow(orderId);
         for (OrderItemQuantityRow row : rows) {
-            stockService.decreaseAllocated(tenantId, row.itemId(), row.quantity());
+            stockService.decreaseAllocated(row.itemId(), row.quantity());
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public OrderStatus findStatusById(long orderId, long tenantId) {
-        return orderMapper.findStatusById(tenantId, orderId)
+    public OrderStatus findStatusById(long orderId) {
+        return orderMapper.findStatusById(orderId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ORDER));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderItemQuantityRow> findAllOrderItemQuantityRow(long orderId, long tenantId) {
-        List<OrderItemQuantityRow> rows = orderItemMapper.findAllOrderItemQuantityRow(tenantId, orderId);
+    public List<OrderItemQuantityRow> findAllOrderItemQuantityRow(long orderId) {
+        List<OrderItemQuantityRow> rows = orderItemMapper.findAllOrderItemQuantityRow(orderId);
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_ORDER_ITEM);
         }
@@ -303,13 +297,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void updateStatusToShippedIfConfirmed(long orderId, long tenantId) {
-        int affected = orderMapper.updateStatusToIfConfirmed(tenantId, orderId, OrderStatus.SHIPPED);
+    public void updateStatusToShippedIfConfirmed(long orderId) {
+        int affected = orderMapper.updateStatusToIfConfirmed(orderId, OrderStatus.SHIPPED);
         if (affected == 1) {
             return;
         }
         // 실패 사유 판정
-        OrderStatus status = orderMapper.findStatusById(tenantId, orderId)
+        OrderStatus status = orderMapper.findStatusById(orderId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ORDER));
         switch (status) {
             case CANCELLED ->
@@ -322,14 +316,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void updateStatusToConfirmedIfShipped(long orderId, long tenantId) {
-        int affectedRowCount = orderMapper.updateStatusToConfirmedIfShipped(tenantId, orderId);
+    public void updateStatusToConfirmedIfShipped(long orderId) {
+        int affectedRowCount = orderMapper.updateStatusToConfirmedIfShipped(orderId);
         if (affectedRowCount == 1) {
             return; // 성공
         }
 
         // 실패 사유 판정
-        OrderStatus status = orderMapper.findStatusById(tenantId, orderId)
+        OrderStatus status = orderMapper.findStatusById(orderId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ORDER));
 
         switch (status) {

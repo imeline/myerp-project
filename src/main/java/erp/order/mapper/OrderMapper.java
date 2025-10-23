@@ -16,10 +16,9 @@ import java.util.Optional;
 public interface OrderMapper {
     long nextId();
 
-    int save(@Param("tenantId") long tenantId, @Param("order") Order order);
+    int save(@Param("order") Order order);
 
     List<OrderFindRow> findAllOrderFindRow(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("code") String code,
@@ -29,32 +28,27 @@ public interface OrderMapper {
     );
 
     List<OrderCodeAndCustomerRow> findAllCodeAndCustomer(
-            @Param("tenantId") long tenantId
+
     );
 
     Optional<OrderDetailRow> findOrderDetailRow(
-            @Param("tenantId") long tenantId,
             @Param("orderId") long orderId
     );
 
     int updateStatusToIfConfirmed(
-            @Param("tenantId") long tenantId,
             @Param("orderId") long orderId,
             @Param("toStatus") OrderStatus toStatus
     );
 
     int updateStatusToConfirmedIfShipped(
-            @Param("tenantId") long tenantId,
             @Param("orderId") long orderId
     );
 
     Optional<OrderStatus> findStatusById(
-            @Param("tenantId") long tenantId,
             @Param("orderId") long orderId
     );
 
     long countByPeriodAndCodeAndStatus(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("code") String code,
@@ -62,12 +56,10 @@ public interface OrderMapper {
     );
 
     boolean existsById(
-            @Param("tenantId") long tenantId,
             @Param("orderId") long orderId
     );
 
     boolean existsConfirmByItemId(
-            @Param("tenantId") long tenantId,
-            @Param("orderId") long orderId
+            @Param("itemId") long itemId
     );
 }

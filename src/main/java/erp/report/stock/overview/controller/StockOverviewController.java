@@ -1,6 +1,5 @@
 package erp.report.stock.overview.controller;
 
-import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.report.stock.overview.dto.request.StockOverviewFindRequest;
 import erp.report.stock.overview.dto.response.StockOverviewResponse;
@@ -21,9 +20,7 @@ public class StockOverviewController {
 
     @GetMapping
     public ApiResponse<StockOverviewResponse> getOverview(
-            @Valid @RequestBody StockOverviewFindRequest request
-    ) {
-        long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(stockOverviewService.findStockOverview(request, tenantId));
+            @Valid @RequestBody StockOverviewFindRequest request) {
+        return ApiResponse.onSuccess(stockOverviewService.findStockOverview(request));
     }
 }

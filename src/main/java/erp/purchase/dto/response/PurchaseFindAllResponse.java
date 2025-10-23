@@ -28,7 +28,6 @@ public record PurchaseFindAllResponse(
                 .purchaseDate(row.purchaseDate())
                 .status(row.status())
                 .employeeName(row.employeeName())
-                .build(
-                );
+                .build();
     }
 }

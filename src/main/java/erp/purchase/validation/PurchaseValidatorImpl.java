@@ -18,8 +18,8 @@ public class PurchaseValidatorImpl implements PurchaseValidator {
     private final PurchaseMapper purchaseMapper;
 
     @Override
-    public void validPurchaseIdIfPresent(long purchaseId, long tenantId) {
-        if (!purchaseMapper.existsById(tenantId, purchaseId)) {
+    public void validPurchaseIdIfPresent(long purchaseId) {
+        if (!purchaseMapper.existsById(purchaseId)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE);
         }
     }
@@ -36,8 +36,8 @@ public class PurchaseValidatorImpl implements PurchaseValidator {
     }
 
     @Override
-    public void validNoConfirmByItemId(long itemId, long tenantId) {
-        if (purchaseMapper.validConfirmIfPresent(tenantId, itemId)) {
+    public void validNoConfirmByItemId(long itemId) {
+        if (purchaseMapper.validConfirmIfPresent(itemId)) {
             throw new GlobalException(ErrorStatus.CANNOT_DELETE_ITEM_BY_CONFIRMED_PURCHASE);
         }
     }

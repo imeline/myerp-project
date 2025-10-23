@@ -18,12 +18,11 @@ public class ErpAccount extends TimeStamped {
     private String password;
     private String uuid;
     private ErpAccountRole role;
-    private long companyId;
     private LocalDateTime deletedAt;
 
     public static ErpAccount register(Long erpAccountId, long employeeId,
                                       String loginEmail, String hashPassword,
-                                      ErpAccountRole role, long companyId) {
+                                      ErpAccountRole role) {
 
         String newUuid = UUID.randomUUID().toString()
                 .replace("-", "");
@@ -35,7 +34,6 @@ public class ErpAccount extends TimeStamped {
                 .password(hashPassword)
                 .uuid(newUuid)
                 .role(role)
-                .companyId(companyId)
                 .build();
     }
 }

@@ -24,7 +24,7 @@ public class StockOverviewServiceImpl implements StockOverviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public StockOverviewResponse findStockOverview(StockOverviewFindRequest request, long tenantId) {
+    public StockOverviewResponse findStockOverview(StockOverviewFindRequest request) {
 
         int year = request.year();
         int month = request.month();
@@ -41,7 +41,7 @@ public class StockOverviewServiceImpl implements StockOverviewService {
 
         // 1) 품목별 집계(입고/출고/현재재고)
         List<StockOverviewItemRow> rows =
-                stockOverviewMapper.findAllItemRowByMonth(tenantId, startDate, endDate);
+                stockOverviewMapper.findAllItemRowByMonth(startDate, endDate);
 
         int totalInboundQuantity = 0;
         int totalOutboundQuantity = 0;
@@ -69,9 +69,9 @@ public class StockOverviewServiceImpl implements StockOverviewService {
 
         // 3) 전년 동월 합계(입/출고)
         Integer prevInboundTotal = defaultZero(
-                stockOverviewMapper.sumInboundQuantityByMonth(tenantId, prevStartDate, prevEndDate));
+                stockOverviewMapper.sumInboundQuantityByMonth(prevStartDate, prevEndDate));
         Integer prevOutboundTotal = defaultZero(
-                stockOverviewMapper.sumOutboundQuantityByMonth(tenantId, prevStartDate, prevEndDate));
+                stockOverviewMapper.sumOutboundQuantityByMonth(prevStartDate, prevEndDate));
 
         // 4) YoY 계산
         Double yoyInboundChangeRate = computeRatePercent(totalInboundQuantity - prevInboundTotal, prevInboundTotal);

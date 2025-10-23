@@ -28,9 +28,7 @@ public record SignupRequest(
         @NotNull
         Long departmentId,
         @NotNull
-        Long positionId,
-        @NotNull
-        Long companyId
+        Long positionId
 ) {
 
 }

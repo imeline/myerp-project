@@ -10,7 +10,6 @@ import erp.auth.dto.request.SignupRequest;
 import erp.auth.dto.response.LoginResponse;
 import erp.auth.security.jwt.JwtTokenProvider;
 import erp.auth.security.model.UserPrincipal;
-import erp.company.validation.CompanyValidator;
 import erp.employee.dto.request.EmployeeSaveRequest;
 import erp.employee.service.EmployeeService;
 import erp.global.exception.ErrorStatus;
@@ -29,7 +28,6 @@ public class AuthServiceImpl implements AuthService {
 
     private final EmployeeService employeeService;
     private final ErpAccountService erpAccountService;
-    private final CompanyValidator companyValidator;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -38,9 +36,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void signup(SignupRequest request, ErpAccountRole role) {
-        // 회원가입이 아닌 경우는 security 에서 검사하니까 회원가입 때만 따로 검사
-        companyValidator.validCompanyIdIfPresent(request.companyId());
-
         // Employee 생성
         EmployeeSaveRequest employeeSaveRequest =
                 EmployeeSaveRequest.of(
@@ -51,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
                         request.positionId()
                 );
         long employeeId = employeeService.saveEmployee(
-                employeeSaveRequest, request.companyId());
+                employeeSaveRequest);
 
         // ErpAccount 생성
         ErpAccountSaveRequest erpAccountSaveRequest =
@@ -61,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
                         request.password(),
                         role
                 );
-        erpAccountService.saveErpAccount(erpAccountSaveRequest, request.companyId());
+        erpAccountService.saveErpAccount(erpAccountSaveRequest);
     }
 
     @Auditable(type = LogType.LOGIN, messageEl = "'로그인 처리: ' + #args[0].loginEmail()")
@@ -84,8 +79,7 @@ public class AuthServiceImpl implements AuthService {
                 row.uuid(),
                 row.role(),
                 row.name(),
-                null, // 사용되지 않는 민감정보 제거
-                row.tenantId()
+                null // 사용되지 않는 민감정보 제거
         );
         String token = jwtTokenProvider.generateToken(userDetails);
         // 왜 userDetails가 아니라 LoginRow에서 데이터를 가져오는가?

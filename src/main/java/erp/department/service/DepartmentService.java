@@ -8,19 +8,18 @@ import erp.department.dto.response.DepartmentInfoResponse;
 import java.util.List;
 
 public interface DepartmentService {
-    long saveChildDepartment(ChildDepartmentSaveRequest request, long tenantId);
+    long saveChildDepartment(ChildDepartmentSaveRequest request);
 
-    long saveTopDepartment(TopDepartmentSaveRequest request, long tenantId);
+    long saveTopDepartment(TopDepartmentSaveRequest request);
 
-    List<DepartmentInfoResponse> findAllTopLevelDepartment(
-            long tenantId);
+    List<DepartmentInfoResponse> findAllTopLevelDepartment();
 
     List<DepartmentInfoResponse> findAllByParentId(
-            long parentId, long tenantId);
+            long parentId);
 
     void updateDepartment(Long departmentId,
-                          DepartmentUpdateRequest request, long tenantId);
+                          DepartmentUpdateRequest request);
 
-    void deleteDepartment(Long departmentId, long tenantId);
+    void deleteDepartment(Long departmentId);
 
 }

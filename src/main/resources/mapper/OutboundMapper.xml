@@ -15,15 +15,13 @@
                               outbound_date,
                               status,
                               employee_id,
-                              order_id,
-                              company_id)
+                              order_id)
         VALUES (#{outbound.outboundId},
                 #{outbound.code},
                 #{outbound.outboundDate},
                 #{outbound.status},
                 #{outbound.employeeId},
-                #{outbound.orderId},
-                #{tenantId})
+                #{outbound.orderId})
     </insert>
 
     <select id="findAllOutboundFindRow" resultType="OutboundFindRow">
@@ -55,27 +53,9 @@
             AND ob.code LIKE '%' || #{code} || '%'
         </if>
         AND od.status = 'SHIPPED'
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="ob"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="od"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="e"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="oi"/>
-        </include>
-
         GROUP BY
         ob.outbound_id, ob.code, od.customer, od.total_amount,
         ob.outbound_date, od.order_id, od.code, e.name
-
         ORDER BY ob.outbound_date DESC, ob.outbound_id DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
@@ -98,43 +78,18 @@
             AND ob.code LIKE '%' || #{code} || '%'
         </if>
         AND od.status = 'SHIPPED'
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="ob"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="od"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="e"/>
-        </include>
     </select>
 
     <select id="findAllCancelItemRowById" resultType="OutboundCancelItemRow">
-        SELECT
-        oi.item_id AS itemId,
-        oi.quantity AS quantity,
-        o.order_id AS orderId
+        SELECT oi.item_id  AS itemId,
+               oi.quantity AS quantity,
+               o.order_id  AS orderId
         FROM outbound ob
-        JOIN orders o
-        ON o.order_id = ob.order_id
-        JOIN order_item oi
-        ON oi.order_id = o.order_id
+                 JOIN orders o
+                      ON o.order_id = ob.order_id
+                 JOIN order_item oi
+                      ON oi.order_id = o.order_id
         WHERE ob.outbound_id = #{outboundId}
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="ob"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="o"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="oi"/>
-        </include>
         ORDER BY oi.item_id ASC
     </select>
 
@@ -142,18 +97,14 @@
         UPDATE outbound
         SET status = 'CANCELED'
         WHERE outbound_id = #{outboundId}
-        AND status = 'ACTIVE'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status = 'ACTIVE'
     </update>
 
     <select id="existsById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
         FROM outbound
         WHERE outbound_id = #{outboundId}
-        AND status = 'ACTIVE'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status = 'ACTIVE'
     </select>
 
 </mapper>

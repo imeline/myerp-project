@@ -10,52 +10,28 @@
     <select id="findAllMonthlyOrderPurchaseAmountRow"
             resultType="TradeOverviewMonthlyAmountRow">
         SELECT
-        month AS month,
-        SUM(order_amount) AS orderAmount,
-        SUM(purchase_amount) AS purchaseAmount
+            month AS month, SUM (order_amount) AS orderAmount, SUM (purchase_amount) AS purchaseAmount
         FROM (
-        SELECT
-        EXTRACT(MONTH FROM ob.outbound_date) AS month,
-        SUM(o.total_amount) AS order_amount,
-        0 AS purchase_amount
-        FROM outbound ob
-        JOIN orders o
-        ON o.order_id = ob.order_id
-        WHERE ob.status = 'ACTIVE'
-        AND ob.outbound_date >= #{startDate}
-        AND #{endDate} >= ob.outbound_date
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="ob"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="o"/>
-        </include>
-        GROUP BY EXTRACT(MONTH FROM ob.outbound_date)
-
-        UNION ALL
-
-        SELECT
-        EXTRACT(MONTH FROM ib.inbound_date) AS month,
-        0 AS order_amount,
-        SUM(p.total_amount) AS purchase_amount
-        FROM inbound ib
-        JOIN purchase p
-        ON p.purchase_id = ib.purchase_id
-        WHERE ib.status = 'ACTIVE'
-        AND ib.inbound_date >= #{startDate}
-        AND #{endDate} >= ib.inbound_date
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="ib"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="p"/>
-        </include>
-        GROUP BY EXTRACT(MONTH FROM ib.inbound_date)
-        )
+            SELECT
+            EXTRACT (MONTH FROM ob.outbound_date) AS month, SUM (o.total_amount) AS order_amount, 0 AS purchase_amount
+            FROM outbound ob
+            JOIN orders o
+            ON o.order_id = ob.order_id
+            WHERE ob.status = 'ACTIVE'
+            AND ob.outbound_date >= #{startDate}
+            AND #{endDate} >= ob.outbound_date
+            GROUP BY EXTRACT (MONTH FROM ob.outbound_date)
+            UNION ALL
+            SELECT
+            EXTRACT (MONTH FROM ib.inbound_date) AS month, 0 AS order_amount, SUM (p.total_amount) AS purchase_amount
+            FROM inbound ib
+            JOIN purchase p
+            ON p.purchase_id = ib.purchase_id
+            WHERE ib.status = 'ACTIVE'
+            AND ib.inbound_date >= #{startDate}
+            AND #{endDate} >= ib.inbound_date
+            GROUP BY EXTRACT (MONTH FROM ib.inbound_date)
+            )
         GROUP BY month
         ORDER BY month
     </select>
@@ -64,38 +40,22 @@
     <select id="sumOrderAmountByPeriod" resultType="int">
         SELECT NVL(SUM(o.total_amount), 0)
         FROM outbound ob
-        JOIN orders o
-        ON o.order_id = ob.order_id
+                 JOIN orders o
+                      ON o.order_id = ob.order_id
         WHERE ob.status = 'ACTIVE'
-        AND ob.outbound_date >= #{startDate}
-        AND #{endDate} >= ob.outbound_date
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="ob"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="o"/>
-        </include>
+          AND ob.outbound_date >= #{startDate}
+          AND #{endDate} >= ob.outbound_date
     </select>
 
     <!-- 기간 매입 총액 (입고일 기준, ACTIVE 입고만) -->
     <select id="sumPurchaseAmountByPeriod" resultType="int">
         SELECT NVL(SUM(p.total_amount), 0)
         FROM inbound ib
-        JOIN purchase p
-        ON p.purchase_id = ib.purchase_id
+                 JOIN purchase p
+                      ON p.purchase_id = ib.purchase_id
         WHERE ib.status = 'ACTIVE'
-        AND ib.inbound_date >= #{startDate}
-        AND #{endDate} >= ib.inbound_date
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="ib"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="p"/>
-        </include>
+          AND ib.inbound_date >= #{startDate}
+          AND #{endDate} >= ib.inbound_date
     </select>
 
 </mapper>

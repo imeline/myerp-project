@@ -1,6 +1,5 @@
 package erp.outbound.controller;
 
-import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.global.response.PageResponse;
 import erp.outbound.dto.request.OutboundFindAllRequest;
@@ -23,9 +22,8 @@ public class OutboundController {
      */
     @PostMapping
     public ApiResponse<Long> saveOutbound(@Valid @RequestBody OutboundSaveRequest request) {
-        long tenantId = TenantContext.get();
         return ApiResponse.onSuccess(
-                outboundService.saveOutbound(request, tenantId));
+                outboundService.saveOutbound(request));
     }
 
     /**
@@ -35,9 +33,8 @@ public class OutboundController {
     public ApiResponse<PageResponse<OutboundFindAllResponse>> findAllOutbound(
             @Valid @RequestBody OutboundFindAllRequest request
     ) {
-        long tenantId = TenantContext.get();
         return ApiResponse.onSuccess(
-                outboundService.findAllOutbound(request, tenantId));
+                outboundService.findAllOutbound(request));
     }
 
     /**
@@ -45,8 +42,7 @@ public class OutboundController {
      */
     @DeleteMapping("/{outboundId}")
     public ApiResponse<Void> cancelOutbound(@PathVariable long outboundId) {
-        long tenantId = TenantContext.get();
-        outboundService.cancelOutbound(outboundId, tenantId);
+        outboundService.cancelOutbound(outboundId);
         return ApiResponse.onSuccess(null);
     }
 }

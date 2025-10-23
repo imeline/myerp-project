@@ -1,6 +1,5 @@
 ### 환경 변수
-@base = {{host}}/api/v1/user/item
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZmM1MDY4OTUzMzY0ZjEzOWZmZGFjNWNiODE3N2I5YiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzYxMDk3Mzg4LCJleHAiOjE3NjExMzMzODgsInRlbmFudF9pZCI6MiwidXVpZCI6IjNmYzUwNjg5NTMzNjRmMTM5ZmZkYWM1Y2I4MTc3YjliIiwibmFtZSI6ImFkbWluMiJ9.9k8QKSuzIL-MYDeCGQV3lA_2O1EwFCsbR0CdghtzrW8
+@base = {{host}}/user/item
 
 ### 품목 등록
 POST {{base}}
@@ -9,8 +8,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "마우스",
-  "code": "ITM-0006",
+  "name": "매트",
+  "code": "ITM-0007",
   "price": 15000,
   "unit": "개",
   "category": "MERCHANDISE",
@@ -19,7 +18,7 @@ Accept: application/json
 }
 
 ### 품목 상세 조회 (여기 123을 실제 item_id로 바꿔서 사용)
-GET {{base}}/1
+GET {{base}}/8
 Authorization: {{token}}
 Accept: application/json
 
@@ -79,7 +78,7 @@ Accept: application/json
   "warehouse": "B창고"
 }
 
-### 품목 소프트 삭제 - 123을 실제 item_id로 교체
-DELETE {{base}}/1
+### 품목 소프트 삭제
+DELETE {{base}}/8
 Authorization: {{token}}
 Accept: application/json

@@ -18,9 +18,4 @@ public class MyBatisConfig {
     public PlatformTransactionManager transactionManager(DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
-
-//    @Bean
-//    public Interceptor tenantSqlInterceptor() {
-//        return new TenantSqlInterceptor();
-//    }
 }

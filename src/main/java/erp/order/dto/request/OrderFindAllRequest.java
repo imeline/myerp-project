@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public record OrderFindAllRequest(
-
         @NotNull
         @PositiveOrZero
         Integer page,

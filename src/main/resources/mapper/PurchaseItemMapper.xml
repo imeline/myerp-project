@@ -16,14 +16,12 @@
             purchase_item_id,
             purchase_id,
             item_id,
-            quantity,
-            company_id
+            quantity
             ) VALUES (
             #{it.purchaseItemId},
             #{it.purchaseId},
             #{it.itemId},
-            #{it.quantity},
-            #{tenantId}
+            #{it.quantity}
             )
         </foreach>
         SELECT 1 FROM dual
@@ -31,90 +29,60 @@
 
     <select id="findAllPurchaseItemStockFindRow"
             resultType="PurchaseItemStockFindRow">
-        SELECT
-        i.code AS code,
-        i.name AS name,
-        pi.quantity AS quantity,
-        i.price AS unitPrice,
-        (pi.quantity * i.price) AS subtotal,
-        s.on_hand_quantity AS onHandStock,
-        s.allocated_quantity AS allocatedStock,
-        (s.on_hand_quantity - s.allocated_quantity) AS availableStock,
-        ((s.on_hand_quantity - s.allocated_quantity)
-        + pi.quantity) AS availableStockAfterInbound
+        SELECT i.code                                      AS code,
+               i.name                                      AS name,
+               pi.quantity                                 AS quantity,
+               i.price                                     AS unitPrice,
+               (pi.quantity * i.price)                     AS subtotal,
+               s.on_hand_quantity                          AS onHandStock,
+               s.allocated_quantity                        AS allocatedStock,
+               (s.on_hand_quantity - s.allocated_quantity) AS availableStock,
+               ((s.on_hand_quantity - s.allocated_quantity)
+                   +
+                pi.quantity)                               AS availableStockAfterInbound
         FROM purchase_item pi
-        JOIN purchase p
-        ON p.purchase_id = pi.purchase_id
-        JOIN item i
-        ON i.item_id = pi.item_id
-        JOIN stock s
-        ON s.item_id = pi.item_id
+                 JOIN purchase p
+                      ON p.purchase_id = pi.purchase_id
+                 JOIN item i
+                      ON i.item_id = pi.item_id
+                 JOIN stock s
+                      ON s.item_id = pi.item_id
         WHERE pi.purchase_id = #{purchaseId}
-        AND p.status = 'CONFIRMED'
-        AND i.deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="p"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="i"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="s"/>
-        </include>
+          AND p.status = 'CONFIRMED'
+          AND i.deleted_at IS NULL
         ORDER BY i.name ASC, pi.purchase_item_id ASC
     </select>
 
     <select id="findAllPurchaseItemDetailRow"
             resultType="PurchaseItemDetailRow">
-        SELECT
-        i.name,
-        i.code,
-        pi.quantity,
-        i.unit,
-        i.price AS unitPrice,
-        (pi.quantity * i.price) AS subtotal
+        SELECT i.name,
+               i.code,
+               pi.quantity,
+               i.unit,
+               i.price                 AS unitPrice,
+               (pi.quantity * i.price) AS subtotal
         FROM purchase_item pi
-        JOIN purchase p
-        ON p.purchase_id = pi.purchase_id
-        JOIN item i
-        ON i.item_id = pi.item_id
+                 JOIN purchase p
+                      ON p.purchase_id = pi.purchase_id
+                 JOIN item i
+                      ON i.item_id = pi.item_id
         WHERE pi.purchase_id = #{purchaseId}
-        AND p.status != 'CANCELLED'
+          AND p.status != 'CANCELLED'
         AND i.deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="p"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="i"/>
-        </include>
         ORDER BY pi.purchase_item_id ASC
     </select>
 
     <select id="findAllPurchaseItemQuantityRow"
             resultType="PurchaseItemQuantityRow">
-        SELECT
-        pi.purchase_item_id AS purchaseItemId,
-        pi.item_id AS itemId,
-        pi.quantity AS quantity
+        SELECT pi.purchase_item_id AS purchaseItemId,
+               pi.item_id          AS itemId,
+               pi.quantity         AS quantity
         FROM purchase_item pi
-        JOIN purchase p ON p.purchase_id = pi.purchase_id
-        JOIN item i ON i.item_id = pi.item_id
+                 JOIN purchase p ON p.purchase_id = pi.purchase_id
+                 JOIN item i ON i.item_id = pi.item_id
         WHERE pi.purchase_id = #{purchaseId}
-        AND p.status != 'CANCELLED'
+          AND p.status != 'CANCELLED'
         AND i.deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="p"/>
-        </include>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="i"/>
-        </include>
     </select>
 
 </mapper>

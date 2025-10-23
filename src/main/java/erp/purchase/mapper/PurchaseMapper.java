@@ -16,10 +16,9 @@ import java.util.Optional;
 public interface PurchaseMapper {
     long nextId();
 
-    int save(@Param("tenantId") long tenantId, @Param("purchase") Purchase purchase);
+    int save(@Param("purchase") Purchase purchase);
 
     List<PurchaseFindRow> findAllPurchaseFindRow(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("code") String code,
@@ -29,41 +28,33 @@ public interface PurchaseMapper {
     );
 
     List<PurchaseCodeAndSupplierRow> findAllCodeAndSupplier(
-            @Param("tenantId") long tenantId
+
     );
 
     Optional<PurchaseDetailRow> findPurchaseDetailRow(
-            @Param("tenantId") long tenantId,
             @Param("purchaseId") long purchaseId);
 
-    Optional<PurchaseStatus> findStatusById(@Param("tenantId") long tenantId,
-                                            @Param("purchaseId") long purchaseId);
+    Optional<PurchaseStatus> findStatusById(@Param("purchaseId") long purchaseId);
 
-    int updateStatusToIfConfirmed(@Param("tenantId") long tenantId,
-                                  @Param("purchaseId") long purchaseId,
+    int updateStatusToIfConfirmed(@Param("purchaseId") long purchaseId,
                                   @Param("to") PurchaseStatus to);
 
     // shipped 는 canceled 될 수 없다.
     // UI 상으로 shipped 상태에서 취소는 confirmed
     // 그 후에 confirmed 상태에서 canceled로 변경 가능
-    int updateStatusToConfirmedIfShipped(@Param("tenantId") long tenantId,
-                                         @Param("purchaseId") long purchaseId);
+    int updateStatusToConfirmedIfShipped(@Param("purchaseId") long purchaseId);
 
     long countByPeriodAndCodeAndStatus(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("code") String code,
             @Param("status") PurchaseStatus status
     );
 
-    boolean existsById(@Param("tenantId") long tenantId,
-                       @Param("purchaseId") long purchaseId);
+    boolean existsById(@Param("purchaseId") long purchaseId);
 
-    boolean existsShippedById(@Param("tenantId") long tenantId,
-                              @Param("purchaseId") long purchaseId);
+    boolean existsShippedById(@Param("purchaseId") long purchaseId);
 
-    boolean validConfirmIfPresent(@Param("tenantId") long tenantId,
-                                  @Param("itemId") long itemId);
+    boolean validConfirmIfPresent(@Param("itemId") long itemId);
 
 }

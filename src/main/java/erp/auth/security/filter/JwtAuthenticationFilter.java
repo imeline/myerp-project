@@ -62,10 +62,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String uuid = jwtTokenProvider.extractUuid(jwt);
             final String role = jwtTokenProvider.extractRole(jwt);
             final String name = jwtTokenProvider.extractName(jwt);
-            final Long tenantId = jwtTokenProvider.extractTenantId(jwt); // 힌트(검증은 다음 필터)
 
             UserPrincipal principal = UserPrincipal.of(
-                    uuid, role, name, null, tenantId
+                    uuid, role, name, null
             );
 
             // 시큐리티에서 사용할 인증 객체 생성

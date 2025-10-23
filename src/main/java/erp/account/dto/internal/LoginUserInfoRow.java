@@ -1,7 +1,6 @@
 package erp.account.dto.internal;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public record LoginUserInfoRow(
         @NotBlank
@@ -11,8 +10,6 @@ public record LoginUserInfoRow(
         @NotBlank
         String passwordHash,
         @NotBlank
-        String name,
-        @NotNull
-        Long tenantId
+        String name
 ) {
 }

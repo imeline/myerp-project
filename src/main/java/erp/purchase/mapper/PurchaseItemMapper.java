@@ -14,20 +14,16 @@ public interface PurchaseItemMapper {
 
     long nextId();
 
-    int saveAll(@Param("tenantId") long tenantId,
-                @Param("items") List<PurchaseItem> items);
+    int saveAll(@Param("items") List<PurchaseItem> items);
 
     List<PurchaseItemStockFindRow> findAllPurchaseItemStockFindRow(
-            @Param("tenantId") long tenantId,
             @Param("purchaseId") long purchaseId
     );
 
     List<PurchaseItemDetailRow> findAllPurchaseItemDetailRow(
-            @Param("tenantId") long tenantId,
             @Param("purchaseId") long purchaseId);
 
     List<PurchaseItemQuantityRow> findAllPurchaseItemQuantityRow(
-            @Param("tenantId") long tenantId,
             @Param("purchaseId") long purchaseId
     );
 }

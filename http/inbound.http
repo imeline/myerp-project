@@ -1,5 +1,4 @@
-@base = {{host}}/api/v1/user/inbound
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc0OTMxOTksImV4cCI6MTc1NzUyOTE5OSwidGVuYW50X2lkIjoyfQ.87WMus-JheLmWkzfyxk_bre7eHUag94uu3gUvvb-1lk
+@base = {{host}}/user/inbound
 
 ### 1) 입고 등록
 POST {{base}}
@@ -9,7 +8,7 @@ Content-Type: application/json
 {
   "purchaseId": 35,
   "inboundDate": "2025-09-03",
-  "employeeId": 7
+  "employeeId": 8
 }
 
 ### 2) 입고 목록 조회 (기간/코드 검색 + 페이징)
@@ -19,11 +18,11 @@ Content-Type: application/json
 
 {
   "period": "LAST_30_DAYS",
-  "code": "IB-2024",
+  "code": "IB-2025",
   "page": 0,
   "size": 20
 }
 
 ### 3) 입고 취소 (CANCELED 전이 + 재고 롤백 + 발주 CONFIRMED)
-DELETE {{base}}/2
+DELETE {{base}}/5
 Authorization: {{token}}

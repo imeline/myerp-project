@@ -12,23 +12,17 @@
     <insert id="save" parameterType="ErpAccount">
         INSERT INTO erp_account (erp_account_id, login_email,
                                  password, uuid, role,
-                                 employee_id, company_id)
+                                 employee_id)
         VALUES (#{erpAccountId}, #{loginEmail},
                 #{password}, #{uuid}, #{role},
-                #{employeeId}, #{companyId})
+                #{employeeId})
     </insert>
-
-    <select id="findCompanyIdByUuid" resultType="Long">
-        SELECT company_id
-        FROM erp_account
-        WHERE uuid = #{uuid}
-    </select>
 
     <select id="existsByLoginEmail" parameterType="string" resultType="boolean">
         SELECT CASE
                    WHEN EXISTS (SELECT 1
                                 FROM ERP_ACCOUNT a
-                                WHERE a.LOGIN_EMAIL = #{loginEmail}
+                                WHERE a.login_email = #{loginEmail}
                                   AND a.deleted_at IS NULL)
                        THEN 1
                    ELSE 0 END
@@ -37,14 +31,13 @@
 
     <select id="findLoginRowByLoginEmail" parameterType="string"
             resultType="LoginUserInfoRow">
-        SELECT a.UUID       AS uuid,
-               a.ROLE       AS role,
-               a.PASSWORD   AS passwordHash,
-               e.name       AS name,
-               e.COMPANY_ID AS tenantId
+        SELECT a.uuid     AS uuid,
+               a.role     AS role,
+               a.password AS passwordHash,
+               e.name     AS name
         FROM ERP_ACCOUNT a
-                 JOIN EMPLOYEE e ON e.EMPLOYEE_ID = a.EMPLOYEE_ID
-        WHERE a.LOGIN_EMAIL = #{loginEmail}
+                 JOIN EMPLOYEE e ON e.employee_id = a.employee_id
+        WHERE a.login_email = #{loginEmail}
           AND a.deleted_at IS NULL
     </select>
 
@@ -52,9 +45,7 @@
         UPDATE erp_account
         SET deleted_at = SYSTIMESTAMP
         WHERE employee_id = #{employeeId}
-        AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND deleted_at IS NULL
     </update>
 
 </mapper>

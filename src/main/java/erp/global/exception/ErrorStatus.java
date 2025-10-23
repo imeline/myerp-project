@@ -14,12 +14,10 @@ public enum ErrorStatus {
     NOT_FOUND(HttpStatus.NOT_FOUND, "NOT_FOUND", "리소스를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR",
             "서버 내부 오류가 발생했습니다."),
-    NULL_TENANT_ID(HttpStatus.INTERNAL_SERVER_ERROR, "TENANT001", "테넌트 ID가 설정되지 않았습니다."),
 
     // AUTH
     DUPLICATE_LOGIN_EMAIL("AUTH101", "기존 사용중인 이메일입니다."),
-    INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."), NOT_FOUND_TENANT_ID("AUTH103",
-            "테넌트 ID가 설정되지 않았습니다."),
+    INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."),
     SIGNUP_FAIL("AUTH104", "회원가입에 실패했습니다."),
     NOT_FOUND_ERP_ACCOUNT("AUTH105", "계정을 찾을 수 없습니다."),
 
@@ -35,17 +33,6 @@ public enum ErrorStatus {
     NOT_FOUND_EMPLOYEE("EMP305", "존재하지 않는 직원입니다."),
     UPDATE_EMPLOYEE_FAIL("EMP306", "직원 수정에 실패했습니다."),
     ALREADY_RETIRED_EMPLOYEE("EMP307", "이미 퇴사 처리된 직원입니다."),
-
-    // COMPANY
-    DUPLICATE_BIZ_NO("COMP401", "이미 등록된 사업자등록번호입니다."),
-    DUPLICATE_NAME("COMP402", "이미 등록된 회사명입니다."),
-    NOT_FOUND_COMPANY("COMP403", "존재하지 않는 회사입니다."),
-    CREATE_COMPANY_FAIL("COMP404", "회사 생성에 실패했습니다."),
-    UPDATE_COMPANY_FAIL("COMP405", "회사 수정에 실패했습니다."),
-    DELETE_COMPANY_FAIL("COMP406", "회사를 찾을 수 없거나 이미 삭제된 회사입니다."),
-    EXTERNAL_DATA_EXISTS("COMP407", "연관된 데이터가 존재하여 삭제할 수 없습니다."),
-    NOT_REGISTERED_COMPANY("COMP408", "등록된 회사가 없습니다."),
-    CANNOT_DELETE_COMPANY_HAS_RELATION("COMP409", "연관된 데이터가 존재하여 회사를 삭제할 수 없습니다."),
 
     // DEPARTMENT
     DUPLICATE_DEPARTMENT_NAME("DPT501", "이미 등록된 부서명입니다."),
@@ -102,8 +89,7 @@ public enum ErrorStatus {
     UPDATE_PURCHASE_STATUS_FAIL("PUR912", "발주 상태 변경에 실패했습니다."),
     CANNOT_REVERT_CANCELLED_PURCHASE("PUR913", "취소된 발주는 상태를 되돌릴 수 없습니다."),
     ALREADY_CONFIRMED_PURCHASE("PUR914", "이미 확정 상태의 발주입니다."),
-
-
+    
     // INBOUND
     CREATE_INBOUND_FAIL("INB1001", "입고 생성에 실패했습니다."),
     NOT_REGISTERED_INBOUND("INB1002", "등록된 입고가 없습니다."),

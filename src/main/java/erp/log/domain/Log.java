@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Log {
     private Long logId;
-    private Long companyId;
     private LogType type;         // ACCESS | WORK | LOGIN | ERROR
     private boolean success;     // true -> 'Y', false -> 'N'
     private String employeeUuid;

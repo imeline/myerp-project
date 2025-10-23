@@ -10,73 +10,57 @@
     </select>
 
     <insert id="save">
-        INSERT INTO position (position_id, name, level_no, company_id)
+        INSERT INTO position (position_id, name, level_no)
         VALUES (#{position.positionId},
                 #{position.name},
-                #{position.levelNo},
-                #{tenantId})
+                #{position.levelNo})
     </insert>
 
     <select id="findAll" parameterType="long" resultType="Position">
         SELECT position_id, name, level_no
         FROM position
-        WHERE
-        <include refid="frag.tenantGuard"/>
         ORDER BY level_no
     </select>
 
     <select id="findLastLevelNo" parameterType="long" resultType="int">
         SELECT NVL(MAX(level_no), 0)
         FROM position
-        WHERE
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="findLevelNoById" resultType="Integer">
         SELECT level_no
         FROM position
         WHERE position_id = #{positionId}
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <update id="updateNameById">
         UPDATE position
         SET name = #{name}
         WHERE position_id = #{positionId}
-        AND
-        <include refid="frag.tenantGuard"/>
     </update>
 
     <update id="updateLevelNoById">
         UPDATE position
         SET level_no = #{levelNo}
         WHERE position_id = #{positionId}
-        AND
-        <include refid="frag.tenantGuard"/>
     </update>
 
     <update id="shiftUpRange">
         UPDATE position
         SET level_no = level_no + 1
         WHERE level_no between #{newLevelNo} AND #{oldLevelNo} - 1
-        AND
-        <include refid="frag.tenantGuard"/>
     </update>
 
     <update id="shiftDownRange">
         UPDATE position
         SET level_no = level_no - 1
         WHERE level_no between #{oldLevelNo} + 1 AND #{newLevelNo}
-        AND
-        <include refid="frag.tenantGuard"/>
     </update>
 
     <delete id="deleteById">
-        DELETE FROM position
+        DELETE
+        FROM position
         WHERE position_id = #{positionId}
-        AND
-        <include refid="frag.tenantGuard"/>
     </delete>
 
     <select id="existsByName" resultType="boolean">
@@ -86,16 +70,12 @@
         <if test="excludeId != null">
             AND position_id != #{excludeId}
         </if>
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM position
         WHERE position_id = #{positionId}
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
 </mapper>
