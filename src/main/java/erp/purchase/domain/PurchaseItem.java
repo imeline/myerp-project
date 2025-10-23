@@ -11,16 +11,14 @@ public class PurchaseItem {
     private int quantity;
     private long purchaseId;
     private long itemId;
-    private long companyId;
 
     public static PurchaseItem register(
-            long purchaseItemId, long purchaseId, long itemId, int quantity, long companyId) {
+            long purchaseItemId, long purchaseId, long itemId, int quantity) {
         return PurchaseItem.builder()
                 .purchaseItemId(purchaseItemId)
                 .purchaseId(purchaseId)
                 .itemId(itemId)
                 .quantity(quantity)
-                .companyId(companyId)
                 .build();
     }
 }

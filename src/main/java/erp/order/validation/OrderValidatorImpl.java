@@ -28,15 +28,15 @@ public class OrderValidatorImpl implements OrderValidator {
     }
 
     @Override
-    public void validOrderIdIfPresent(long orderId, long tenantId) {
-        if (!orderMapper.existsById(tenantId, orderId)) {
+    public void validOrderIdIfPresent(long orderId) {
+        if (!orderMapper.existsById(orderId)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_ORDER);
         }
     }
 
     @Override
-    public void validNoConfirmByItemId(long itemId, long tenantId) {
-        if (orderMapper.existsConfirmByItemId(tenantId, itemId)) {
+    public void validNoConfirmByItemId(long itemId) {
+        if (orderMapper.existsConfirmByItemId(itemId)) {
             throw new GlobalException(ErrorStatus.CANNOT_DELETE_ITEM_BY_CONFIRMED_ORDER);
         }
     }

@@ -12,7 +12,6 @@
     <insert id="save">
         INSERT INTO log (
         log_id,
-        company_id,
         type,
         success,
         employee_uuid,
@@ -23,7 +22,6 @@
         payload
         ) VALUES (
         #{log.logId},
-        #{tenantId,         jdbcType=NUMERIC}, <!-- NULL 가능 -->
         #{log.type},
         #{log.success,      typeHandler=erp.global.mybatis.BooleanYnTypeHandler},
         #{log.employeeUuid, jdbcType=VARCHAR},

@@ -5,9 +5,9 @@ import erp.purchase.dto.request.PurchaseItemSaveRequest;
 import java.util.List;
 
 public interface PurchaseValidator {
-    void validPurchaseIdIfPresent(long purchaseId, long tenantId);
+    void validPurchaseIdIfPresent(long purchaseId);
 
     void validItemIdsUniqueInRequest(List<PurchaseItemSaveRequest> requestItems);
 
-    void validNoConfirmByItemId(long itemId, long tenantId);
+    void validNoConfirmByItemId(long itemId);
 }

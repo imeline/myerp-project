@@ -21,7 +21,6 @@ public class UserPrincipal implements UserDetails {
     private final String name;
     @JsonIgnore // 외부에 노출되지 않게 보안
     private final String password;
-    private final Long tenantId;
 
 
     @Override
@@ -62,8 +61,7 @@ public class UserPrincipal implements UserDetails {
     public static UserPrincipal of(String uuid,
                                    String role,
                                    String name,
-                                   String password,
-                                   Long tenantId) {
+                                   String password) {
         // null/공백 방어 + 접두사 정규화
         String r = (role == null || role.isBlank()) ? "USER" : role.trim();
         String normalized = r.startsWith("ROLE_") ? r : "ROLE_" + r;
@@ -75,7 +73,6 @@ public class UserPrincipal implements UserDetails {
                 .role(normalized)
                 .name(name)
                 .password(password)
-                .tenantId(tenantId)
                 .build();
     }
 }

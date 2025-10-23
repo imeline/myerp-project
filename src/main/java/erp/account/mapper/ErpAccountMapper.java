@@ -14,14 +14,11 @@ public interface ErpAccountMapper {
 
     int save(ErpAccount account);
 
-    Optional<Long> findCompanyIdByUuid(@Param("uuid") String uuid);
-
     Optional<LoginUserInfoRow> findLoginRowByLoginEmail(
             @Param("loginEmail") String loginEmail
     );
 
     boolean existsByLoginEmail(@Param("loginEmail") String loginEmail);
 
-    int softDeleteByEmployeeId(@Param("tenantId") long tenantId,
-                               @Param("employeeId") long employeeId);
+    int softDeleteByEmployeeId(@Param("employeeId") long employeeId);
 }

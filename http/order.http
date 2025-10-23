@@ -1,7 +1,5 @@
 ### 환경 변수
-@base = {{host}}/api/v1/user/order
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc2NTk1MjIsImV4cCI6MTc1NzY5NTUyMiwidGVuYW50X2lkIjoyfQ.pQ6DGNBqyAuoF8HsW7EYIth7WiJzJc23Vs_jhfSyePA
-
+@base = {{host}}/user/order
 
 ### 주문 등록 (주문 + 주문아이템 저장)
 POST {{base}}
@@ -16,11 +14,11 @@ Accept: application/json
   "items": [
     {
       "itemId": 5,
-      "quantity": 10
+      "quantity": 1
     },
     {
       "itemId": 6,
-      "quantity": 10
+      "quantity": 1
     }
   ]
 }
@@ -69,7 +67,7 @@ Accept: application/json
 
 
 ### 특정 주문의 주문아이템 목록 요약 조회 (가용/현재/예약 재고 포함)
-GET {{base}}/2/items/summary
+GET {{base}}/6/items/summary
 Authorization: {{token}}
 Accept: application/json
 
@@ -81,12 +79,12 @@ Accept: application/json
 
 
 ### 특정 주문 상세 조회
-GET {{base}}/2
+GET {{base}}/6
 Authorization: {{token}}
 Accept: application/json
 
 
 ### 주문 취소 — status를 CANCELLED로 변경 (SHIPPED/이미 CANCELLED면 불가)
-DELETE {{base}}/2
+DELETE {{base}}/6
 Authorization: {{token}}
 Accept: application/json

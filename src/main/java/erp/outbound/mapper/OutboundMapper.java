@@ -14,11 +14,9 @@ public interface OutboundMapper {
 
     long nextId();
 
-    int save(@Param("tenantId") long tenantId,
-             @Param("outbound") Outbound outbound);
+    int save(@Param("outbound") Outbound outbound);
 
     List<OutboundFindRow> findAllOutboundFindRow(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("code") String code,
@@ -26,26 +24,16 @@ public interface OutboundMapper {
             @Param("size") int size
     );
 
-    List<OutboundCancelItemRow> findAllCancelItemRowById(
-            @Param("tenantId") long tenantId,
-            @Param("outboundId") long outboundId
-    );
+    List<OutboundCancelItemRow> findAllCancelItemRowById(@Param("outboundId") long outboundId);
 
-    int updateStatusToCanceledIfActive(
-            @Param("tenantId") long tenantId,
-            @Param("outboundId") long outboundId
-    );
+    int updateStatusToCanceledIfActive(@Param("outboundId") long outboundId);
 
     long countByPeriodAndCode(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("code") String code
     );
 
-    boolean existsById(
-            @Param("tenantId") long tenantId,
-            @Param("outboundId") long outboundId
-    );
+    boolean existsById(@Param("outboundId") long outboundId);
 
 }

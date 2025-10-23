@@ -1,5 +1,4 @@
-@base = {{host}}/api/v1/user/stock
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NTc5MjIzMDUsImV4cCI6MTc1Nzk1ODMwNSwidGVuYW50X2lkIjoyfQ.fgMa3EPJfgzGtBzOUsBMJ5S8mAwVW5J5DWT24J5zjcc
+@base = {{host}}/user/stock
 
 ### 재고 목록 조회
 GET {{base}}

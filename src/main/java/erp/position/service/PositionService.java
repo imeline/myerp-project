@@ -8,15 +8,14 @@ import java.util.List;
 
 public interface PositionService {
 
-    long savePosition(PositionNameRequest request, long tenantId);
+    long savePosition(PositionNameRequest request);
 
-    List<PositionFindAllResponse> findAllPosition(long tenantId);
+    List<PositionFindAllResponse> findAllPosition();
 
-    void updatePositionName(long positionId, PositionNameRequest request, long tenantId);
+    void updatePositionName(long positionId, PositionNameRequest request);
 
-    void updatePositionLevelNo(long positionId, PositionLevelNoRequest request,
-                               long tenantId);
+    void updatePositionLevelNo(long positionId, PositionLevelNoRequest request);
 
-    void deletePosition(long positionId, long tenantId);
+    void deletePosition(long positionId);
 
 }

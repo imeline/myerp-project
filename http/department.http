@@ -1,8 +1,7 @@
 ### 환경 변수 (필요하면 값만 바꿔)
-@base = {{host}}/api/v1/admin/department
-@token = Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzZmM1MDY4OTUzMzY0ZjEzOWZmZGFjNWNiODE3N2I5YiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzU4MTYzMzIwLCJleHAiOjE3NTgxOTkzMjAsInRlbmFudF9pZCI6MiwiZW1wbG95ZWVfdXVpZCI6IjNmYzUwNjg5NTMzNjRmMTM5ZmZkYWM1Y2I4MTc3YjliIiwiZW1wbG95ZWVfbmFtZSI6ImFkbWluMiJ9.qQ8rtjD3dkOKRu25AbmVkfcwM6cKYXRT6lI-uGHfKY4
-@rootId = 3
-@childId = 6
+@base = {{host}}/admin/department
+@rootId = 11
+@childId = 13
 
 ### 또 다른 루트 부서 생성
 POST {{base}}/top
@@ -11,7 +10,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "안전관리팀"
+  "name": "회계팀"
 }
 
 
@@ -47,7 +46,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "전략기획팀"
+  "name": "전략팀"
 }
 
 ### 부서 삭제

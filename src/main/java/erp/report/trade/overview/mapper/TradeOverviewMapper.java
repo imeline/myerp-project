@@ -10,19 +10,16 @@ import java.util.List;
 @Mapper
 public interface TradeOverviewMapper {
     List<TradeOverviewMonthlyAmountRow> findAllMonthlyOrderPurchaseAmountRow(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
 
     Integer sumOrderAmountByPeriod(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
 
     Integer sumPurchaseAmountByPeriod(
-            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );

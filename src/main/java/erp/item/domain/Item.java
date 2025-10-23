@@ -18,11 +18,10 @@ public class Item extends TimeStamped {
     private BigDecimal price;
     private String unit;
     private ItemCategory category;
-    private long companyId;
     private LocalDateTime deletedAt;
 
-    public static Item register(Long itemId, String name, String code, BigDecimal price,
-                                String unit, ItemCategory category, long companyId) {
+    public static Item register(Long itemId, String name, String code,
+                                BigDecimal price, String unit, ItemCategory category) {
         return Item.builder()
                 .itemId(itemId)
                 .name(name)
@@ -30,19 +29,17 @@ public class Item extends TimeStamped {
                 .price(price)
                 .unit(unit)
                 .category(category)
-                .companyId(companyId)
                 .build();
     }
 
     public static Item update(Long itemId, String name, BigDecimal price,
-                              String unit, ItemCategory category, long companyId) {
+                              String unit, ItemCategory category) {
         return Item.builder()
                 .itemId(itemId)
                 .name(name)
                 .price(price)
                 .unit(unit)
                 .category(category)
-                .companyId(companyId)
                 .build();
     }
 }

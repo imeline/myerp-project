@@ -19,7 +19,6 @@ public class Purchase extends TimeStamped {
     private int totalAmount;
     private PurchaseStatus status;
     private long employeeId;
-    private long companyId;
 
     public static Purchase register(
             long purchaseId,
@@ -28,8 +27,7 @@ public class Purchase extends TimeStamped {
             LocalDate purchaseDate,
             int totalQuantity,
             int totalAmount,
-            long employeeId,
-            long companyId
+            long employeeId
     ) {
         return Purchase.builder()
                 .purchaseId(purchaseId)
@@ -40,7 +38,6 @@ public class Purchase extends TimeStamped {
                 .totalAmount(totalAmount)
                 .status(PurchaseStatus.CONFIRMED)
                 .employeeId(employeeId)
-                .companyId(companyId)
                 .build();
     }
 }

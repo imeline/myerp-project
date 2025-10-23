@@ -11,18 +11,15 @@
 
     <insert id="save" parameterType="Employee">
         INSERT INTO employee (employee_id, emp_no, name, phone, status,
-                              department_id, position_id, company_id)
+                              department_id, position_id)
         VALUES (#{employeeId}, #{empNo}, #{name}, #{phone}, #{status},
-                #{departmentId}, #{positionId}, #{companyId})
+                #{departmentId}, #{positionId})
     </insert>
 
     <select id="findAllIdAndName" resultType="EmployeeIdAndNameRow">
         SELECT employee_id, name
         FROM employee
-        WHERE
-        status != 'RETIRED'
-        AND
-        <include refid="frag.tenantGuard"/>
+        WHERE status != 'RETIRED'
         ORDER BY name
     </select>
 
@@ -39,13 +36,10 @@
         FROM employee e
         LEFT JOIN department d
         ON d.department_id = e.department_id
-        AND d.company_id = e.company_id
         LEFT JOIN position p
         ON p.position_id = e.position_id
-        AND p.company_id = e.company_id
         LEFT JOIN erp_account a
         ON a.employee_id = e.employee_id
-        AND a.company_id = e.company_id
         WHERE e.status != 'RETIRED'
         <if test="departmentId != null">
             AND e.department_id = #{departmentId}
@@ -56,63 +50,47 @@
         <if test="name != null">
             AND e.name LIKE '%' || #{name} || '%'
         </if>
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="e"/>
-        </include>
         ORDER BY e.created_at DESC, e.employee_id DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
 
     <select id="findEmployeeFindRowById" resultType="EmployeeFindRow">
-        SELECT
-        e.emp_no AS empNo,
-        e.name AS name,
-        d.department_id AS departmentId,
-        d.name AS departmentName,
-        p.position_id AS positionId,
-        p.name AS positionName,
-        e.phone AS phone
+        SELECT e.emp_no        AS empNo,
+               e.name          AS name,
+               d.department_id AS departmentId,
+               d.name          AS departmentName,
+               p.position_id   AS positionId,
+               p.name          AS positionName,
+               e.phone         AS phone
         FROM employee e
-        LEFT JOIN department d
-        ON d.department_id = e.department_id
-        AND d.company_id = e.company_id
-        LEFT JOIN position p
-        ON p.position_id = e.position_id
-        AND p.company_id = e.company_id
-        LEFT JOIN erp_account a
-        ON a.employee_id = e.employee_id
-        AND a.company_id = e.company_id
+                 LEFT JOIN department d
+                           ON d.department_id = e.department_id
+                 LEFT JOIN position p
+                           ON p.position_id = e.position_id
+                 LEFT JOIN erp_account a
+                           ON a.employee_id = e.employee_id
         WHERE e.employee_id = #{employeeId}
-        AND e.status != 'RETIRED'
-        AND
-        <include refid="frag.tenantGuardAlias">
-            <property name="alias" value="e"/>
-        </include>
+          AND e.status != 'RETIRED'
     </select>
 
 
     <update id="updateById">
         UPDATE employee
-        SET emp_no = #{employee.empNo},
-        name = #{employee.name},
-        phone = #{employee.phone},
-        department_id = #{employee.departmentId},
-        position_id = #{employee.positionId}
+        SET emp_no        = #{employee.empNo},
+            name          = #{employee.name},
+            phone         = #{employee.phone},
+            department_id = #{employee.departmentId},
+            position_id   = #{employee.positionId}
         WHERE employee_id = #{employee.employeeId}
-        AND status != 'RETIRED'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status != 'RETIRED'
     </update>
 
     <update id="updateStatusToRetired">
         UPDATE employee
         SET status = 'RETIRED'
         WHERE employee_id = #{employeeId}
-        AND status = 'ACTIVE'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status = 'ACTIVE'
     </update>
 
     <select id="countByFilters" resultType="long">
@@ -128,28 +106,20 @@
         <if test="name != null">
             AND name LIKE '%' || #{name} || '%'
         </if>
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsByDepartmentId" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE department_id = #{departmentId}
-        AND
-        status != 'RETIRED'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status != 'RETIRED'
     </select>
 
     <select id="existsByPositionId" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE position_id = #{positionId}
-        AND
-        status != 'RETIRED'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status != 'RETIRED'
     </select>
 
     <select id="existsByEmpNo" resultType="boolean">
@@ -161,8 +131,6 @@
         </if>
         AND
         status != 'RETIRED'
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsByPhone" resultType="boolean">
@@ -174,25 +142,18 @@
         </if>
         AND
         status != 'RETIRED'
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsActiveById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE employee_id = #{employeeId}
-        AND
-        status = 'ACTIVE'
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND status = 'ACTIVE'
     </select>
 
     <select id="existsAnyById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM employee
         WHERE employee_id = #{employeeId}
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 </mapper>

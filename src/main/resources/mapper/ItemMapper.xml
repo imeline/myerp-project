@@ -9,19 +9,16 @@
     </select>
 
     <insert id="save">
-        INSERT INTO item (item_id, name, code, price, unit, category,
-                          company_id)
+        INSERT INTO item (item_id, name, code, price, unit, category)
         VALUES (#{item.itemId}, #{item.name}, #{item.code}, #{item.price},
-                #{item.unit}, #{item.category}, #{tenantId})
+                #{item.unit}, #{item.category})
     </insert>
 
     <select id="findById" resultType="Item">
         SELECT *
         FROM item
         WHERE item_id = #{itemId}
-        AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND deleted_at IS NULL
     </select>
 
     <select id="findAllItemFindRow" resultType="ItemFindRow">
@@ -42,8 +39,6 @@
             AND category = #{category}
         </if>
         AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
         ORDER BY created_at DESC, item_id DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
@@ -51,9 +46,7 @@
     <select id="findAllItemOptionRow" resultType="ItemOptionRow">
         SELECT item_id, name, code
         FROM item
-        WHERE
-        <include refid="frag.tenantGuard"/>
-        AND deleted_at IS NULL
+        WHERE deleted_at IS NULL
         ORDER BY name
     </select>
 
@@ -66,29 +59,23 @@
             #{id}
         </foreach>
         AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <update id="updateById">
         UPDATE item
-        SET name = #{item.name},
-        price = #{item.price},
-        unit = #{item.unit},
-        category = #{item.category}
+        SET name     = #{item.name},
+            price    = #{item.price},
+            unit     = #{item.unit},
+            category = #{item.category}
         WHERE item_id = #{item.itemId}
-        AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND deleted_at IS NULL
     </update>
 
     <update id="softDeleteById">
         UPDATE item
         SET deleted_at = SYSTIMESTAMP
         WHERE item_id = #{itemId}
-        AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND deleted_at IS NULL
     </update>
 
     <select id="countByNameAndCategory" resultType="long">
@@ -102,8 +89,6 @@
             AND category = #{category}
         </if>
         AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsByName" resultType="boolean">
@@ -114,8 +99,6 @@
             AND item_id != #{excludeId}
         </if>
         AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsByCode" resultType="boolean">
@@ -126,8 +109,6 @@
             AND item_id != #{excludeId}
         </if>
         AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsByIds" resultType="boolean">
@@ -142,17 +123,13 @@
             #{id}
         </foreach>
         AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <select id="existsById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
         FROM item
         WHERE item_id = #{itemId}
-        AND deleted_at IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
+          AND deleted_at IS NULL
     </select>
 
 </mapper>

@@ -13,15 +13,15 @@ public class InboundValidatorImpl implements InboundValidator {
     private final InboundMapper inboundMapper;
 
     @Override
-    public void validInboundIdIfPresent(long inboundId, long tenantId) {
-        if (!inboundMapper.existsById(tenantId, inboundId)) {
+    public void validInboundIdIfPresent(long inboundId) {
+        if (!inboundMapper.existsById(inboundId)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_INBOUND);
         }
     }
 
     @Override
-    public void validInboundActive(long inboundId, long tenantId) {
-        if (!inboundMapper.existsActiveById(tenantId, inboundId)) {
+    public void validInboundActive(long inboundId) {
+        if (!inboundMapper.existsActiveById(inboundId)) {
             throw new GlobalException(ErrorStatus.INBOUND_NOT_ACTIVE);
         }
     }

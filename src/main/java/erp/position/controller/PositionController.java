@@ -1,6 +1,5 @@
 package erp.position.controller;
 
-import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.position.dto.request.PositionLevelNoRequest;
 import erp.position.dto.request.PositionNameRequest;
@@ -21,36 +20,31 @@ public class PositionController {
 
     @PostMapping
     public ApiResponse<Long> savePosition(@Valid @RequestBody PositionNameRequest request) {
-        long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(positionService.savePosition(request, tenantId));
+        return ApiResponse.onSuccess(positionService.savePosition(request));
     }
 
     @GetMapping
     public ApiResponse<List<PositionFindAllResponse>> findAllPosition() {
-        long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(positionService.findAllPosition(tenantId));
+        return ApiResponse.onSuccess(positionService.findAllPosition());
     }
 
     @PutMapping("/{positionId}/name")
     public ApiResponse<Void> updatePositionName(@PathVariable Long positionId,
                                                 @Valid @RequestBody PositionNameRequest request) {
-        long tenantId = TenantContext.get();
-        positionService.updatePositionName(positionId, request, tenantId);
+        positionService.updatePositionName(positionId, request);
         return ApiResponse.onSuccess(null);
     }
 
     @PutMapping("/{positionId}/level-no")
     public ApiResponse<Void> updatePositionLevelNo(@PathVariable Long positionId,
                                                    @Valid @RequestBody PositionLevelNoRequest request) {
-        long tenantId = TenantContext.get();
-        positionService.updatePositionLevelNo(positionId, request, tenantId);
+        positionService.updatePositionLevelNo(positionId, request);
         return ApiResponse.onSuccess(null);
     }
 
     @DeleteMapping("/{positionId}")
     public ApiResponse<Void> deletePosition(@PathVariable Long positionId) {
-        long tenantId = TenantContext.get();
-        positionService.deletePosition(positionId, tenantId);
+        positionService.deletePosition(positionId);
         return ApiResponse.onSuccess(null);
     }
 }

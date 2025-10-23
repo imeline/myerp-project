@@ -26,7 +26,6 @@ public class JwtTokenProvider {
     public static final String CLAIM_UUID = "uuid";
     public static final String CLAIM_ROLE = "role";
     public static final String CLAIM_NAME = "name";
-    public static final String CLAIM_TENANT_ID = "tenant_id";
     public static final String BEARER_PREFIX = "Bearer ";
     private final Environment env;
 
@@ -46,9 +45,7 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(now.getTime() + expMillis))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256);
 
-        // UserPrincipal 객체 타입이면 tenant_id 넣기
         if (userDetails instanceof UserPrincipal principal) {
-            builder.claim(CLAIM_TENANT_ID, principal.getTenantId());
             // 있으면 싣고, null이면 생략
             if (principal.getUuid() != null) {
                 builder.claim(CLAIM_UUID, principal.getUuid());
@@ -77,10 +74,6 @@ public class JwtTokenProvider {
 
     public String extractName(String token) {
         return extractAllClaims(token).get(CLAIM_NAME, String.class);
-    }
-
-    public Long extractTenantId(String token) {
-        return extractAllClaims(token).get(CLAIM_TENANT_ID, Long.class);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

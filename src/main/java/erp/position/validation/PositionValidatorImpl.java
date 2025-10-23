@@ -13,15 +13,15 @@ public class PositionValidatorImpl implements PositionValidator {
     private final PositionMapper positionMapper;
 
     @Override
-    public void validPositionIdIfPresent(long positionId, long tenantId) {
-        if (positionMapper.findLevelNoById(tenantId, positionId).isEmpty()) {
+    public void validPositionIdIfPresent(long positionId) {
+        if (positionMapper.findLevelNoById(positionId).isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_POSITION);
         }
     }
 
     @Override
-    public void validNameUnique(String name, Long excludeId, long tenantId) {
-        if (name != null && positionMapper.existsByName(tenantId, name, excludeId)) {
+    public void validNameUnique(String name, Long excludeId) {
+        if (name != null && positionMapper.existsByName(name, excludeId)) {
             throw new GlobalException(ErrorStatus.DUPLICATE_POSITION_NAME);
         }
     }

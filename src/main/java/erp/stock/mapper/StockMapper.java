@@ -13,51 +13,39 @@ public interface StockMapper {
 
     long nextId();
 
-    int save(@Param("tenantId") long tenantId, @Param("stock") Stock stock);
+    int save(@Param("stock") Stock stock);
 
 
-    List<StockFindAllRow> findAllStockFindAllRow(@Param("tenantId") long tenantId,
-                                                 @Param("filter") StockFindFilterRow filter);
+    List<StockFindAllRow> findAllStockFindAllRow(@Param("filter") StockFindFilterRow filter);
 
     Optional<StockPriceFindRow> findStockPriceFindRowByItemId(
-            @Param("tenantId") long tenantId,
             @Param("itemId") long itemId
     );
 
-    int updateWarehouse(@Param("tenantId") long tenantId,
-                        @Param("itemId") long itemId,
+    int updateWarehouse(@Param("itemId") long itemId,
                         @Param("warehouse") String warehouse);
 
-    int increaseOnHand(@Param("tenantId") long tenantId,
-                       @Param("itemId") long itemId,
+    int increaseOnHand(@Param("itemId") long itemId,
                        @Param("delta") int delta);
 
-    int decreaseOnHandIfEnough(@Param("tenantId") long tenantId,
-                               @Param("itemId") long itemId,
+    int decreaseOnHandIfEnough(@Param("itemId") long itemId,
                                @Param("delta") int delta);
 
-    int increaseAllocatedIfEnoughOnHand(@Param("tenantId") long tenantId,
-                                        @Param("itemId") long itemId,
+    int increaseAllocatedIfEnoughOnHand(@Param("itemId") long itemId,
                                         @Param("quantity") int quantity);
 
-    int decreaseAllocatedIfEnough(@Param("tenantId") long tenantId,
-                                  @Param("itemId") long itemId,
+    int decreaseAllocatedIfEnough(@Param("itemId") long itemId,
                                   @Param("quantity") int quantity);
 
-    long countByStock(@Param("tenantId") long tenantId,
-                      @Param("filter") StockFindFilterRow filter);
+    long countByStock(@Param("filter") StockFindFilterRow filter);
 
-    StockMovementSummaryRow findMovementSummary(@Param("tenantId") long tenantId,
-                                                @Param("filter") StockMovementSearchFilter filter);
+    StockMovementSummaryRow findMovementSummary(@Param("filter") StockMovementSearchFilter filter);
 
-    List<StockMovementFindRow> findMovementRows(@Param("tenantId") long tenantId,
-                                                @Param("filter") StockMovementSearchFilter filter);
+    List<StockMovementFindRow> findMovementRows(@Param("filter") StockMovementSearchFilter filter);
 
-    long countMovementRows(@Param("tenantId") long tenantId,
-                           @Param("filter") StockMovementSearchFilter filter);
+    long countMovementRows(@Param("filter") StockMovementSearchFilter filter);
 
-    StockSummaryRow findStockSummaryRow(@Param("tenantId") long tenantId);
+    StockSummaryRow findStockSummaryRow();
 
-    boolean existsPositiveByItemId(@Param("tenantId") long tenantId,
-                                   @Param("itemId") long itemId);
+    boolean existsPositiveByItemId(@Param("itemId") long itemId);
 }

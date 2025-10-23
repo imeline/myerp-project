@@ -1,7 +1,5 @@
 package erp.account.service;
 
-import static erp.global.util.RowCountGuards.requireOneRowAffected;
-
 import erp.account.domain.ErpAccount;
 import erp.account.dto.internal.LoginUserInfoRow;
 import erp.account.dto.request.ErpAccountSaveRequest;
@@ -15,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+
 @Service
 @RequiredArgsConstructor
 public class ErpAccountServiceImpl implements ErpAccountService {
@@ -25,7 +25,7 @@ public class ErpAccountServiceImpl implements ErpAccountService {
 
     @Override
     @Transactional
-    public Long saveErpAccount(ErpAccountSaveRequest request, long companyId) {
+    public Long saveErpAccount(ErpAccountSaveRequest request) {
         String loginEmail = Strings.normalizeOrNull(request.loginEmail());
         erpAccountValidator.validLoginEmailUnique(loginEmail);
 
@@ -33,12 +33,11 @@ public class ErpAccountServiceImpl implements ErpAccountService {
         String hashPassword = passwordEncoder.encode(request.rawPassword());
 
         ErpAccount account = ErpAccount.register(
-            erpAccountId,
-            request.employeeId(),
-            loginEmail,
-            hashPassword,
-            request.role(),
-            companyId
+                erpAccountId,
+                request.employeeId(),
+                loginEmail,
+                hashPassword,
+                request.role()
         );
 
         int affectedRowCount = erpAccountMapper.save(account);
@@ -51,20 +50,13 @@ public class ErpAccountServiceImpl implements ErpAccountService {
     public LoginUserInfoRow findLoginRowByLoginEmail(String loginEmail) {
         String email = Strings.normalizeOrNull(loginEmail);
         return erpAccountMapper.findLoginRowByLoginEmail(email)
-            .orElseThrow(() -> new GlobalException(ErrorStatus.INVALID_LOGIN_CREDENTIALS));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public long findCompanyIdByUuid(String uuid) {
-        return erpAccountMapper.findCompanyIdByUuid(uuid)
-            .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ERP_ACCOUNT));
+                .orElseThrow(() -> new GlobalException(ErrorStatus.INVALID_LOGIN_CREDENTIALS));
     }
 
     @Override
     @Transactional
-    public void softDeleteById(long employeeId, long tenantId) {
-        int affected = erpAccountMapper.softDeleteByEmployeeId(tenantId, employeeId);
+    public void softDeleteById(long employeeId) {
+        int affected = erpAccountMapper.softDeleteByEmployeeId(employeeId);
         requireOneRowAffected(affected, ErrorStatus.DELETE_ERP_ACCOUNT_FAIL);
     }
 }

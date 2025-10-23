@@ -13,8 +13,8 @@ public class OutboundValidatorImpl implements OutboundValidator {
     private final OutboundMapper outboundMapper;
 
     @Override
-    public void validOutboundIdIfPresent(long outboundId, long tenantId) {
-        if (!outboundMapper.existsById(tenantId, outboundId)) {
+    public void validOutboundIdIfPresent(long outboundId) {
+        if (!outboundMapper.existsById(outboundId)) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_OUTBOUND);
         }
     }

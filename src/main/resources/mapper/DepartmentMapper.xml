@@ -7,38 +7,29 @@
         SELECT department_seq.NEXTVAL
         FROM dual
     </select>
-
-    <!-- insert 시 tenant_id 검증은 삽입할 도메인에
-    jwt 토큰에서 추출한 tenant_id를 넣어주므로 별도 검증 없음 -->
+    
     <insert id="save">
-        INSERT INTO DEPARTMENT (department_id, company_id, parent_id, name)
+        INSERT INTO department (department_id, parent_id, name)
         VALUES (#{department.departmentId},
-        #{tenantId},
         #{department.parentId, jdbcType=NUMERIC}, <!-- null 허용 -->
         #{department.name})
     </insert>
 
     <update id="updateById">
-        UPDATE DEPARTMENT
+        UPDATE department
         SET
         name = #{department.name},
         parent_id = #{department.parentId}
         WHERE department_id = #{department.departmentId}
-        AND
-        <include refid="frag.tenantGuard"/>
         <!-- 오라클은 비용 기반 최적화라서 AND 순서가 성능에 영향 없음 -->
     </update>
 
     <select id="findById" resultType="Department">
-        SELECT
-        department_id,
-        company_id,
-        parent_id,
-        name
-        FROM DEPARTMENT
+        SELECT department_id,
+               parent_id,
+               name
+        FROM department
         WHERE department_id = #{departmentId}
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
     <!-- 최상위(parent_id IS NULL) 목록 + 자식 존재 여부 -->
@@ -49,19 +40,15 @@
         <!-- 자식 여부 0, 1 리턴 -->
         CASE WHEN EXISTS (
         SELECT 1  <!-- 존재 여부만 확인할 거라 관례적으로 1 같은 상수 -->
-        FROM DEPARTMENT c
+        FROM department c
         WHERE
         <!-- 바깥 행(DEPARTMENT)이 부모이고, 그를 부모로 가진 자식(c)이 있는지 확인 -->
         c.parent_id = DEPARTMENT.department_id
-        AND
-        <include refid="frag.tenantGuard"/>
         ) THEN 1 ELSE 0 END AS hasChildren
-        FROM DEPARTMENT
+        FROM department
         WHERE
-        DEPARTMENT.parent_id IS NULL
-        AND
-        <include refid="frag.tenantGuard"/>
-        ORDER BY DEPARTMENT.department_id
+        department.parent_id IS NULL
+        ORDER BY department.department_id
     </select>
 
     <!-- 특정 부모의 직계 자식 + 자식 존재 여부 -->
@@ -72,32 +59,27 @@
         <!-- 자식 여부 0, 1 리턴 -->
         CASE WHEN EXISTS (
         SELECT 1  <!-- 존재 여부만 확인할 거라 관례적으로 1 같은 상수 -->
-        FROM DEPARTMENT c
+        FROM department c
         WHERE
         <!-- 바깥 행(DEPARTMENT)이 부모이고, 그를 부모로 가진 자식(c)이 있는지 확인 -->
         c.parent_id = DEPARTMENT.department_id
-        AND
-        <include refid="frag.tenantGuard"/>
         ) THEN 1 ELSE 0 END AS hasChildren
-        FROM DEPARTMENT
+        FROM department
         WHERE
-        DEPARTMENT.parent_id = #{parentId}
-        AND
-        <include refid="frag.tenantGuard"/>
-        ORDER BY DEPARTMENT.department_id
+        department.parent_id = #{parentId}
+        ORDER BY department.department_id
     </select>
 
     <delete id="deleteById">
-        DELETE FROM DEPARTMENT
+        DELETE
+        FROM department
         WHERE department_id = #{departmentId}
-        AND
-        <include refid="frag.tenantGuard"/>
     </delete>
 
     <!-- 같은 부모 아래 이름 중복 확인 (수정 시 자기 자신 제외) -->
     <select id="existsByNameAndParentId" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
-        FROM DEPARTMENT
+        FROM department
         WHERE
         LOWER(name) = LOWER(#{name})
         <if test="parentId != null">
@@ -109,28 +91,20 @@
         <if test="excludeId != null">
             AND department_id != #{excludeId}
         </if>
-        AND
-        <include refid="frag.tenantGuard"/>
     </select>
 
 
     <select id="existsById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
-        FROM DEPARTMENT
-        WHERE
-        department_id = #{departmentId}
-        AND
-        <include refid="frag.tenantGuard"/>
+        FROM department
+        WHERE department_id = #{departmentId}
     </select>
 
     <!-- 자식 존재 여부 -->
     <select id="existsChildById" resultType="boolean">
         SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END
-        FROM DEPARTMENT
-        WHERE
-        parent_id = #{departmentId}
-        AND
-        <include refid="frag.tenantGuard"/>
+        FROM department
+        WHERE parent_id = #{departmentId}
     </select>
 
 </mapper>

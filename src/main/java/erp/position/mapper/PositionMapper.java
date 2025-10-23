@@ -11,43 +11,34 @@ import java.util.Optional;
 public interface PositionMapper {
     long nextId();
 
-    int save(@Param("tenantId") long tenantId,
-             @Param("position") Position position);
+    int save(@Param("position") Position position);
 
-    List<Position> findAll(@Param("tenantId") long tenantId);
+    List<Position> findAll();
 
     // 아무 직급도 없을 경우, 0 반환
-    int findLastLevelNo(@Param("tenantId") long tenantId);
+    int findLastLevelNo();
 
-    Optional<Integer> findLevelNoById(@Param("tenantId") long tenantId,
-                                      @Param("positionId") long positionId);
+    Optional<Integer> findLevelNoById(@Param("positionId") long positionId);
 
-    int updateNameById(@Param("tenantId") long tenantId,
-                       @Param("positionId") long positionId,
+    int updateNameById(@Param("positionId") long positionId,
                        @Param("name") String name);
 
-    int updateLevelNoById(@Param("tenantId") long tenantId,
-                          @Param("positionId") long positionId,
+    int updateLevelNoById(@Param("positionId") long positionId,
                           @Param("levelNo") int levelNo);
 
     // newLevelNo ~ (oldLevelNo - 1) 범위의 직급들을 +1 씩 증가시킴
-    void shiftUpRange(@Param("tenantId") long tenantId,
-                      @Param("newLevelNo") int newLevelNo,
+    void shiftUpRange(@Param("newLevelNo") int newLevelNo,
                       @Param("oldLevelNo") int oldLevelNo);
 
     // (oldLevelNo + 1) ~ newLevelNo 범위의 직급들을 -1 씩 감소시킴
-    void shiftDownRange(@Param("tenantId") long tenantId,
-                        @Param("oldLevelNo") int oldLevelNo,
+    void shiftDownRange(@Param("oldLevelNo") int oldLevelNo,
                         @Param("newLevelNo") int newLevelNo);
 
-    int deleteById(@Param("tenantId") long tenantId,
-                   @Param("positionId") long positionId);
+    int deleteById(@Param("positionId") long positionId);
 
-    boolean existsByName(@Param("tenantId") long tenantId,
-                         @Param("name") String name,
+    boolean existsByName(@Param("name") String name,
                          @Param("excludeId") Long excludeId);
 
-    boolean existsById(@Param("tenantId") long tenantId,
-                       @Param("positionId") long positionId);
+    boolean existsById(@Param("positionId") long positionId);
 
 }

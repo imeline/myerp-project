@@ -8,18 +8,15 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Position extends TimeStamped {
-
     private Long positionId;
     private String name;
     private int levelNo;
-    private long companyId;
 
-    public static Position register(Long positionId, String name, int levelNo, long companyId) {
+    public static Position register(Long positionId, String name, int levelNo) {
         return Position.builder()
                 .positionId(positionId)
                 .name(name)
                 .levelNo(levelNo)
-                .companyId(companyId)
                 .build();
     }
 }

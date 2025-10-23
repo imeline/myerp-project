@@ -1,6 +1,5 @@
 package erp.stock.controller;
 
-import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.global.response.PageResponse;
 import erp.stock.dto.request.StockFindAllRequest;
@@ -21,49 +20,29 @@ public class StockController {
 
     private final StockService stockService;
 
-    /**
-     * 재고 목록 조회
-     */
     @GetMapping
     public ApiResponse<PageResponse<StockFindAllResponse>> findAllStocks(
-            @Valid @RequestBody StockFindAllRequest request
-    ) {
-        long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(
-                stockService.findAllStock(request, tenantId));
+            @Valid @RequestBody StockFindAllRequest request) {
+        return ApiResponse.onSuccess(stockService.findAllStock(request));
     }
 
-    /**
-     * 단일 품목 재고/단가 조회
-     */
     @GetMapping("/{itemId}")
     public ApiResponse<StockPriceFindResponse> findStockPrice(
-            @PathVariable long itemId
-    ) {
-        long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(
-                stockService.findStockPrice(itemId, tenantId));
+            @PathVariable long itemId) {
+
+        return ApiResponse.onSuccess(stockService.findStockPrice(itemId));
     }
 
-    /**
-     * 단일 품목 재고 변동 내역 조회
-     */
     @GetMapping("{itemId}/movement")
     public ApiResponse<StockMovementFindAllResponse> findMovements(
             @PathVariable long itemId,
-            @Valid @RequestBody StockMovementFindRequest request
-    ) {
-        long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(stockService.findAllMovement(itemId, request, tenantId));
+            @Valid @RequestBody StockMovementFindRequest request) {
+        return ApiResponse.onSuccess(stockService.findAllMovement(itemId, request));
     }
 
-    /**
-     * 재고 현황 조회
-     */
     @GetMapping("/summary")
     public ApiResponse<StockSummaryFindResponse> findSummary() {
-        long tenantId = TenantContext.get();
-        return ApiResponse.onSuccess(stockService.findSummary(tenantId));
+        return ApiResponse.onSuccess(stockService.findSummary());
     }
 
 }

@@ -13,18 +13,14 @@ import java.util.List;
 public interface OrderItemMapper {
     long nextId();
 
-    int save(@Param("tenantId") long tenantId,
-             @Param("orderItem") OrderItem orderItem);
+    int save(@Param("orderItem") OrderItem orderItem);
 
     List<OrderItemStockFindRow> findAllOrderItemStockFindRow(
-            @Param("tenantId") long tenantId,
             @Param("orderId") long orderId);
 
     List<OrderItemDetailRow> findAllOrderItemDetailRow(
-            @Param("tenantId") long tenantId,
             @Param("orderId") long orderId);
 
     List<OrderItemQuantityRow> findAllOrderItemQuantityRow(
-            @Param("tenantId") long tenantId,
             @Param("orderId") long orderId);
 }

@@ -15,43 +15,33 @@ import java.util.Optional;
 public interface ItemMapper {
     long nextId();
 
-    int save(@Param("tenantId") long tenantId,
-             @Param("item") Item item);
+    int save(@Param("item") Item item);
 
-    Optional<Item> findById(@Param("tenantId") long tenantId,
-                            @Param("itemId") long itemId);
+    Optional<Item> findById(@Param("itemId") long itemId);
 
-    List<ItemFindRow> findAllItemFindRow(@Param("tenantId") long tenantId,
-                                         @Param("name") String name,
+    List<ItemFindRow> findAllItemFindRow(@Param("name") String name,
                                          @Param("category") ItemCategory category,
                                          @Param("offset") int offset,
                                          @Param("size") int size);
 
-    List<ItemOptionRow> findAllItemOptionRow(@Param("tenantId") long tenantId);
+    List<ItemOptionRow> findAllItemOptionRow();
 
-    List<ItemPriceRow> findAllPriceByIds(long tenantId, List<Long> itemIds);
+    List<ItemPriceRow> findAllPriceByIds(@Param("itemIds") List<Long> itemIds);
 
-    int updateById(@Param("tenantId") long tenantId,
-                   @Param("item") Item item);
+    int updateById(@Param("item") Item item);
 
-    int softDeleteById(@Param("tenantId") long tenantId,
-                       @Param("itemId") long itemId);
+    int softDeleteById(@Param("itemId") long itemId);
 
-    long countByNameAndCategory(@Param("tenantId") long tenantId,
-                                @Param("name") String name,
+    long countByNameAndCategory(@Param("name") String name,
                                 @Param("category") ItemCategory category);
 
-    boolean existsByName(@Param("tenantId") long tenantId,
-                         @Param("name") String name,
+    boolean existsByName(@Param("name") String name,
                          @Param("excludeId") Long excludeId);
 
-    boolean existsByCode(@Param("tenantId") long tenantId,
-                         @Param("code") String code,
+    boolean existsByCode(@Param("code") String code,
                          @Param("excludeId") Long excludeId);
 
-    boolean existsByIds(@Param("tenantId") long tenantId,
-                        @Param("itemIds") List<Long> itemIds);
+    boolean existsByIds(@Param("itemIds") List<Long> itemIds);
 
-    boolean existsById(@Param("tenantId") long tenantId,
-                       @Param("itemId") long itemId);
+    boolean existsById(@Param("itemId") long itemId);
 }
