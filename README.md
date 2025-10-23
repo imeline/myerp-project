@@ -4,7 +4,7 @@
 - `설명` : 상품 등록부터 주문·발주·출고·입고까지 한 번에 처리하는 업무 일원화 ERP
 - `기간` : 25.08.01 ~ 25.09.18
 - `구성` : BE 1명
-- `사용 기술 및 라이브러리` :  
+- `사용 기술 및 라이브러리` :
 
 <img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=Spring-Security&logoColor=white" /> <img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens" /> <img src="https://img.shields.io/badge/MyBatis-D30100?style=for-the-badge" /> <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=Spring-Boot&logoColor=white" /> <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
 <br>
