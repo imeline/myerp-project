@@ -37,6 +37,7 @@
 ---
 
 ## 📚 개발 문서
-- 🗺️ **ERD 설계서**  
-  <img src="https://github.com/user-attachments/assets/28e9f3d9-b90c-4078-8cba-c6bb9d2b615c" width="800">
+- 🗺️ **ERD 설계서** 
+
+  <img src="https://github.com/user-attachments/assets/68c81263-0e84-438a-bdd7-1cc7a0b8c034" width="800">
 - 📘 **API 명세서** [링크](https://sugared-visitor-f84.notion.site/API-295b450e6b238179aeb6c88b2ec71d94?source=copy_link)
