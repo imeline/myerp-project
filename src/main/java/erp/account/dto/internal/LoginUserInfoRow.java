@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 
 public record LoginUserInfoRow(
         @NotBlank
+        Long erpAccountId,
+        @NotBlank
         String uuid,
         @NotBlank
         String role,

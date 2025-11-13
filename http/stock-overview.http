@@ -2,7 +2,7 @@
 
 ### 재고 리포트(월별) — 2024년 12월
 GET {{base}}
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 

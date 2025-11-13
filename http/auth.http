@@ -32,3 +32,20 @@ Content-Type: application/json
   "loginEmail": "user1@naver.com",
   "password": "123456"
 }
+
+### 액세스 토큰 재발급
+POST {{base}}/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NjMwMTYwNzQsImV4cCI6MTc2NDIyNTY3NCwidXVpZCI6IjA3MzkyNmNhODE2ZjQ4NjVhNWYwNTZhYWEwYmU5YmYzIiwibmFtZSI6InVzZXIxIn0.zFPo-tGCX9AdghahfndQh6CJRpAwCCRGELYuuTK53AU"
+}
+
+### 로그아웃
+POST {{base}}/logout
+Authorization: {{accessToken}}
+Content-Type: application/json
+
+{
+  "refreshToken": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NjMwMTYwNzQsImV4cCI6MTc2NDIyNTY3NCwidXVpZCI6IjA3MzkyNmNhODE2ZjQ4NjVhNWYwNTZhYWEwYmU5YmYzIiwibmFtZSI6InVzZXIxIn0.zFPo-tGCX9AdghahfndQh6CJRpAwCCRGELYuuTK53AU"
+}

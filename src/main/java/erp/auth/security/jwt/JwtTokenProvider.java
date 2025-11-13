@@ -32,10 +32,8 @@ public class JwtTokenProvider {
     // *파라미터를 UserPrincipal로 안 받아도 되나?
     //  UserPrincipal은 UserDetails를 구현하므로
     // `UserDetails userDetails = principal;` - 업캐스팅 가능. 더 유연한 코드
-    public String generateToken(UserDetails userDetails) {
+    private String buildToken(UserDetails userDetails, long expMillis) {
         Date now = new Date();
-        Long expMillis = env.getProperty("jwt.expiration-time", Long.class,
-                1000L * 60 * 60); // 기본값: 1시간
 
         JwtBuilder builder = Jwts.builder()
                 .setSubject(userDetails.getUsername())
@@ -46,7 +44,6 @@ public class JwtTokenProvider {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256);
 
         if (userDetails instanceof UserPrincipal principal) {
-            // 있으면 싣고, null이면 생략
             if (principal.getUuid() != null) {
                 builder.claim(CLAIM_UUID, principal.getUuid());
             }
@@ -56,6 +53,18 @@ public class JwtTokenProvider {
         }
 
         return BEARER_PREFIX + builder.compact();
+    }
+
+    public String generateAccessToken(UserDetails userDetails) {
+        Long expMillis = env.getProperty("jwt.access-expiration-time", Long.class,
+                1000L * 60 * 60); // 기본값: 1시간
+        return buildToken(userDetails, expMillis);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        Long expMillis = env.getProperty("jwt.refresh-expiration-time", Long.class,
+                1000L * 60 * 60 * 24 * 14); // 기본값: 14일
+        return buildToken(userDetails, expMillis);
     }
 
     // 보통 시큐리티에서 알아서 SecurityContextHolder.getContext().getAuthentication()
@@ -112,5 +121,14 @@ public class JwtTokenProvider {
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(env.getProperty("jwt.secret-key"));
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String stripBearer(String token) {
+        if (token == null) return null;
+        String trimmed = token.trim();
+        if (trimmed.regionMatches(true, 0, BEARER_PREFIX, 0, BEARER_PREFIX.length())) {
+            return trimmed.substring(BEARER_PREFIX.length()).trim();
+        }
+        return trimmed;
     }
 }

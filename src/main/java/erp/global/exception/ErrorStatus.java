@@ -20,6 +20,13 @@ public enum ErrorStatus {
     INVALID_LOGIN_CREDENTIALS("AUTH102", "아이디 또는 비밀번호가 일치하지 않습니다."),
     SIGNUP_FAIL("AUTH104", "회원가입에 실패했습니다."),
     NOT_FOUND_ERP_ACCOUNT("AUTH105", "계정을 찾을 수 없습니다."),
+    CREATE_REFRESH_TOKEN_FAIL(
+            "AUTH106", "리프레시 토큰 생성에 실패했습니다."),
+    REFRESH_TOKEN_NOT_FOUND("AUTH107", "리프레시 토큰을 찾을 수 없습니다."),
+    EXPIRED_REFRESH_TOKEN("AUTH108", "만료된 리프레시 토큰입니다."),
+    UPDATE_REFRESH_TOKEN_FAIL("AUTH109", "리프레시 토큰 갱신에 실패했습니다."),
+    DELETE_REFRESH_TOKEN_FAIL("AUTH110", "리프레시 토큰 삭제에 실패했습니다."),
+    INVALID_REFRESH_TOKEN("AUTH111", "유효하지 않은 리프레시 토큰입니다."),
 
     // ERP ACCOUNT
     CREATE_ERP_ACCOUNT_FAIL("ERP201", "계정 생성에 실패했습니다."),
@@ -89,7 +96,7 @@ public enum ErrorStatus {
     UPDATE_PURCHASE_STATUS_FAIL("PUR912", "발주 상태 변경에 실패했습니다."),
     CANNOT_REVERT_CANCELLED_PURCHASE("PUR913", "취소된 발주는 상태를 되돌릴 수 없습니다."),
     ALREADY_CONFIRMED_PURCHASE("PUR914", "이미 확정 상태의 발주입니다."),
-    
+
     // INBOUND
     CREATE_INBOUND_FAIL("INB1001", "입고 생성에 실패했습니다."),
     NOT_REGISTERED_INBOUND("INB1002", "등록된 입고가 없습니다."),
@@ -121,7 +128,8 @@ public enum ErrorStatus {
 
     // LOG
     LOG_SAVE_FAIL("LOG1301", "로그 저장에 실패했습니다."),
-    LOG_PAYLOAD_INVALID_JSON("LOG1302", "로그 페이로드가 유효한 JSON 형식이 아닙니다.");
+    LOG_PAYLOAD_INVALID_JSON("LOG1302", "로그 페이로드가 유효한 JSON 형식이 아닙니다."),
+    ;
 
 
     private final HttpStatus httpStatus;

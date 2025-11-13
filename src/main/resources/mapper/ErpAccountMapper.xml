@@ -31,10 +31,11 @@
 
     <select id="findLoginRowByLoginEmail" parameterType="string"
             resultType="LoginUserInfoRow">
-        SELECT a.uuid     AS uuid,
-               a.role     AS role,
-               a.password AS passwordHash,
-               e.name     AS name
+        SELECT a.erp_account_id AS erpAccountId,
+               a.uuid           AS uuid,
+               a.role           AS role,
+               a.password       AS passwordHash,
+               e.name           AS name
         FROM ERP_ACCOUNT a
                  JOIN EMPLOYEE e ON e.employee_id = a.employee_id
         WHERE a.login_email = #{loginEmail}

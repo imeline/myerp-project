@@ -5,9 +5,13 @@ import erp.account.dto.internal.LoginUserInfoRow;
 import erp.account.dto.request.ErpAccountSaveRequest;
 import erp.account.enums.ErpAccountRole;
 import erp.account.service.ErpAccountService;
+import erp.auth.domain.RefreshToken;
+import erp.auth.dto.internal.RefreshTokenRow;
 import erp.auth.dto.request.LoginRequest;
+import erp.auth.dto.request.RefreshTokenRequest;
 import erp.auth.dto.request.SignupRequest;
 import erp.auth.dto.response.LoginResponse;
+import erp.auth.mapper.RefreshTokenMapper;
 import erp.auth.security.jwt.JwtTokenProvider;
 import erp.auth.security.model.UserPrincipal;
 import erp.employee.dto.request.EmployeeSaveRequest;
@@ -22,6 +26,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -30,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final ErpAccountService erpAccountService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenMapper refreshTokenMapper;
 
     // 회원가입은 계정/직원 생성이라 WORK로 기록
     @Auditable(type = LogType.WORK, messageEl = "'회원가입 처리: ' + #args[0].loginEmail() + ' / ' + #args[0].name()")
@@ -81,10 +88,96 @@ public class AuthServiceImpl implements AuthService {
                 row.name(),
                 null // 사용되지 않는 민감정보 제거
         );
-        String token = jwtTokenProvider.generateToken(userDetails);
+        String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
+
+        long erpAccountId = row.erpAccountId();
+        saveOrUpdateRefreshToken(erpAccountId, refreshToken);
+
+
         // 왜 userDetails가 아니라 LoginRow에서 데이터를 가져오는가?
         // -> 응답(LoginResponse)은 DB 조회 결과(row) 기준으로 채워야 책임이 명확함
         // -> UserPrincipal은 인증 컨텍스트 전용이므로 API 응답에 끌고 오면 역할이 섞임
-        return LoginResponse.of(token, row.uuid(), row.role(), row.name());
+        return LoginResponse.of(accessToken, refreshToken, row.uuid(), row.role(), row.name());
+    }
+
+    @Auditable(type = LogType.LOGIN, messageEl = "'토큰 리프레시 처리: '+ #args[0].refreshToken()")
+    @Override
+    @Transactional(readOnly = true)
+    public LoginResponse refresh(RefreshTokenRequest request) {
+        final String reqRefresh = request.refreshToken();
+        final String rawRefresh = jwtTokenProvider.stripBearer(reqRefresh);
+
+        // 1) DB에서 리프레시 토큰 행 조회
+        RefreshToken refreshRow = refreshTokenMapper.findByToken(rawRefresh)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.INVALID_REFRESH_TOKEN));
+
+        // 2) 리프레시 토큰 만료 검증
+        if (!jwtTokenProvider.validateToken(rawRefresh)) {
+            // 만료된 토큰이면 DB에서 제거 후 예외
+            int affectedRowCount = refreshTokenMapper.deleteById(refreshRow.getRefreshTokenId());
+            requireOneRowAffected(affectedRowCount,
+                    ErrorStatus.DELETE_REFRESH_TOKEN_FAIL);
+            throw new GlobalException(ErrorStatus.EXPIRED_REFRESH_TOKEN);
+        }
+
+        // 3) 리프레시 토큰에서 사용자 정보 추출 (DB 재조회 없이)
+        final String uuid = jwtTokenProvider.extractUuid(rawRefresh);
+        final String role = jwtTokenProvider.extractRole(rawRefresh);
+        final String name = jwtTokenProvider.extractName(rawRefresh);
+
+        UserDetails userDetails = UserPrincipal.of(uuid, role, name, null);
+        String newAccessToken = jwtTokenProvider.generateAccessToken(userDetails);
+
+        return LoginResponse.of(newAccessToken, reqRefresh, uuid, role, name);
+    }
+
+    @Auditable(type = LogType.LOGIN, messageEl = "'로그아웃 처리: uuid='+ #args[0].uuid()")
+    @Override
+    @Transactional
+    public void logout(String uuid, RefreshTokenRequest request) {
+        RefreshTokenRow refreshTokenRow =
+                refreshTokenMapper.findRefreshTokenRowByUuid(uuid)
+                        .orElseThrow(() ->
+                                new GlobalException(ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
+        String dbRefreshToken = refreshTokenRow.token();
+        String reqRefreshToken = jwtTokenProvider.stripBearer(request.refreshToken());
+
+        // 1) 요청으로 들어온 리프레시 토큰과 DB 저장값 비교
+        if (dbRefreshToken == null || dbRefreshToken.isBlank()
+                || !dbRefreshToken.equals(reqRefreshToken)) {
+            throw new GlobalException(ErrorStatus.INVALID_REFRESH_TOKEN);
+        }
+
+        // 2) 검증 통과하면 해당 계정의 리프레시 토큰 삭제
+        int affected = refreshTokenMapper.deleteById(refreshTokenRow.refreshTokenId());
+        requireOneRowAffected(affected, ErrorStatus.DELETE_REFRESH_TOKEN_FAIL);
+    }
+
+    @Transactional
+    protected void saveOrUpdateRefreshToken(long erpAccountId, String refreshToken) {
+        // DB에는 Bearer 제거한 raw 리프레시 토큰 저장
+        String refreshRaw = jwtTokenProvider.stripBearer(refreshToken);
+
+        boolean existsRefreshToken = refreshTokenMapper.existsByErpAccountId(erpAccountId);
+
+        if (existsRefreshToken) {
+            // 기존 토큰 있으면 업데이트
+            int affectedRowCount = refreshTokenMapper.updateTokenByErpAccountId(
+                    erpAccountId, refreshRaw);
+            requireOneRowAffected(affectedRowCount,
+                    ErrorStatus.UPDATE_REFRESH_TOKEN_FAIL);
+        } else {
+            // 없으면 새로 생성
+            long refreshTokenId = refreshTokenMapper.nextId();
+            RefreshToken entity = RefreshToken.issue(
+                    refreshTokenId,
+                    erpAccountId,
+                    refreshRaw
+            );
+            int affectedRowCount = refreshTokenMapper.save(entity);
+            requireOneRowAffected(affectedRowCount,
+                    ErrorStatus.CREATE_REFRESH_TOKEN_FAIL);
+        }
     }
 }

@@ -5,7 +5,7 @@
 
 ### 또 다른 루트 부서 생성
 POST {{base}}/top
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -16,7 +16,7 @@ Accept: application/json
 
 ### 자식 부서 생성
 POST {{base}}/child
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -28,20 +28,20 @@ Accept: application/json
 
 ### 최상위 부서 목록 (parent_id IS NULL)
 GET {{base}}/top
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Accept: application/json
 
 
 ### 특정 부모의 직계 자식 목록 조회 (위 @rootId 기준)
 GET {{base}}/child/{{rootId}}
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
 
 ### 부서 이름 수정
 PUT {{base}}/{{childId}}
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -51,6 +51,6 @@ Accept: application/json
 
 ### 부서 삭제
 DELETE {{base}}/{{childId}}
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 Accept: application/json

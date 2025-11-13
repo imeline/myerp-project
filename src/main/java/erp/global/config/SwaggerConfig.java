@@ -1,4 +1,3 @@
-// OpenApiConfig.java
 package erp.global.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -19,5 +18,5 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT"
 )
 @Configuration
-public class OpenApiConfig {
+public class SwaggerConfig {
 }
