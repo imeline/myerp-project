@@ -1,6 +1,10 @@
 package erp.auth.dto.request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public record SignupRequest(
         @NotBlank
@@ -28,7 +32,9 @@ public record SignupRequest(
         @NotNull
         Long departmentId,
         @NotNull
-        Long positionId
+        Long positionId,
+        @NotNull
+        Long companyId
 ) {
 
 }

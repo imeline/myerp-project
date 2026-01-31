@@ -14,22 +14,23 @@ import java.util.List;
 public interface PurchaseService {
 
     long savePurchaseAndPurchaseItems(
-            PurchaseSaveRequest request);
+            PurchaseSaveRequest request, long tenantId);
 
     PageResponse<PurchaseFindAllResponse> findAllPurchase(
-            PurchaseFindAllRequest request);
+            PurchaseFindAllRequest request, long tenantId);
 
-    PurchaseItemsSummaryResponse findPurchaseItemsSummary(long purchaseId);
+    PurchaseItemsSummaryResponse findPurchaseItemsSummary(long purchaseId, long tenantId);
 
-    List<PurchaseCodeAndSupplierResponse> findAllPurchaseCodeAndSupplier();
+    List<PurchaseCodeAndSupplierResponse> findAllPurchaseCodeAndSupplier(
+            long tenantId);
 
-    PurchaseDetailResponse findPurchaseDetail(long purchaseId);
+    PurchaseDetailResponse findPurchaseDetail(long purchaseId, long tenantId);
 
-    void cancelPurchase(long purchaseId);
+    void cancelPurchase(long purchaseId, long tenantId);
 
-    List<PurchaseItemQuantityRow> findAllPurchaseItemQuantityRow(long purchaseId);
+    List<PurchaseItemQuantityRow> findAllPurchaseItemQuantityRow(long purchaseId, long tenantId);
 
-    void updateStatusToShippedIfConfirmed(long purchaseId);
+    void updateStatusToShippedIfConfirmed(long purchaseId, long tenantId);
 
-    void updateStatusToConfirmedIfShipped(long purchaseId);
+    void updateStatusToConfirmedIfShipped(long purchaseId, long tenantId);
 }

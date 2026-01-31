@@ -52,17 +52,17 @@ public class OutboundServiceImpl implements OutboundService {
             messageEl = "'출고 등록: orderId=' + #args[0].orderId() + ', date=' + #args[0].outboundDate() + ', emp=' + #args[0].employeeId()")
     @Override
     @Transactional
-    public long saveOutbound(OutboundSaveRequest request) {
+    public long saveOutbound(OutboundSaveRequest request, long tenantId) {
         LocalDate outboundDate = request.outboundDate();
         long orderId = request.orderId();
         long employeeId = request.employeeId();
 
-        orderValidator.validOrderIdIfPresent(orderId);
-        employeeValidator.validEmployeeIdIfPresent(employeeId);
+        orderValidator.validOrderIdIfPresent(orderId, tenantId);
+        employeeValidator.validEmployeeIdIfPresent(employeeId, tenantId);
 
         // 1) 주문 품목 수량 조회
         List<OrderItemQuantityRow> itemRows =
-                orderService.findAllOrderItemQuantityRow(orderId);
+                orderService.findAllOrderItemQuantityRow(orderId, tenantId);
 
         // 2) 재고 체크 및 차감
         for (OrderItemQuantityRow row : itemRows) {
@@ -70,10 +70,10 @@ public class OutboundServiceImpl implements OutboundService {
             int quantity = row.quantity();
 
             // 현재 재고(on_hand) 감소 — 부족하면 예외
-            stockService.decreaseOnHand(itemId, quantity);
+            stockService.decreaseOnHand(itemId, quantity, tenantId);
 
             // 예약 재고(allocated) 감소 — 부족하면 예외
-            stockService.decreaseAllocated(itemId, quantity);
+            stockService.decreaseAllocated(tenantId, itemId, quantity);
         }
 
         // 3) 출고 저장 (코드 유니크 충돌 시 재시도)
@@ -90,13 +90,14 @@ public class OutboundServiceImpl implements OutboundService {
                         .status(OutboundStatus.ACTIVE)
                         .employeeId(employeeId)
                         .orderId(orderId)
+                        .companyId(tenantId)
                         .build();
 
-                int affectedRowCount = outboundMapper.save(outbound);
+                int affectedRowCount = outboundMapper.save(tenantId, outbound);
                 requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_OUTBOUND_FAIL);
 
                 // 5) 주문 상태 SHIPPED로 변경 (CONFIRMED일 때만)
-                orderService.updateStatusToShippedIfConfirmed(orderId);
+                orderService.updateStatusToShippedIfConfirmed(orderId, tenantId);
 
                 return newOutboundId;
 
@@ -114,7 +115,8 @@ public class OutboundServiceImpl implements OutboundService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<OutboundFindAllResponse> findAllOutbound(
-            OutboundFindAllRequest request
+            OutboundFindAllRequest request,
+            long tenantId
     ) {
         PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
 
@@ -126,6 +128,7 @@ public class OutboundServiceImpl implements OutboundService {
         String code = Strings.normalizeOrNull(request.code());
 
         List<OutboundFindRow> rows = outboundMapper.findAllOutboundFindRow(
+                tenantId,
                 startDate,
                 endDate,
                 code,
@@ -141,6 +144,7 @@ public class OutboundServiceImpl implements OutboundService {
                 .toList();
 
         long total = outboundMapper.countByPeriodAndCode(
+                tenantId,
                 startDate,
                 endDate,
                 code
@@ -158,13 +162,13 @@ public class OutboundServiceImpl implements OutboundService {
             messageEl = "'출고 취소: outboundId=' + #args[0]")
     @Override
     @Transactional
-    public void cancelOutbound(long outboundId) {
+    public void cancelOutbound(long outboundId, long tenantId) {
         // 1) 출고 존재 + ACTIVE 검증
-        outboundValidator.validOutboundIdIfPresent(outboundId);
+        outboundValidator.validOutboundIdIfPresent(outboundId, tenantId);
 
         // 2) 주문 품목 수량 목록 조회
         List<OutboundCancelItemRow> rows =
-                outboundMapper.findAllCancelItemRowById(outboundId);
+                outboundMapper.findAllCancelItemRowById(tenantId, outboundId);
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_FOUND_OUTBOUND);
         }
@@ -175,17 +179,17 @@ public class OutboundServiceImpl implements OutboundService {
         //   - 예약재고(allocated): + 수량 (on_hand 충분 조건을 함께 보장하려면 on_hand 증가 후 호출)
         for (OutboundCancelItemRow row : rows) {
             // on_hand 먼저 복구
-            stockService.increaseOnHand(row.itemId(), row.quantity());
+            stockService.increaseOnHand(row.itemId(), row.quantity(), tenantId);
             // 예약재고 복구
-            stockService.increaseAllocatedIfEnoughOnHand(row.itemId(), row.quantity());
+            stockService.increaseAllocatedIfEnoughOnHand(tenantId, row.itemId(), row.quantity());
         }
 
         // 4) 출고 상태를 CANCELED로 변경 (ACTIVE일 때만)
-        int affectedRowCount = outboundMapper.updateStatusToCanceledIfActive(outboundId);
+        int affectedRowCount = outboundMapper.updateStatusToCanceledIfActive(tenantId, outboundId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_OUTBOUND_STAUS_FAIL);
 
         // 5) 주문 상태를 SHIPPED → CONFIRMED 로 되돌림
-        orderService.updateStatusToConfirmedIfShipped(orderId);
+        orderService.updateStatusToConfirmedIfShipped(orderId, tenantId);
     }
 
 

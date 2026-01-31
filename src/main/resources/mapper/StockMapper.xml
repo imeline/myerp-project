@@ -14,12 +14,14 @@
                            warehouse,
                            on_hand_quantity,
                            allocated_quantity,
-                           item_id)
+                           item_id,
+                           company_id)
         VALUES (#{stock.stockId},
                 #{stock.warehouse},
                 #{stock.onHandQuantity},
                 #{stock.allocatedQuantity},
-                #{stock.itemId})
+                #{stock.itemId},
+                #{tenantId})
     </insert>
 
     <!-- 목록 조회 -->
@@ -66,6 +68,14 @@
         </if>
 
         AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
 
         <choose>
             <when test="filter.sortBy.name() == 'AVAILABLE'">
@@ -120,16 +130,24 @@
     </select>
 
     <select id="findStockPriceFindRowByItemId" resultType="StockPriceFindRow">
-        SELECT NVL(SUM(s.on_hand_quantity), 0)   AS onHandQuantity,
-               NVL(SUM(s.allocated_quantity), 0) AS allocatedQuantity,
-               NVL(SUM(s.on_hand_quantity), 0) -
-               NVL(SUM(s.allocated_quantity), 0) AS
-                                                    availableQuantity,
-               i.price                           AS unitPrice
+        SELECT
+        NVL(SUM(s.on_hand_quantity), 0) AS onHandQuantity,
+        NVL(SUM(s.allocated_quantity), 0) AS allocatedQuantity,
+        NVL(SUM(s.on_hand_quantity), 0) - NVL(SUM(s.allocated_quantity), 0) AS
+        availableQuantity,
+        i.price AS unitPrice
         FROM item i
-                 LEFT JOIN stock s ON s.item_id = i.item_id
+        LEFT JOIN stock s ON s.item_id = i.item_id
         WHERE i.item_id = #{itemId}
-          AND i.deleted_at IS NULL
+        AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
         GROUP BY i.price
     </select>
 
@@ -137,6 +155,8 @@
         UPDATE stock
         SET warehouse = #{warehouse}
         WHERE item_id = #{itemId}
+        AND
+        <include refid="frag.tenantGuard"/>
     </update>
 
     <!-- 총 개수 -->
@@ -171,33 +191,49 @@
         </if>
 
         AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
     </select>
 
     <update id="increaseOnHand">
         UPDATE stock
         SET on_hand_quantity = on_hand_quantity + #{delta}
         WHERE item_id = #{itemId}
+        AND
+        <include refid="frag.tenantGuard"/>
     </update>
 
     <update id="decreaseOnHandIfEnough">
         UPDATE stock
         SET on_hand_quantity = on_hand_quantity - #{delta}
         WHERE item_id = #{itemId}
-          AND on_hand_quantity >= #{delta}
+        AND on_hand_quantity >= #{delta}
+        AND
+        <include refid="frag.tenantGuard"/>
     </update>
 
     <update id="increaseAllocatedIfEnoughOnHand">
         UPDATE stock
         SET allocated_quantity = allocated_quantity + #{quantity}
         WHERE item_id = #{itemId}
-          AND on_hand_quantity >= #{quantity}
+        AND on_hand_quantity >= #{quantity}
+        AND
+        <include refid="frag.tenantGuard"/>
     </update>
 
     <update id="decreaseAllocatedIfEnough">
         UPDATE stock
         SET allocated_quantity = allocated_quantity - #{quantity}
         WHERE item_id = #{itemId}
-          AND allocated_quantity >= #{quantity}
+        AND allocated_quantity >= #{quantity}
+        AND
+        <include refid="frag.tenantGuard"/>
     </update>
 
     <!-- 상단 요약 -->
@@ -231,6 +267,18 @@
                 AND inb.status = 'CANCELED'
             </when>
         </choose>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="inb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
         ) AS totalInboundCount,
         /* 출고 수량 합계 */
         (
@@ -256,11 +304,31 @@
                 AND outb.status = 'CANCELED'
             </when>
         </choose>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="outb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
         ) AS totalOutboundCount
         FROM item i
         JOIN stock s ON s.item_id = i.item_id
         WHERE i.item_id = #{filter.itemId}
         AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
     </select>
 
     <!-- 상세 변동 목록 -->
@@ -298,6 +366,26 @@
             </when>
         </choose>
         AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="inb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
         GROUP BY inb.inbound_date, e.name, inb.code, inb.status
 
         UNION ALL
@@ -333,6 +421,26 @@
             </when>
         </choose>
         AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="outb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="e"/>
+        </include>
         GROUP BY outb.outbound_date, e.name, outb.code, outb.status
         )
         ORDER BY movementDate DESC, code DESC
@@ -359,6 +467,22 @@
             UPPER(#{filter.code}) || '%'
         </if>
         AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="inb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="pi"/>
+        </include>
 
         UNION ALL
 
@@ -378,39 +502,82 @@
             UPPER(#{filter.code}) || '%'
         </if>
         AND i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="outb"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="o"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="oi"/>
+        </include>
         )
     </select>
 
     <select id="findStockSummaryRow" resultType="StockSummaryRow">
         SELECT
-            /* 1) 삭제되지 않은 품목 종류 수 */
-            (SELECT COUNT(1)
-             FROM item i
-             WHERE i.deleted_at IS NULL)   AS totalItemCount,
+        /* 1) 삭제되지 않은 품목 종류 수 */
+        (SELECT COUNT(1)
+        FROM item i
+        WHERE i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        ) AS totalItemCount,
 
-            /* 2) CONFIRMED 상태(= 입고 예정) 발주 수 */
-            (SELECT COUNT(1)
-             FROM purchase p
-             WHERE p.status = 'CONFIRMED') AS confirmedPurchaseCount,
+        /* 2) CONFIRMED 상태(= 입고 예정) 발주 수 */
+        (SELECT COUNT(1)
+        FROM purchase p
+        WHERE p.status = 'CONFIRMED'
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="p"/>
+        </include>
+        ) AS confirmedPurchaseCount,
 
-            /* 3) 가용재고(on_hand - allocated) = 0 인 품목 수 */
-            (SELECT COUNT(1)
-             FROM (SELECT i.item_id
-                   FROM item i
-                            LEFT JOIN stock s
-                                      ON s.item_id = i.item_id
-                   WHERE i.deleted_at IS NULL
-                   GROUP BY i.item_id
-                   HAVING (NVL(SUM(s.on_hand_quantity), 0) -
-                           NVL(SUM(s.allocated_quantity),
-                               0)) = 0))   AS zeroAvailableItemCount,
+        /* 3) 가용재고(on_hand - allocated) = 0 인 품목 수 */
+        (SELECT COUNT(1) FROM (
+        SELECT i.item_id
+        FROM item i
+        LEFT JOIN stock s
+        ON s.item_id = i.item_id
+        WHERE i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+        GROUP BY i.item_id
+        HAVING (NVL(SUM(s.on_hand_quantity), 0) - NVL(SUM(s.allocated_quantity),
+        0)) = 0
+        )) AS zeroAvailableItemCount,
 
-            /* 4) 총 재고가치 = Σ(on_hand × 단가) */
-            (SELECT NVL(SUM(NVL(s.on_hand_quantity, 0) * i.price), 0)
-             FROM item i
-                      JOIN stock s
-                           ON s.item_id = i.item_id
-             WHERE i.deleted_at IS NULL)   AS totalInventoryValue
+        /* 4) 총 재고가치 = Σ(on_hand × 단가) */
+        (SELECT NVL(SUM(NVL(s.on_hand_quantity, 0) * i.price), 0)
+        FROM item i
+        JOIN stock s
+        ON s.item_id = i.item_id
+        WHERE i.deleted_at IS NULL
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="i"/>
+        </include>
+        AND
+        <include refid="frag.tenantGuardAlias">
+            <property name="alias" value="s"/>
+        </include>
+        ) AS totalInventoryValue
         FROM dual
     </select>
 
@@ -418,7 +585,9 @@
         SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
         FROM stock
         WHERE item_id = #{itemId}
-          AND (on_hand_quantity > 0 OR allocated_quantity > 0)
+        AND (on_hand_quantity > 0 OR allocated_quantity > 0)
+        AND
+        <include refid="frag.tenantGuard"/>
     </select>
 
 </mapper>

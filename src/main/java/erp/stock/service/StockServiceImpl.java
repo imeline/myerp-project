@@ -39,7 +39,8 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
-    public long saveStock(long itemId, int initialQuantity, String warehouse) {
+    public long saveStock(long itemId, int initialQuantity, String warehouse,
+                          long tenantId) {
         if (initialQuantity < 0)
             throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
 
@@ -49,10 +50,11 @@ public class StockServiceImpl implements StockService {
                 newStockId,
                 warehouse,
                 initialQuantity,
-                itemId
+                itemId,
+                tenantId
         );
 
-        int affectedRowCount = stockMapper.save(stock);
+        int affectedRowCount = stockMapper.save(tenantId, stock);
         requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_STOCK_FAIL);
 
         return newStockId;
@@ -61,7 +63,8 @@ public class StockServiceImpl implements StockService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<StockFindAllResponse> findAllStock(
-            StockFindAllRequest request
+            StockFindAllRequest request,
+            long tenantId
     ) {
         String normalizedItemName = Strings.normalizeOrNull(request.name());
         String normalizedWarehouseName = Strings.normalizeOrNull(request.warehouse());
@@ -85,12 +88,14 @@ public class StockServiceImpl implements StockService {
         );
 
         List<StockFindAllRow> rows = stockMapper.findAllStockFindAllRow(
+                tenantId,
                 filter
         );
         if (rows.isEmpty())
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_STOCK);
 
         long totalCount = stockMapper.countByStock(
+                tenantId,
                 filter
         );
         List<StockFindAllResponse> responseList = rows.stream()
@@ -107,9 +112,9 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional(readOnly = true)
-    public StockPriceFindResponse findStockPrice(long itemId) {
+    public StockPriceFindResponse findStockPrice(long itemId, long tenantId) {
         StockPriceFindRow row =
-                stockMapper.findStockPriceFindRowByItemId(itemId)
+                stockMapper.findStockPriceFindRowByItemId(tenantId, itemId)
                         .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ITEM));
 
         return StockPriceFindResponse.from(row);
@@ -117,52 +122,52 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
-    public void updateStockWarehouse(long itemId, String warehouse) {
+    public void updateStockWarehouse(long itemId, String warehouse, long tenantId) {
         String normalizedWarehouse = Strings.normalizeOrNull(warehouse);
 
         int affectedRowCount = stockMapper.updateWarehouse(
-                itemId, normalizedWarehouse);
+                tenantId, itemId, normalizedWarehouse);
         requireOneRowAffected(affectedRowCount, ErrorStatus.NOT_FOUND_STOCK);
     }
 
     @Override
     @Transactional
-    public void increaseOnHand(long itemId, int delta) {
+    public void increaseOnHand(long itemId, int delta, long tenantId) {
         if (delta <= 0) {
             throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
         }
-        itemValidator.validItemIdIfPresent(itemId);
+        itemValidator.validItemIdIfPresent(itemId, tenantId);
         int affectedRowCount = stockMapper.increaseOnHand(
-                itemId, delta);
+                tenantId, itemId, delta);
         requireOneRowAffected(affectedRowCount, ErrorStatus.NOT_FOUND_STOCK);
     }
 
     @Override
     @Transactional
-    public void decreaseOnHand(long itemId, int delta) {
+    public void decreaseOnHand(long itemId, int delta, long tenantId) {
         if (delta <= 0) {
             throw new GlobalException(ErrorStatus.INVALID_STOCK_QUANTITY);
         }
-        itemValidator.validItemIdIfPresent(itemId);
+        itemValidator.validItemIdIfPresent(itemId, tenantId);
         int affected = stockMapper.decreaseOnHandIfEnough(
-                itemId, delta);
+                tenantId, itemId, delta);
         requireOneRowAffected(affected, ErrorStatus.NOT_FOUND_STOCK);
     }
 
     @Override
     @Transactional
-    public void increaseAllocatedIfEnoughOnHand(long itemId, int quantity) {
+    public void increaseAllocatedIfEnoughOnHand(long tenantId, long itemId, int quantity) {
         int affectedRowCount = stockMapper.increaseAllocatedIfEnoughOnHand(
-                itemId, quantity
+                tenantId, itemId, quantity
         );
         requireOneRowAffected(affectedRowCount, ErrorStatus.INCREASE_STOCK_ALLOCATED_FAIL);
     }
 
     @Override
     @Transactional
-    public void decreaseAllocated(long itemId, int quantity) {
+    public void decreaseAllocated(long tenantId, long itemId, int quantity) {
         int affectedRowCount = stockMapper.decreaseAllocatedIfEnough(
-                itemId, quantity
+                tenantId, itemId, quantity
         );
         requireOneRowAffected(affectedRowCount, ErrorStatus.DECREASE_STOCK_ALLOCATED_FAIL);
     }
@@ -177,7 +182,8 @@ public class StockServiceImpl implements StockService {
     @Transactional(readOnly = true)
     public StockMovementFindAllResponse findAllMovement(
             long itemId,
-            StockMovementFindRequest request
+            StockMovementFindRequest request,
+            long tenantId
     ) {
         DateRange dateRange = Periods.resolve(request.period(), LocalDate.now());
         String normalizedCode = Strings.normalizeOrNull(request.code());
@@ -193,12 +199,12 @@ public class StockServiceImpl implements StockService {
         );
 
         StockMovementSummaryRow summaryFromDatabase =
-                stockMapper.findMovementSummary(filter);
+                stockMapper.findMovementSummary(tenantId, filter);
         StockMovementSummaryRow summary = StockMovementSummaryRow.from(summaryFromDatabase);
 
 
-        List<StockMovementFindRow> rows = stockMapper.findMovementRows(filter);
-        long totalCount = stockMapper.countMovementRows(filter);
+        List<StockMovementFindRow> rows = stockMapper.findMovementRows(tenantId, filter);
+        long totalCount = stockMapper.countMovementRows(tenantId, filter);
 
         return StockMovementFindAllResponse.of(
                 summary,
@@ -211,8 +217,8 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional(readOnly = true)
-    public StockSummaryFindResponse findSummary() {
-        StockSummaryRow row = stockMapper.findStockSummaryRow();
+    public StockSummaryFindResponse findSummary(long tenantId) {
+        StockSummaryRow row = stockMapper.findStockSummaryRow(tenantId);
         return StockSummaryFindResponse.from(row);
     }
 

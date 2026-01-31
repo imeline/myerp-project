@@ -5,9 +5,11 @@ import erp.account.dto.request.ErpAccountSaveRequest;
 
 public interface ErpAccountService {
 
-    Long saveErpAccount(ErpAccountSaveRequest request);
+    Long saveErpAccount(ErpAccountSaveRequest request, long companyId);
 
     LoginUserInfoRow findLoginRowByLoginEmail(String loginEmail);
 
-    void softDeleteById(long employeeId);
+    long findCompanyIdByUuid(String uuid);
+
+    void softDeleteById(long employeeId, long tenantId);
 }

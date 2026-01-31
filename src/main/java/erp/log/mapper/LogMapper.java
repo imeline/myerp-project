@@ -9,7 +9,8 @@ public interface LogMapper {
 
     long nextId();
 
-    int save(@Param("log") Log log);
+    int save(@Param("tenantId") Long tenantId,
+             @Param("log") Log log);
 
     int deleteOlderThan(@Param("type") String type,
                         @Param("days") int days);

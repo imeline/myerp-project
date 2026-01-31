@@ -17,13 +17,15 @@ public class Inbound extends TimeStamped {
     private InboundStatus status;
     private long employeeId;
     private long purchaseId;
+    private long companyId;
 
     public static Inbound register(
             long inboundId,
             String code,
             LocalDate inboundDate,
             long employeeId,
-            long purchaseId
+            long purchaseId,
+            long companyId
     ) {
         return Inbound.builder()
                 .inboundId(inboundId)
@@ -32,6 +34,7 @@ public class Inbound extends TimeStamped {
                 .status(InboundStatus.ACTIVE)
                 .employeeId(employeeId)
                 .purchaseId(purchaseId)
+                .companyId(companyId)
                 .build();
     }
 }

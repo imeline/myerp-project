@@ -20,10 +20,11 @@ public class Order extends TimeStamped {
     private int totalAmount;
     private OrderStatus status;
     private long employeeId;
+    private long companyId;
 
     public static Order register(long orderId, String code, String customer,
                                  LocalDate orderDate, int totalQuantity, int totalAmount,
-                                 long employeeId) {
+                                 long employeeId, long companyId) {
         return Order.builder()
                 .orderId(orderId)
                 .code(code)
@@ -33,6 +34,7 @@ public class Order extends TimeStamped {
                 .totalAmount(totalAmount)
                 .status(OrderStatus.CONFIRMED)
                 .employeeId(employeeId)
+                .companyId(companyId)
                 .build();
     }
 }

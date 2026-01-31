@@ -6,10 +6,11 @@ import erp.outbound.dto.request.OutboundSaveRequest;
 import erp.outbound.dto.response.OutboundFindAllResponse;
 
 public interface OutboundService {
-    long saveOutbound(OutboundSaveRequest request);
+    long saveOutbound(OutboundSaveRequest request, long tenantId);
 
     PageResponse<OutboundFindAllResponse> findAllOutbound(
-            OutboundFindAllRequest request);
+            OutboundFindAllRequest request,
+            long tenantId);
 
-    void cancelOutbound(long outboundId);
+    void cancelOutbound(long outboundId, long tenantId);
 }

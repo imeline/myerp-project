@@ -7,7 +7,7 @@ import java.util.List;
 public interface OrderValidator {
     void validItemIdsUniqueInRequest(List<OrderItemSaveRequest> requestItems);
 
-    void validOrderIdIfPresent(long orderId);
+    void validOrderIdIfPresent(long orderId, long tenantId);
 
-    void validNoConfirmByItemId(long itemId);
+    void validNoConfirmByItemId(long itemId, long tenantId);
 }

@@ -1,5 +1,6 @@
 package erp.report.trade.overview.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.report.trade.overview.dto.request.TradeOverviewReportFindRequest;
 import erp.report.trade.overview.dto.response.TradeOverviewReportResponse;
@@ -20,7 +21,9 @@ public class TradeOverviewController {
 
     @GetMapping
     public ApiResponse<TradeOverviewReportResponse> getOverview(
-            @Valid @RequestBody TradeOverviewReportFindRequest request) {
-        return ApiResponse.onSuccess(tradeOverviewService.findTradeOverview(request));
+            @Valid @RequestBody TradeOverviewReportFindRequest request
+    ) {
+        long tenantId = TenantContext.get();
+        return ApiResponse.onSuccess(tradeOverviewService.findTradeOverview(request, tenantId));
     }
 }

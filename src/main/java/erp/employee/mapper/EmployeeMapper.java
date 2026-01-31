@@ -17,35 +17,47 @@ public interface EmployeeMapper {
 
     int save(Employee employee);
 
-    List<EmployeeIdAndNameRow> findAllIdAndName();
+    List<EmployeeIdAndNameRow> findAllIdAndName(
+            @Param("tenantId") long tenantId);
 
-    List<EmployeeFindAllRow> findAllEmployeeFindRow(@Param("departmentId") Long departmentId,
+    List<EmployeeFindAllRow> findAllEmployeeFindRow(@Param("tenantId") long tenantId,
+                                                    @Param("departmentId") Long departmentId,
                                                     @Param("positionId") Long positionId,
                                                     @Param("name") String name,
                                                     @Param("offset") int offset,
                                                     @Param("size") int size);
 
-    Optional<EmployeeFindRow> findEmployeeFindRowById(@Param("employeeId") long employeeId);
+    Optional<EmployeeFindRow> findEmployeeFindRowById(@Param("tenantId") long tenantId,
+                                                      @Param("employeeId") long employeeId);
 
-    int updateById(@Param("employee") Employee employee);
+    int updateById(@Param("tenantId") long tenantId,
+                   @Param("employee") Employee employee);
 
-    int updateStatusToRetired(@Param("employeeId") long employeeId);
+    int updateStatusToRetired(@Param("tenantId") long tenantId,
+                              @Param("employeeId") long employeeId);
 
-    long countByFilters(@Param("departmentId") Long departmentId,
+    long countByFilters(@Param("tenantId") long tenantId,
+                        @Param("departmentId") Long departmentId,
                         @Param("positionId") Long positionId,
                         @Param("name") String name);
 
-    boolean existsByDepartmentId(@Param("departmentId") long departmentId);
+    boolean existsByDepartmentId(@Param("tenantId") long tenantId,
+                                 @Param("departmentId") long departmentId);
 
-    boolean existsByPositionId(@Param("positionId") long positionId);
+    boolean existsByPositionId(@Param("tenantId") long tenantId,
+                               @Param("positionId") long positionId);
 
-    boolean existsActiveById(@Param("employeeId") long employeeId);
+    boolean existsActiveById(@Param("tenantId") long tenantId,
+                             @Param("employeeId") long employeeId);
 
-    boolean existsAnyById(@Param("employeeId") long employeeId);
+    boolean existsAnyById(@Param("tenantId") long tenantId,
+                          @Param("employeeId") long employeeId);
 
-    boolean existsByEmpNo(@Param("empNo") String empNo,
+    boolean existsByEmpNo(@Param("tenantId") long tenantId,
+                          @Param("empNo") String empNo,
                           @Param("excludeId") Long excludeId);
 
-    boolean existsByPhone(@Param("phone") String phone,
+    boolean existsByPhone(@Param("tenantId") long tenantId,
+                          @Param("phone") String phone,
                           @Param("excludeId") Long excludeId);
 }

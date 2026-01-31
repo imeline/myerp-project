@@ -1,6 +1,8 @@
 // AuthServiceImpl.java
 package erp.auth.service;
 
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+
 import erp.account.dto.internal.LoginUserInfoRow;
 import erp.account.dto.request.ErpAccountSaveRequest;
 import erp.account.enums.ErpAccountRole;
@@ -14,6 +16,7 @@ import erp.auth.dto.response.LoginResponse;
 import erp.auth.mapper.RefreshTokenMapper;
 import erp.auth.security.jwt.JwtTokenProvider;
 import erp.auth.security.model.UserPrincipal;
+import erp.company.validation.CompanyValidator;
 import erp.employee.dto.request.EmployeeSaveRequest;
 import erp.employee.service.EmployeeService;
 import erp.global.exception.ErrorStatus;
@@ -26,14 +29,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static erp.global.util.RowCountGuards.requireOneRowAffected;
-
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final EmployeeService employeeService;
     private final ErpAccountService erpAccountService;
+    private final CompanyValidator companyValidator;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenMapper refreshTokenMapper;
@@ -43,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void signup(SignupRequest request, ErpAccountRole role) {
+        companyValidator.validCompanyIdIfPresent(request.companyId());
         // Employee 생성
         EmployeeSaveRequest employeeSaveRequest =
                 EmployeeSaveRequest.of(
@@ -52,8 +55,7 @@ public class AuthServiceImpl implements AuthService {
                         request.departmentId(),
                         request.positionId()
                 );
-        long employeeId = employeeService.saveEmployee(
-                employeeSaveRequest);
+        long employeeId = employeeService.saveEmployee(employeeSaveRequest, request.companyId());
 
         // ErpAccount 생성
         ErpAccountSaveRequest erpAccountSaveRequest =
@@ -63,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
                         request.password(),
                         role
                 );
-        erpAccountService.saveErpAccount(erpAccountSaveRequest);
+        erpAccountService.saveErpAccount(erpAccountSaveRequest, request.companyId());
     }
 
     @Auditable(type = LogType.LOGIN, messageEl = "'로그인 처리: ' + #args[0].loginEmail()")
@@ -86,14 +88,14 @@ public class AuthServiceImpl implements AuthService {
                 row.uuid(),
                 row.role(),
                 row.name(),
-                null // 사용되지 않는 민감정보 제거
+                null, // 사용되지 않는 민감정보 제거
+                row.tenantId()
         );
         String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
 
         long erpAccountId = row.erpAccountId();
         saveOrUpdateRefreshToken(erpAccountId, refreshToken);
-
 
         // 왜 userDetails가 아니라 LoginRow에서 데이터를 가져오는가?
         // -> 응답(LoginResponse)은 DB 조회 결과(row) 기준으로 채워야 책임이 명확함
@@ -116,8 +118,7 @@ public class AuthServiceImpl implements AuthService {
         if (!jwtTokenProvider.validateToken(rawRefresh)) {
             // 만료된 토큰이면 DB에서 제거 후 예외
             int affectedRowCount = refreshTokenMapper.deleteById(refreshRow.getRefreshTokenId());
-            requireOneRowAffected(affectedRowCount,
-                    ErrorStatus.DELETE_REFRESH_TOKEN_FAIL);
+            requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_REFRESH_TOKEN_FAIL);
             throw new GlobalException(ErrorStatus.EXPIRED_REFRESH_TOKEN);
         }
 
@@ -125,8 +126,9 @@ public class AuthServiceImpl implements AuthService {
         final String uuid = jwtTokenProvider.extractUuid(rawRefresh);
         final String role = jwtTokenProvider.extractRole(rawRefresh);
         final String name = jwtTokenProvider.extractName(rawRefresh);
+        final Long tenantId = jwtTokenProvider.extractTenantId(rawRefresh);
 
-        UserDetails userDetails = UserPrincipal.of(uuid, role, name, null);
+        UserDetails userDetails = UserPrincipal.of(uuid, role, name, null, tenantId);
         String newAccessToken = jwtTokenProvider.generateAccessToken(userDetails);
 
         return LoginResponse.of(newAccessToken, reqRefresh, uuid, role, name);
@@ -139,7 +141,8 @@ public class AuthServiceImpl implements AuthService {
         RefreshTokenRow refreshTokenRow =
                 refreshTokenMapper.findRefreshTokenRowByUuid(uuid)
                         .orElseThrow(() ->
-                                new GlobalException(ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
+                                             new GlobalException(
+                                                     ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
         String dbRefreshToken = refreshTokenRow.token();
         String reqRefreshToken = jwtTokenProvider.stripBearer(request.refreshToken());
 
@@ -166,7 +169,7 @@ public class AuthServiceImpl implements AuthService {
             int affectedRowCount = refreshTokenMapper.updateTokenByErpAccountId(
                     erpAccountId, refreshRaw);
             requireOneRowAffected(affectedRowCount,
-                    ErrorStatus.UPDATE_REFRESH_TOKEN_FAIL);
+                                  ErrorStatus.UPDATE_REFRESH_TOKEN_FAIL);
         } else {
             // 없으면 새로 생성
             long refreshTokenId = refreshTokenMapper.nextId();
@@ -177,7 +180,7 @@ public class AuthServiceImpl implements AuthService {
             );
             int affectedRowCount = refreshTokenMapper.save(entity);
             requireOneRowAffected(affectedRowCount,
-                    ErrorStatus.CREATE_REFRESH_TOKEN_FAIL);
+                                  ErrorStatus.CREATE_REFRESH_TOKEN_FAIL);
         }
     }
 }

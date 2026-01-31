@@ -28,7 +28,7 @@ public class TradeOverviewServiceImpl implements TradeOverviewService {
     @Override
     @Transactional(readOnly = true)
     public TradeOverviewReportResponse findTradeOverview(
-            TradeOverviewReportFindRequest request
+            TradeOverviewReportFindRequest request, long tenantId
     ) {
         int year = request.year();
         int fromMonth = request.fromMonth();
@@ -52,7 +52,7 @@ public class TradeOverviewServiceImpl implements TradeOverviewService {
         // 1) 월별 합계 조회(미래 달 제외된 effectiveEndDate 사용)
         List<TradeOverviewMonthlyAmountRow> monthlyRows =
                 tradeOverviewMapper.findAllMonthlyOrderPurchaseAmountRow(
-                        startDate, effectiveEndDate);
+                        tenantId, startDate, effectiveEndDate);
 
         Map<Integer, Integer> monthToOrderAmount = new HashMap<>();
         Map<Integer, Integer> monthToPurchaseAmount = new HashMap<>();
@@ -69,9 +69,9 @@ public class TradeOverviewServiceImpl implements TradeOverviewService {
         LocalDate prevEndDate = prevEndYm.atEndOfMonth();
 
         Integer prevOrderTotal = defaultZero(
-                tradeOverviewMapper.sumOrderAmountByPeriod(prevStartDate, prevEndDate));
+                tradeOverviewMapper.sumOrderAmountByPeriod(tenantId, prevStartDate, prevEndDate));
         Integer prevPurchaseTotal = defaultZero(
-                tradeOverviewMapper.sumPurchaseAmountByPeriod(prevStartDate, prevEndDate));
+                tradeOverviewMapper.sumPurchaseAmountByPeriod(tenantId, prevStartDate, prevEndDate));
 
         // 3) 응답 조립(미래 달은 값 null로)
         List<SeriesPoint> series = new ArrayList<>();
@@ -116,7 +116,7 @@ public class TradeOverviewServiceImpl implements TradeOverviewService {
                 orderTotal, purchaseTotal, grossProfitAmount,
                 grossProfitRate, yoyOrderChangeRate, yoyPurchaseChangeRate
         );
-
+        
         Range range = new Range(year, fromMonth, toMonth, observedToMonth);
 
         return new TradeOverviewReportResponse(summary, series, monthlyDetails, range);

@@ -13,25 +13,26 @@ import erp.order.enums.OrderStatus;
 import java.util.List;
 
 public interface OrderService {
-    long saveOrderAndOrderItems(OrderSaveRequest request);
+    long saveOrderAndOrderItems(OrderSaveRequest request, long tenantId);
 
     PageResponse<OrderFindAllResponse> findAllOrder(
-            OrderFindAllRequest request);
+            OrderFindAllRequest request, long tenantId);
 
     OrderItemsSummaryResponse findOrderItemsSummary(
-            long orderId);
+            long orderId, long tenantId);
 
-    List<OrderCodeAndCustomerResponse> findAllOrderCodeAndCustomer();
+    List<OrderCodeAndCustomerResponse> findAllOrderCodeAndCustomer(
+            long tenantId);
 
-    OrderDetailResponse findOrderDetail(long orderId);
+    OrderDetailResponse findOrderDetail(long orderId, long tenantId);
 
-    void cancelOrder(long orderId);
+    void cancelOrder(long orderId, long tenantId);
 
-    OrderStatus findStatusById(long orderId);
+    OrderStatus findStatusById(long orderId, long tenantId);
 
-    List<OrderItemQuantityRow> findAllOrderItemQuantityRow(long orderId);
+    List<OrderItemQuantityRow> findAllOrderItemQuantityRow(long orderId, long tenantId);
 
-    void updateStatusToShippedIfConfirmed(long orderId);
+    void updateStatusToShippedIfConfirmed(long orderId, long tenantId);
 
-    void updateStatusToConfirmedIfShipped(long orderId);
+    void updateStatusToConfirmedIfShipped(long orderId, long tenantId);
 }

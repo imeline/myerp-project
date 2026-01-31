@@ -4,22 +4,22 @@ import erp.department.dto.request.ChildDepartmentSaveRequest;
 import erp.department.dto.request.DepartmentUpdateRequest;
 import erp.department.dto.request.TopDepartmentSaveRequest;
 import erp.department.dto.response.DepartmentInfoResponse;
-
 import java.util.List;
 
 public interface DepartmentService {
-    long saveChildDepartment(ChildDepartmentSaveRequest request);
 
-    long saveTopDepartment(TopDepartmentSaveRequest request);
+    long saveChildDepartment(ChildDepartmentSaveRequest request, long tenantId);
 
-    List<DepartmentInfoResponse> findAllTopLevelDepartment();
+    long saveTopDepartment(TopDepartmentSaveRequest request, long tenantId);
+
+    List<DepartmentInfoResponse> findAllTopLevelDepartment(
+            long tenantId);
 
     List<DepartmentInfoResponse> findAllByParentId(
-            long parentId);
+            long parentId, long tenantId);
 
     void updateDepartment(Long departmentId,
-                          DepartmentUpdateRequest request);
+                          DepartmentUpdateRequest request, long tenantId);
 
-    void deleteDepartment(Long departmentId);
-
+    void deleteDepartment(Long departmentId, long tenantId);
 }

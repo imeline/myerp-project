@@ -12,17 +12,18 @@ import erp.item.dto.response.ItemOptionResponse;
 import java.util.List;
 
 public interface ItemService {
-    Long saveItemAndStock(ItemSaveRequest request);
+    Long saveItemAndStock(ItemSaveRequest request, long tenantId);
 
-    ItemInfoResponse findItem(long itemId);
+    ItemInfoResponse findItem(long itemId, long tenantId);
 
-    PageResponse<ItemFindResponse> findAllItems(ItemFindAllRequest request);
+    PageResponse<ItemFindResponse> findAllItems(ItemFindAllRequest request, long tenantId);
 
-    List<ItemOptionResponse> findAllItemOption();
+    List<ItemOptionResponse> findAllItemOption(long tenantId);
 
-    List<ItemPriceRow> findAllItemPriceByIds(List<Long> itemIds);
+    List<ItemPriceRow> findAllItemPriceByIds(
+            List<Long> itemIds, long tenantId);
 
-    void updateItem(long itemId, ItemUpdateRequest request);
+    void updateItem(long itemId, ItemUpdateRequest request, long tenantId);
 
-    void softDeleteItem(long itemId);
+    void softDeleteItem(long itemId, long tenantId);
 }

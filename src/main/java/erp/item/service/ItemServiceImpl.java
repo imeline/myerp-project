@@ -48,13 +48,13 @@ public class ItemServiceImpl implements ItemService {
             messageEl = "'품목+재고 등록: name=' + #args[0].name() + ', code=' + #args[0].code() + ', qty=' + #args[0].initialQuantity()")
     @Override
     @Transactional
-    public Long saveItemAndStock(ItemSaveRequest request) {
+    public Long saveItemAndStock(ItemSaveRequest request, long tenantId) {
         String name = normalizeOrNull(request.name());
         String code = normalizeOrNull(request.code());
         ItemCategory category = request.category();
 
-        itemValidator.validNameUnique(name, null);
-        itemValidator.validCodeUnique(code, null);
+        itemValidator.validNameUnique(name, null, tenantId);
+        itemValidator.validCodeUnique(code, null, tenantId);
 
         long newItemId = itemMapper.nextId();
 
@@ -64,16 +64,18 @@ public class ItemServiceImpl implements ItemService {
                 code,
                 request.price(),
                 request.unit(),
-                category
+                category,
+                tenantId
         );
 
-        int affectedRowCount = itemMapper.save(item);
+        int affectedRowCount = itemMapper.save(tenantId, item);
         requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_ITEM_FAIL);
 
         stockService.saveStock(
                 newItemId,
                 request.initialQuantity(),
-                request.warehouse()
+                request.warehouse(),
+                tenantId
         );
 
 
@@ -82,21 +84,21 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemInfoResponse findItem(long itemId) {
-        Item item = itemMapper.findById(itemId)
+    public ItemInfoResponse findItem(long itemId, long tenantId) {
+        Item item = itemMapper.findById(tenantId, itemId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ITEM));
         return ItemInfoResponse.from(item);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<ItemFindResponse> findAllItems(ItemFindAllRequest request) {
+    public PageResponse<ItemFindResponse> findAllItems(ItemFindAllRequest request, long tenantId) {
         PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
         String name = normalizeOrNull(request.name());
         ItemCategory category = request.category(); // 검색 조건 없으면 null
 
         List<ItemFindRow> rows = itemMapper.findAllItemFindRow(
-                name, category, pageParam.offset(), pageParam.size());
+                tenantId, name, category, pageParam.offset(), pageParam.size());
 
         if (rows.isEmpty())
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_ITEM);
@@ -105,14 +107,14 @@ public class ItemServiceImpl implements ItemService {
                 .map(ItemFindResponse::from)
                 .toList();
 
-        long total = itemMapper.countByNameAndCategory(name, category);
+        long total = itemMapper.countByNameAndCategory(tenantId, name, category);
         return PageResponse.of(responses, pageParam.page(), total, pageParam.size());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemOptionResponse> findAllItemOption() {
-        List<ItemOptionRow> rows = itemMapper.findAllItemOptionRow();
+    public List<ItemOptionResponse> findAllItemOption(long tenantId) {
+        List<ItemOptionRow> rows = itemMapper.findAllItemOptionRow(tenantId);
         if (rows.isEmpty())
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_ITEM);
         return rows.stream()
@@ -122,8 +124,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemPriceRow> findAllItemPriceByIds(List<Long> itemIds) {
-        List<ItemPriceRow> priceRows = itemMapper.findAllPriceByIds(itemIds);
+    public List<ItemPriceRow> findAllItemPriceByIds(List<Long> itemIds, long tenantId) {
+        List<ItemPriceRow> priceRows = itemMapper.findAllPriceByIds(tenantId, itemIds);
         if (priceRows.isEmpty())
             throw new GlobalException(ErrorStatus.NOT_FOUND_ITEM_PRICE);
         return priceRows;
@@ -133,42 +135,43 @@ public class ItemServiceImpl implements ItemService {
             messageEl = "'품목 수정: id=' + #args[0] + ', name=' + #args[1].name() + ', price=' + #args[1].price()")
     @Override
     @Transactional
-    public void updateItem(long itemId, ItemUpdateRequest request) {
+    public void updateItem(long itemId, ItemUpdateRequest request, long tenantId) {
         String name = normalizeOrNull(request.name());
         ItemCategory category = request.category();
 
-        itemValidator.validItemIdIfPresent(itemId);
-        itemValidator.validNameUnique(name, itemId);
+        itemValidator.validItemIdIfPresent(itemId, tenantId);
+        itemValidator.validNameUnique(name, itemId, tenantId);
 
         Item item = Item.update(
                 itemId,
                 name,
                 request.price(),
                 request.unit(),
-                category
+                category,
+                tenantId
         );
 
-        int affectedRowCount = itemMapper.updateById(item);
+        int affectedRowCount = itemMapper.updateById(tenantId, item);
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_ITEM_FAIL);
 
-        stockService.updateStockWarehouse(itemId, request.warehouse());
+        stockService.updateStockWarehouse(itemId, request.warehouse(), tenantId);
     }
 
     @Auditable(type = LogType.WORK,
             messageEl = "'품목 삭제(소프트): id=' + #args[0]")
     @Override
     @Transactional
-    public void softDeleteItem(long itemId) {
+    public void softDeleteItem(long itemId, long tenantId) {
         // 활성 품목인지 우선 확인
-        itemValidator.validItemIdIfPresent(itemId);
+        itemValidator.validItemIdIfPresent(itemId, tenantId);
         // 재고 보유 시 삭제 불가
-        stockValidator.validZeroStockByItemId(itemId);
+        stockValidator.validZeroStockByItemId(itemId, tenantId);
         // 진행 중 발주(CONFIRMED) 참조 시 삭제 불가
-        purchaseValidator.validNoConfirmByItemId(itemId);
+        purchaseValidator.validNoConfirmByItemId(itemId, tenantId);
         // 진행 중 주문(CONFIRMED) 참조 시 삭제 불가
-        orderValidator.validNoConfirmByItemId(itemId);
+        orderValidator.validNoConfirmByItemId(tenantId, itemId);
 
-        int affectedRowCount = itemMapper.softDeleteById(itemId);
+        int affectedRowCount = itemMapper.softDeleteById(tenantId, itemId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_ITEM_FAIL);
     }
 }

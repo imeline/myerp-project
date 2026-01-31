@@ -11,14 +11,16 @@ public class OrderItem {
     private int quantity;
     private long orderId;
     private long itemId;
+    private long companyId;
 
     public static OrderItem register(long orderItemId, int quantity, long orderId,
-                                     long itemId) {
+                                     long itemId, long companyId) {
         return OrderItem.builder()
                 .orderItemId(orderItemId)
                 .quantity(quantity)
                 .orderId(orderId)
                 .itemId(itemId)
+                .companyId(companyId)
                 .build();
     }
 }

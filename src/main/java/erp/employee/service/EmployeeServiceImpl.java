@@ -40,14 +40,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final DepartmentValidator departmentValidator;
     private final PositionValidator positionValidator;
     private final EmployeeValidator employeeValidator;
-
+    
     @Override
     @Transactional
-    public Long saveEmployee(EmployeeSaveRequest request) {
-        employeeValidator.validEmpNoUnique(request.empNo(), null);
-        employeeValidator.validPhoneUnique(request.phone(), null);
-        departmentValidator.validDepartmentIdIfPresent(request.departmentId());
-        positionValidator.validPositionIdIfPresent(request.positionId());
+    public Long saveEmployee(EmployeeSaveRequest request, long companyId) {
+        employeeValidator.validEmpNoUnique(request.empNo(), companyId, null);
+        employeeValidator.validPhoneUnique(request.phone(), companyId, null);
+        departmentValidator.validDepartmentIdIfPresent(request.departmentId(), companyId);
+        positionValidator.validPositionIdIfPresent(request.positionId(), companyId);
 
         long employeeId = employeeMapper.nextId();
 
@@ -58,7 +58,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 request.phone(),
                 EmployeeStatus.ACTIVE,
                 request.departmentId(),
-                request.positionId()
+                request.positionId(),
+                companyId
         );
 
         int affectedRowCount = employeeMapper.save(employee);
@@ -70,9 +71,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EmployeeIdAndNameResponse> findAllIdAndName() {
+    public List<EmployeeIdAndNameResponse> findAllIdAndName(long tenantId) {
         List<EmployeeIdAndNameRow> employeeIdAndNameRows =
-                employeeMapper.findAllIdAndName();
+                employeeMapper.findAllIdAndName(tenantId);
 
         if (employeeIdAndNameRows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_EMPLOYEE);
@@ -85,7 +86,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<EmployeeFindAllResponse> findAllEmployees(EmployeeFindAllRequest request) {
+    public PageResponse<EmployeeFindAllResponse> findAllEmployees(EmployeeFindAllRequest request,
+                                                                  long tenantId) {
         PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
 
         Long departmentId = request.departmentId();
@@ -93,7 +95,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         String name = normalizeOrNull(request.name());
 
         List<EmployeeFindAllRow> rows = employeeMapper.findAllEmployeeFindRow(
-                departmentId, positionId, name, pageParam.offset(), pageParam.size());
+                tenantId, departmentId, positionId, name, pageParam.offset(), pageParam.size());
 
         if (rows.isEmpty()) {
             throw new GlobalException(ErrorStatus.NOT_REGISTERED_EMPLOYEE);
@@ -103,33 +105,34 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .map(EmployeeFindAllResponse::from)
                 .toList();
 
-        long total = employeeMapper.countByFilters(departmentId, positionId, name);
+        long total = employeeMapper.countByFilters(tenantId, departmentId, positionId, name);
 
         return PageResponse.of(responses, pageParam.page(), total, pageParam.size());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public EmployeeFindResponse findEmployee(long employeeId) {
-        return employeeMapper.findEmployeeFindRowById(employeeId)
+    public EmployeeFindResponse findEmployee(long employeeId, long tenantId) {
+        return employeeMapper.findEmployeeFindRowById(tenantId, employeeId)
                 .map(EmployeeFindResponse::from)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_EMPLOYEE));
     }
 
-    @Auditable(type = LogType.WORK, messageEl = "'직원 수정: id=' + #args[0] + ', empNo=' + #args[1].empNo() + ', name=' + #args[1].name()")
+    @Auditable(type = LogType.WORK, messageEl = "'직원 수정: id=' + #args[0] + ', empNo=' + #args[1].empNo() + ', name=' + #args[1].name() + ', tenant=' + #args[2]")
     @Override
     @Transactional
-    public void updateEmployee(long employeeId, EmployeeUpdateRequest request) {
+    public void updateEmployee(long employeeId, EmployeeUpdateRequest request,
+                               long tenantId) {
         String name = normalizeOrNull(request.name());
         String empNo = normalizeOrNull(request.empNo());
         String phone = normalizeOrNull(request.phone());
         Long departmentId = request.departmentId();
         Long positionId = request.positionId();
 
-        departmentValidator.validDepartmentIdIfPresent(departmentId);
-        positionValidator.validPositionIdIfPresent(positionId);
-        employeeValidator.validEmpNoUnique(empNo, employeeId);
-        employeeValidator.validPhoneUnique(phone, employeeId);
+        departmentValidator.validDepartmentIdIfPresent(departmentId, tenantId);
+        positionValidator.validPositionIdIfPresent(positionId, tenantId);
+        employeeValidator.validEmpNoUnique(empNo, tenantId, employeeId);
+        employeeValidator.validPhoneUnique(phone, tenantId, employeeId);
 
         Employee employee = Employee.update(
                 employeeId,
@@ -137,23 +140,24 @@ public class EmployeeServiceImpl implements EmployeeService {
                 name,
                 phone,
                 request.departmentId(),
-                request.positionId()
+                request.positionId(),
+                tenantId
         );
 
-        int affectedRowCount = employeeMapper.updateById(employee);
+        int affectedRowCount = employeeMapper.updateById(tenantId, employee);
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_EMPLOYEE_FAIL);
     }
 
-    @Auditable(type = LogType.WORK, messageEl = "'직원 퇴사 처리: id=' + #args[0]")
+    @Auditable(type = LogType.WORK, messageEl = "'직원 퇴사 처리: id=' + #args[0] + ', tenant=' + #args[1]")
     @Override
     @Transactional
-    public void retireEmployee(long employeeId) {
-        int affected = employeeMapper.updateStatusToRetired(employeeId);
+    public void retireEmployee(long employeeId, long tenantId) {
+        int affected = employeeMapper.updateStatusToRetired(tenantId, employeeId);
         if (affected == 1) {
-            erpAccountService.softDeleteById(employeeId);
+            erpAccountService.softDeleteById(employeeId, tenantId);
             return;
         }
-        if (employeeMapper.existsAnyById(employeeId)) {
+        if (employeeMapper.existsAnyById(tenantId, employeeId)) {
             throw new GlobalException(ErrorStatus.ALREADY_RETIRED_EMPLOYEE);
         }
         throw new GlobalException(ErrorStatus.NOT_FOUND_EMPLOYEE);

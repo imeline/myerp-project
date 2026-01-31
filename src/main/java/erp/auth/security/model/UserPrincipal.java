@@ -1,19 +1,23 @@
 package erp.auth.security.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import java.util.Collection;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.List;
 
 @Builder
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString(exclude = "password") // 보안상 ToString에서 제외
 public class UserPrincipal implements UserDetails {
+
     // 로그인 시 전부 주입
     private final String uuid;
     // GrantedAuthority가 String 기반이라 String으로 사용
@@ -21,6 +25,7 @@ public class UserPrincipal implements UserDetails {
     private final String name;
     @JsonIgnore // 외부에 노출되지 않게 보안
     private final String password;
+    private final Long tenantId;
 
 
     @Override
@@ -61,7 +66,8 @@ public class UserPrincipal implements UserDetails {
     public static UserPrincipal of(String uuid,
                                    String role,
                                    String name,
-                                   String password) {
+                                   String password,
+                                   Long tenantId) {
         // null/공백 방어 + 접두사 정규화
         String r = (role == null || role.isBlank()) ? "USER" : role.trim();
         String normalized = r.startsWith("ROLE_") ? r : "ROLE_" + r;
@@ -73,6 +79,7 @@ public class UserPrincipal implements UserDetails {
                 .role(normalized)
                 .name(name)
                 .password(password)
+                .tenantId(tenantId)
                 .build();
     }
 }

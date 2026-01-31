@@ -1,5 +1,6 @@
 package erp.inbound.controller;
 
+import erp.global.context.TenantContext;
 import erp.global.response.ApiResponse;
 import erp.global.response.PageResponse;
 import erp.inbound.dto.request.InboundFindAllRequest;
@@ -19,18 +20,21 @@ public class InboundController {
 
     @PostMapping
     public ApiResponse<Long> saveInbound(@Valid @RequestBody InboundSaveRequest request) {
-        return ApiResponse.onSuccess(inboundService.saveInbound(request));
+        long tenantId = TenantContext.get();
+        return ApiResponse.onSuccess(inboundService.saveInbound(request, tenantId));
     }
 
     @GetMapping
     public ApiResponse<PageResponse<InboundFindAllResponse>> findAllInbound(
             @Valid @RequestBody InboundFindAllRequest request) {
-        return ApiResponse.onSuccess(inboundService.findAllInbound(request));
+        long tenantId = TenantContext.get();
+        return ApiResponse.onSuccess(inboundService.findAllInbound(request, tenantId));
     }
 
     @DeleteMapping("/{inboundId}")
     public ApiResponse<Void> cancelInbound(@PathVariable("inboundId") long inboundId) {
-        inboundService.cancelInbound(inboundId);
+        long tenantId = TenantContext.get();
+        inboundService.cancelInbound(inboundId, tenantId);
         return ApiResponse.onSuccess(null);
     }
 }

@@ -7,11 +7,12 @@ import erp.inbound.dto.response.InboundFindAllResponse;
 
 public interface InboundService {
 
-    long saveInbound(InboundSaveRequest request);
+    long saveInbound(InboundSaveRequest request, long tenantId);
 
     PageResponse<InboundFindAllResponse> findAllInbound(
-            InboundFindAllRequest request
+            InboundFindAllRequest request,
+            long tenantId
     );
 
-    void cancelInbound(long inboundId);
+    void cancelInbound(long inboundId, long tenantId);
 }

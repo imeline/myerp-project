@@ -1,8 +1,10 @@
 package erp.global.config;
 
 import erp.auth.security.filter.AccessLogFilter;
+import erp.auth.security.filter.CompanyActiveGuardFilter;
 import erp.auth.security.filter.JwtAuthenticationFilter;
 import erp.auth.security.filter.RequestIdFilter;
+import erp.auth.security.filter.TenantScopeGuardFilter;
 import erp.global.exception.RestAccessDeniedHandler;
 import erp.global.exception.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,10 @@ public class SecurityConfig {
 
     // JWT 검증하고, 유저 정보를 SecurityContext에 저장하는 필터
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    // tenant_id 위변조 방지 필터
+    private final TenantScopeGuardFilter tenantScopeGuardFilter;
+    // 회사가 활성 상태인지 검사하는 필터
+    private final CompanyActiveGuardFilter companyActiveGuardFilter;
     private final CorsConfig corsConfig;
     private final RequestIdFilter requestIdFilter;
     private final AccessLogFilter accessLogFilter;
@@ -43,7 +49,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html",
+                                         "/swagger-resources/**").permitAll()
+                        .requestMatchers("/api/v1/sys/**").hasRole("SYS")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/user/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated() // 위에 것 외 모든 요청은 로그인 사용자만 접근 가능
@@ -58,8 +66,11 @@ public class SecurityConfig {
                 // -> finally에서 쓰기 때문에, 체인 도는 동안 JWT/테넌트가 세팅되고, 그걸 사용해 DB에 기록 가능
                 // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
                 //→ 그래야 로그인 요청이 아니라도 JWT 인증을 먼저 처리할 수 있음
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(accessLogFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter,
+                                 UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(tenantScopeGuardFilter, JwtAuthenticationFilter.class)
+                .addFilterAfter(companyActiveGuardFilter, TenantScopeGuardFilter.class)
+                .addFilterBefore(accessLogFilter, CompanyActiveGuardFilter.class)
                 // CORS 허용 필터 추가 (프론트에서 토큰 보낼 수 있게)
                 .addFilter(corsConfig.corsFilter());
 

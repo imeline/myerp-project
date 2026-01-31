@@ -33,17 +33,17 @@ public class PositionServiceImpl implements PositionService {
             messageEl = "'직급 등록: name=' + #args[0].name()")
     @Override
     @Transactional
-    public long savePosition(PositionNameRequest request) {
+    public long savePosition(PositionNameRequest request, long tenantId) {
         long newPositionId = positionMapper.nextId();
 
         String name = normalizeOrNull(request.name());
-        validNameUnique(name, null);
+        validNameUnique(name, null, tenantId);
 
         // 직급 번호는 가장 마지막 직급 번호 + 1
-        int levelNo = positionMapper.findLastLevelNo() + 1;
+        int levelNo = positionMapper.findLastLevelNo(tenantId) + 1;
 
-        Position position = Position.register(newPositionId, name, levelNo);
-        int affectedRowCount = positionMapper.save(position);
+        Position position = Position.register(newPositionId, name, levelNo, tenantId);
+        int affectedRowCount = positionMapper.save(tenantId, position);
         requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_POSITION_FAIL);
 
         return newPositionId;
@@ -51,8 +51,8 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PositionFindAllResponse> findAllPosition() {
-        List<PositionFindAllResponse> list = positionMapper.findAll().stream()
+    public List<PositionFindAllResponse> findAllPosition(long tenantId) {
+        List<PositionFindAllResponse> list = positionMapper.findAll(tenantId).stream()
                 .map(PositionFindAllResponse::from)
                 .toList();
         if (list.isEmpty()) {
@@ -65,11 +65,11 @@ public class PositionServiceImpl implements PositionService {
             messageEl = "'직급명 변경: id=' + #args[0] + ' → ' + #args[1].name()")
     @Override
     @Transactional
-    public void updatePositionName(long positionId, PositionNameRequest request) {
+    public void updatePositionName(long positionId, PositionNameRequest request, long tenantId) {
         String newName = request.name();
-        validNameUnique(newName, positionId);
+        validNameUnique(newName, positionId, tenantId);
 
-        int affectedRowCount = positionMapper.updateNameById(positionId, newName);
+        int affectedRowCount = positionMapper.updateNameById(tenantId, positionId, newName);
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_POSITION_FAIL);
     }
 
@@ -77,17 +77,17 @@ public class PositionServiceImpl implements PositionService {
             messageEl = "'직급 레벨 변경: id=' + #args[0] + ', newLevel=' + #args[1].levelNo()")
     @Override
     @Transactional
-    public void updatePositionLevelNo(long positionId, PositionLevelNoRequest request) {
+    public void updatePositionLevelNo(long positionId, PositionLevelNoRequest request, long tenantId) {
         int newLevelNo = request.levelNo();
-        int oldLevelNo = positionMapper.findLevelNoById(positionId)
+        int oldLevelNo = positionMapper.findLevelNoById(tenantId, positionId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_POSITION));
 
         if (newLevelNo < oldLevelNo)
-            positionMapper.shiftUpRange(newLevelNo, oldLevelNo);
+            positionMapper.shiftUpRange(tenantId, newLevelNo, oldLevelNo);
         else if (newLevelNo > oldLevelNo)
-            positionMapper.shiftDownRange(oldLevelNo, newLevelNo);
+            positionMapper.shiftDownRange(tenantId, oldLevelNo, newLevelNo);
 
-        int affectedRowCount = positionMapper.updateLevelNoById(positionId, newLevelNo);
+        int affectedRowCount = positionMapper.updateLevelNoById(tenantId, positionId, newLevelNo);
         requireOneRowAffected(affectedRowCount, ErrorStatus.UPDATE_POSITION_FAIL);
     }
 
@@ -95,21 +95,21 @@ public class PositionServiceImpl implements PositionService {
             messageEl = "'직급 삭제: id=' + #args[0]")
     @Override
     @Transactional
-    public void deletePosition(long positionId) {
+    public void deletePosition(long positionId, long tenantId) {
         // 해당 직급에 속한 사원이 있는지 검사
-        employeeValidator.validNoEmployeesInPosition(positionId);
+        employeeValidator.validNoEmployeesInPosition(positionId, tenantId);
         // 삭제하려는 직급의 levelNo
-        int oldLevelNo = positionMapper.findLevelNoById(positionId)
+        int oldLevelNo = positionMapper.findLevelNoById(tenantId, positionId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_POSITION));
         // 직급 삭제
-        int affectedRowCount = positionMapper.deleteById(positionId);
+        int affectedRowCount = positionMapper.deleteById(tenantId, positionId);
         requireOneRowAffected(affectedRowCount, ErrorStatus.DELETE_POSITION_FAIL);
         // 삭제된 직급보다 낮은 직급들의 levelNo -1
-        positionMapper.shiftDownRange(oldLevelNo, Integer.MAX_VALUE);
+        positionMapper.shiftDownRange(tenantId, oldLevelNo, Integer.MAX_VALUE);
     }
 
     // 원래 네이밍/흐름 유지
-    private void validNameUnique(String name, Long excludeId) {
-        positionValidator.validNameUnique(name, excludeId);
+    private void validNameUnique(String name, Long excludeId, long tenantId) {
+        positionValidator.validNameUnique(name, excludeId, tenantId);
     }
 }

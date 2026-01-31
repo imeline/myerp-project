@@ -14,9 +14,11 @@ public interface InboundMapper {
 
     long nextId();
 
-    int save(@Param("inbound") Inbound inbound);
+    int save(@Param("tenantId") long tenantId,
+             @Param("inbound") Inbound inbound);
 
     List<InboundFindAllRow> findAllInboundFindAllRow(
+            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("code") String code,
@@ -25,24 +27,29 @@ public interface InboundMapper {
     );
 
     List<InboundCancelItemRow> findAllCancelItemRowById(
+            @Param("tenantId") long tenantId,
             @Param("inboundId") long inboundId
     );
 
     int updateStatusToCanceledIfActive(
+            @Param("tenantId") long tenantId,
             @Param("inboundId") long inboundId
     );
 
     long countByPeriodAndCode(
+            @Param("tenantId") long tenantId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("code") String code
     );
 
     boolean existsById(
+            @Param("tenantId") long tenantId,
             @Param("inboundId") long inboundId
     );
 
     boolean existsActiveById(
+            @Param("tenantId") long tenantId,
             @Param("inboundId") long inboundId
     );
 }

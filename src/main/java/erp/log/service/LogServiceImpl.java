@@ -3,6 +3,7 @@ package erp.log.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.auth.security.model.UserPrincipal;
 import erp.global.context.RequestContext;
+import erp.global.context.TenantContext;
 import erp.global.exception.ErrorStatus;
 import erp.global.util.SensitiveMasker;
 import erp.log.domain.Log;
@@ -33,6 +34,7 @@ public class LogServiceImpl implements LogService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void save(LogSaveRequest request) {
         UserPrincipal principal = currentUserOrNull();
+        Long tenantId = resolveTenantId(principal);
 
         String ip = RequestContext.ip();
         String requestId = RequestContext.requestId();
@@ -55,8 +57,13 @@ public class LogServiceImpl implements LogService {
                 json
         );
 
-        int affected = logMapper.save(log);
+        int affected = logMapper.save(tenantId, log);
         requireOneRowAffected(affected, ErrorStatus.LOG_SAVE_FAIL);
+    }
+
+    private Long resolveTenantId(UserPrincipal principal) {
+        Long t = TenantContext.get(); // "/auth" 등 TenantContext를 설정하지 않는 곳에서는 null
+        return (t != null) ? t : (principal != null ? principal.getTenantId() : null);
     }
 
     private UserPrincipal currentUserOrNull() {

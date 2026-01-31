@@ -1,5 +1,7 @@
 package erp.account.service;
 
+import static erp.global.util.RowCountGuards.requireOneRowAffected;
+
 import erp.account.domain.ErpAccount;
 import erp.account.dto.internal.LoginUserInfoRow;
 import erp.account.dto.request.ErpAccountSaveRequest;
@@ -13,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static erp.global.util.RowCountGuards.requireOneRowAffected;
-
 @Service
 @RequiredArgsConstructor
 public class ErpAccountServiceImpl implements ErpAccountService {
@@ -25,7 +25,7 @@ public class ErpAccountServiceImpl implements ErpAccountService {
 
     @Override
     @Transactional
-    public Long saveErpAccount(ErpAccountSaveRequest request) {
+    public Long saveErpAccount(ErpAccountSaveRequest request, long companyId) {
         String loginEmail = Strings.normalizeOrNull(request.loginEmail());
         erpAccountValidator.validLoginEmailUnique(loginEmail);
 
@@ -37,7 +37,8 @@ public class ErpAccountServiceImpl implements ErpAccountService {
                 request.employeeId(),
                 loginEmail,
                 hashPassword,
-                request.role()
+                request.role(),
+                companyId
         );
 
         int affectedRowCount = erpAccountMapper.save(account);
@@ -54,9 +55,16 @@ public class ErpAccountServiceImpl implements ErpAccountService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public long findCompanyIdByUuid(String uuid) {
+        return erpAccountMapper.findCompanyIdByUuid(uuid)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ERP_ACCOUNT));
+    }
+
+    @Override
     @Transactional
-    public void softDeleteById(long employeeId) {
-        int affected = erpAccountMapper.softDeleteByEmployeeId(employeeId);
+    public void softDeleteById(long employeeId, long tenantId) {
+        int affected = erpAccountMapper.softDeleteByEmployeeId(tenantId, employeeId);
         requireOneRowAffected(affected, ErrorStatus.DELETE_ERP_ACCOUNT_FAIL);
     }
 }

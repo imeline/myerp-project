@@ -1,13 +1,13 @@
 package erp.employee.validation;
 
 public interface EmployeeValidator {
-    void validEmployeeIdIfPresent(Long employeeId);
+    void validEmployeeIdIfPresent(Long employeeId, long tenantId);
 
-    void validEmpNoUnique(String empNo, Long excludeId);
+    void validEmpNoUnique(String empNo, long tenantId, Long excludeId);
 
-    void validPhoneUnique(String phone, Long excludeId);
+    void validPhoneUnique(String phone, long tenantId, Long excludeId);
 
-    void validNoEmployeesInDepartment(Long departmentId);
+    void validNoEmployeesInDepartment(Long departmentId, long tenantId);
 
-    void validNoEmployeesInPosition(long positionId);
+    void validNoEmployeesInPosition(long positionId, long tenantId);
 }

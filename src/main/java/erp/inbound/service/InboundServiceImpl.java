@@ -50,17 +50,17 @@ public class InboundServiceImpl implements InboundService {
             messageEl = "'입고 등록: purchaseId=' + #args[0].purchaseId() + ', date=' + #args[0].inboundDate() + ', emp=' + #args[0].employeeId()")
     @Override
     @Transactional
-    public long saveInbound(InboundSaveRequest request) {
+    public long saveInbound(InboundSaveRequest request, long tenantId) {
         LocalDate inboundDate = request.inboundDate();
         long purchaseId = request.purchaseId();
         long employeeId = request.employeeId();
 
-        purchaseValidator.validPurchaseIdIfPresent(purchaseId);
-        employeeValidator.validEmployeeIdIfPresent(employeeId);
+        purchaseValidator.validPurchaseIdIfPresent(purchaseId, tenantId);
+        employeeValidator.validEmployeeIdIfPresent(employeeId, tenantId);
 
         // 1) 발주 품목 수량 조회
         List<PurchaseItemQuantityRow> itemRows =
-                purchaseService.findAllPurchaseItemQuantityRow(purchaseId);
+                purchaseService.findAllPurchaseItemQuantityRow(purchaseId, tenantId);
 
         // 2) 입고 저장(코드 유니크 충돌 시 재시도)
         // -> 동시성 문제로 인해, 코드 중복을 미리 검사하지 말고 save 시 에러 처리로 대체
@@ -78,10 +78,11 @@ public class InboundServiceImpl implements InboundService {
                         inboundCode,
                         inboundDate,
                         employeeId,
-                        purchaseId
+                        purchaseId,
+                        tenantId
                 );
 
-                int affectedRowCount = inboundMapper.save(inbound);
+                int affectedRowCount = inboundMapper.save(tenantId, inbound);
                 requireOneRowAffected(affectedRowCount, ErrorStatus.CREATE_INBOUND_FAIL);
 
                 newInboundId = inboundId;
@@ -97,11 +98,11 @@ public class InboundServiceImpl implements InboundService {
         // 3) 재고 on_hand 증가
         for (PurchaseItemQuantityRow row : itemRows) {
             stockService.increaseOnHand(
-                    row.itemId(), row.quantity());
+                    row.itemId(), row.quantity(), tenantId);
         }
 
         // 4) 발주 상태 SHIPPED로 변경
-        purchaseService.updateStatusToShippedIfConfirmed(purchaseId);
+        purchaseService.updateStatusToShippedIfConfirmed(purchaseId, tenantId);
 
         // 5) 성공: inbound_id 반환
         return newInboundId;
@@ -110,7 +111,8 @@ public class InboundServiceImpl implements InboundService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<InboundFindAllResponse> findAllInbound(
-            InboundFindAllRequest request
+            InboundFindAllRequest request,
+            long tenantId
     ) {
         PageParam pageParam = PageParam.of(request.page(), request.size(), 20);
 
@@ -122,6 +124,7 @@ public class InboundServiceImpl implements InboundService {
         String code = Strings.normalizeOrNull(request.code());
 
         List<InboundFindAllRow> rows = inboundMapper.findAllInboundFindAllRow(
+                tenantId,
                 startDate,
                 endDate,
                 code,
@@ -137,6 +140,7 @@ public class InboundServiceImpl implements InboundService {
                 .toList();
 
         long total = inboundMapper.countByPeriodAndCode(
+                tenantId,
                 startDate,
                 endDate,
                 code
@@ -154,10 +158,11 @@ public class InboundServiceImpl implements InboundService {
             messageEl = "'입고 취소: inboundId=' + #args[0]")
     @Override
     @Transactional
-    public void cancelInbound(long inboundId) {
-        inboundValidator.validInboundActive(inboundId);
+    public void cancelInbound(long inboundId, long tenantId) {
+        inboundValidator.validInboundActive(inboundId, tenantId);
 
         List<InboundCancelItemRow> rows = inboundMapper.findAllCancelItemRowById(
+                tenantId,
                 inboundId
         );
         if (rows.isEmpty()) {
@@ -169,16 +174,17 @@ public class InboundServiceImpl implements InboundService {
         for (InboundCancelItemRow row : rows) {
             stockService.decreaseOnHand(
                     row.itemId(),
-                    row.quantity()
+                    row.quantity(),
+                    tenantId
             );
         }
 
         // 4) 입고 상태를 CANCELED로 변경
-        int affected = inboundMapper.updateStatusToCanceledIfActive(inboundId);
+        int affected = inboundMapper.updateStatusToCanceledIfActive(tenantId, inboundId);
         requireOneRowAffected(affected, ErrorStatus.CANCEL_INBOUND_FAIL);
 
         // 5) 발주 상태를 CONFIRMED로 되돌림 (SHIPPED → CONFIRMED)
         // 실패 사유는 PurchaseService에서 처리
-        purchaseService.updateStatusToConfirmedIfShipped(purchaseId);
+        purchaseService.updateStatusToConfirmedIfShipped(purchaseId, tenantId);
     }
 }
