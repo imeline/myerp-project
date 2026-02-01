@@ -1,6 +1,5 @@
 ### 환경 변수 (필요하면 값만 바꿔)
 @base = {{host}}/api/v1/admin/department
-@token = Bearer
 @rootId = 3
 @childId = 6
 

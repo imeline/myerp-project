@@ -11,9 +11,9 @@ Content-Type: application/json
   "empNo": "DF234",
   "name": "sys2",
   "phone": "010-3872-5678",
-  "departmentId": 3,
-  "positionId": 4,
-  "companyId": 2
+  "departmentId": 1,
+  "positionId": 1,
+  "companyId": 1
 }
 
 ### ADMIN 회원가입
@@ -78,7 +78,7 @@ POST {{base}}/refresh
 Content-Type: application/json
 
 {
-  "refreshToken": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NjMwMTYwNzQsImV4cCI6MTc2NDIyNTY3NCwidXVpZCI6IjA3MzkyNmNhODE2ZjQ4NjVhNWYwNTZhYWEwYmU5YmYzIiwibmFtZSI6InVzZXIxIn0.zFPo-tGCX9AdghahfndQh6CJRpAwCCRGELYuuTK53AU"
+  "refreshToken": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmNzYxYjBlYzYzNjc0Yjg5YjhkYWQ1YmE5NGI5OGM0NSIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc2OTg2NDM2NiwiZXhwIjoxNzcxMDczOTY2LCJ0ZW5hbnRfaWQiOjEsInV1aWQiOiJmNzYxYjBlYzYzNjc0Yjg5YjhkYWQ1YmE5NGI5OGM0NSIsIm5hbWUiOiJzeXMyIn0.4mpGM3u_sB6LmHbhHk8JbFx6ujKR6f3VzLc8Ic38RhQ"
 }
 
 ### 로그아웃
@@ -87,5 +87,5 @@ Authorization: {{accessToken}}
 Content-Type: application/json
 
 {
-  "refreshToken": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzM5MjZjYTgxNmY0ODY1YTVmMDU2YWFhMGJlOWJmMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NjMwMTYwNzQsImV4cCI6MTc2NDIyNTY3NCwidXVpZCI6IjA3MzkyNmNhODE2ZjQ4NjVhNWYwNTZhYWEwYmU5YmYzIiwibmFtZSI6InVzZXIxIn0.zFPo-tGCX9AdghahfndQh6CJRpAwCCRGELYuuTK53AU"
+  "refreshToken": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmNzYxYjBlYzYzNjc0Yjg5YjhkYWQ1YmE5NGI5OGM0NSIsInJvbGUiOiJST0xFX1NZUyIsImlhdCI6MTc2OTg2NjY1MSwiZXhwIjoxNzcxMDc2MjUxLCJ0ZW5hbnRfaWQiOjEsInV1aWQiOiJmNzYxYjBlYzYzNjc0Yjg5YjhkYWQ1YmE5NGI5OGM0NSIsIm5hbWUiOiJzeXMyIn0.oz4DzA9csCoW0dIjhOeLG-BtUJ1vPIKEXc4i6Zz6BYQ"
 }

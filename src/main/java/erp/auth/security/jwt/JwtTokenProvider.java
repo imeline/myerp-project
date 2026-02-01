@@ -2,7 +2,9 @@ package erp.auth.security.jwt;
 
 import erp.auth.security.model.UserPrincipal;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -60,13 +62,13 @@ public class JwtTokenProvider {
 
     public String generateAccessToken(UserDetails userDetails) {
         Long expMillis = env.getProperty("jwt.access-expiration-time", Long.class,
-                1000L * 60 * 60); // 기본값: 1시간
+                                         1000L * 60 * 60); // 기본값: 1시간
         return buildToken(userDetails, expMillis);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
         Long expMillis = env.getProperty("jwt.refresh-expiration-time", Long.class,
-                1000L * 60 * 60 * 24 * 14); // 기본값: 14일
+                                         1000L * 60 * 60 * 24 * 14); // 기본값: 14일
         return buildToken(userDetails, expMillis);
     }
 
@@ -97,32 +99,36 @@ public class JwtTokenProvider {
         return extractAllClaims(token).get(CLAIM_TENANT_ID, Long.class);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims parseClaimsOrThrow(String token) {
+        String raw = stripBearer(token);
+        if (raw == null || raw.isBlank()) {
+            throw new IllegalArgumentException("JWT is missing");
+        }
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
-                .parseClaimsJws(token) // 토큰 파싱 + 서명 검증이 동시에 일어남
+                .parseClaimsJws(raw)   // 만료면 ExpiredJwtException, 위조/형식오류면 JwtException
                 .getBody();
     }
 
-    // 만료 검증
+    public void validateTokenOrThrow(String token) {
+        parseClaimsOrThrow(token);
+    }
+
     public boolean validateToken(String token) {
         try {
-            // extractAllClaims의 parseClaimsJws 중 서명 검증 수행하므로,
-            // 만료만 추가 확인
-            return !isTokenExpired(token);
-        } catch (Exception e) {
-            log.debug("Invalid JWT: {}", e.getMessage());
+            validateTokenOrThrow(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            // 만료도 "유효하지 않음"으로 보겠다면 false
+            return false;
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    private Claims extractAllClaims(String token) {
+        return parseClaimsOrThrow(token);
     }
 
     private Key getSigningKey() {

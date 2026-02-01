@@ -1,10 +1,9 @@
 ### 환경 변수
-@base = {{host}}/api/v1/sys/company
-@token = Bearer
+@base = {{host}}/sys/company
 
 ### 회사 생성
 POST {{base}}
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 
 {
@@ -16,12 +15,12 @@ Content-Type: application/json
 
 ### 1개 회사 조회
 GET {{base}}/5
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 
 ###  여러개 회사 조회 (페이징, 검색 조건)
 GET {{base}}
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 
 {
@@ -31,7 +30,7 @@ Content-Type: application/json
 
 ### 회사 수정
 PUT {{base}}/6
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
 
 {
@@ -44,5 +43,5 @@ Content-Type: application/json
 
 ### 회사 삭제(연관 데이터 존재시 삭제 안됨)
 DELETE {{base}}/6
-Authorization: {{token}}
+Authorization: {{accessToken}}
 Content-Type: application/json
