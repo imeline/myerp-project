@@ -1,10 +1,24 @@
+# =========================
+# Spring / Maven
+# =========================
 HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
+
+# Build outputs (anywhere)
+**/target/
+**/build/
+
+# Maven wrapper (jar is large; usually not committed)
+**/.mvn/wrapper/maven-wrapper.jar
+
+# (Optional) keep build dirs under src if you really need them (rare)
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### STS ###
+# =========================
+# STS / Eclipse
+# =========================
 .apt_generated
 .classpath
 .factorypath
@@ -13,27 +27,47 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
 *.iws
 *.iml
 *.ipr
 /out/
 
-### NetBeans ###
+# =========================
+# NetBeans
+# =========================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-# MacOS
+# =========================
+# macOS
+# =========================
 .DS_Store
 
-# properties files
+# =========================
+# App config (keep base file, ignore profiles)
+# =========================
 **/src/main/resources/application-*.properties
 
-client/
+# =========================
+# Node / React (client)
+# =========================
+**/node_modules/
+**/dist/
+**/.next/
+**/.nuxt/
+**/.output/
+**/coverage/
+**/.turbo/
+**/.cache/
+
+# env files
+.env
+.env.*
+!.env.example
