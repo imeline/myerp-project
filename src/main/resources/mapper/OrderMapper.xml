@@ -55,7 +55,7 @@
         <if test="code != null">
             AND o.code LIKE '%' || #{code} || '%'
         </if>
-        AND o.status != 'CANCELLED'
+        AND o.status != 'CANCELED'
         <if test="status != null">
             AND o.status = #{status}
         </if>
@@ -113,7 +113,7 @@
         LEFT JOIN order_item oi
         ON oi.order_id = o.order_id
         WHERE o.order_id = #{orderId}
-        AND o.status != 'CANCELLED'
+        AND o.status != 'CANCELED'
         AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="o"/>
@@ -171,7 +171,7 @@
         <if test="code != null">
             AND o.code LIKE '%' || #{code} || '%'
         </if>
-        AND o.status != 'CANCELLED'
+        AND o.status != 'CANCELED'
         <if test="status != null">
             AND o.status = #{status}
         </if>
@@ -185,7 +185,7 @@
         SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
         FROM orders
         WHERE order_id = #{orderId}
-        AND status != 'CANCELLED'
+        AND status != 'CANCELED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>

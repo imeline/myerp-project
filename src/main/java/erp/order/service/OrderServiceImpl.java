@@ -75,9 +75,9 @@ public class OrderServiceImpl implements OrderService {
         Map<Long, Integer> priceMap = priceRows.stream()
                 .collect(Collectors.toMap(ItemPriceRow::itemId, ItemPriceRow::price));
 
-        // 4) 재고 규칙: onHand >= qty 일 때만, allocated += qty (가용재고 초과 허용)
+        // 4) 재고 규칙: 가용재고(onHand - allocated) >= qty 일 때만 allocated += qty
         for (OrderItemSaveRequest it : requestItems) {
-            stockService.increaseAllocatedIfEnoughOnHand(tenantId, it.itemId(), it.quantity()); // 실패 시 내부에서 예외
+            stockService.increaseAllocatedIfEnoughAvailable(tenantId, it.itemId(), it.quantity()); // 실패 시 내부에서 예외
         }
 
         // 5) 합계 계산
@@ -259,9 +259,9 @@ public class OrderServiceImpl implements OrderService {
     public void cancelOrder(long orderId, long tenantId) {
         orderValidator.validOrderIdIfPresent(orderId, tenantId);
 
-        // 1) 상태 변경: CONFIRMED → CANCELLED
+        // 1) 상태 변경: CONFIRMED → CANCELED
         int affectedRowCount = orderMapper.updateStatusToIfConfirmed(
-                tenantId, orderId, OrderStatus.CANCELLED
+                tenantId, orderId, OrderStatus.CANCELED
         );
         if (affectedRowCount != 1) {
             // 2) 실패 사유 판정
@@ -270,8 +270,8 @@ public class OrderServiceImpl implements OrderService {
             switch (status) {
                 case SHIPPED ->
                         throw new GlobalException(ErrorStatus.CANNOT_CANCEL_SHIPPED_ORDER);
-                case CANCELLED ->
-                        throw new GlobalException(ErrorStatus.ALREADY_CANCELLED_ORDER);
+                case CANCELED ->
+                        throw new GlobalException(ErrorStatus.ALREADY_CANCELED_ORDER);
                 default ->
                         throw new GlobalException(ErrorStatus.CANCEL_ORDER_FAIL);
             }
@@ -312,8 +312,8 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus status = orderMapper.findStatusById(tenantId, orderId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ORDER));
         switch (status) {
-            case CANCELLED ->
-                    throw new GlobalException(ErrorStatus.CANNOT_SHIP_CANCELLED_ORDER);
+            case CANCELED ->
+                    throw new GlobalException(ErrorStatus.CANNOT_SHIP_CANCELED_ORDER);
             case SHIPPED ->
                     throw new GlobalException(ErrorStatus.ALREADY_SHIPPED_ORDER);
         }
@@ -333,8 +333,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_ORDER));
 
         switch (status) {
-            case CANCELLED ->
-                    throw new GlobalException(ErrorStatus.CANNOT_REVERT_CANCELLED_ORDER);
+            case CANCELED ->
+                    throw new GlobalException(ErrorStatus.CANNOT_REVERT_CANCELED_ORDER);
             case CONFIRMED ->
                     throw new GlobalException(ErrorStatus.ALREADY_CONFIRMED_ORDER);
             // SHIPPED가 아니면서 업데이트가 안 된 케이스

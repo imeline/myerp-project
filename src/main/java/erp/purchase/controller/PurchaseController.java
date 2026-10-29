@@ -77,7 +77,7 @@ public class PurchaseController {
     }
 
     /**
-     * 발주 취소(삭제) — status를 CANCELLED로 변경. SHIPPED이면 불가
+     * 발주 취소(삭제) — status를 CANCELED로 변경. SHIPPED이면 불가
      */
     @DeleteMapping("/{purchaseId}")
     public ApiResponse<Void> cancelPurchase(@PathVariable Long purchaseId) {

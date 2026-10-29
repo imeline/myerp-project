@@ -70,7 +70,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Auditable(type = LogType.LOGIN, messageEl = "'로그인 처리: ' + #args[0].loginEmail()")
     @Override
-    @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
         final String email = request.loginEmail().trim().toLowerCase();
         // 왜 비밀 번호 검증 전에 jwt를 생성하기 위한 데이터도 같이(join) 조회했는가?
@@ -105,7 +104,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Auditable(type = LogType.LOGIN, messageEl = "'토큰 리프레시 처리: '+ #args[0].refreshToken()")
     @Override
-    @Transactional(readOnly = true)
     public LoginResponse refresh(RefreshTokenRequest request) {
         final String reqRefresh = request.refreshToken();
         final String rawRefresh = jwtTokenProvider.stripBearer(reqRefresh);

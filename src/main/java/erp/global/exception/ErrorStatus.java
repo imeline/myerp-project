@@ -106,10 +106,10 @@ public enum ErrorStatus {
     CANNOT_CANCEL_SHIPPED_PURCHASE("PUR907", "입고된 발주는 취소할 수 없습니다."),
     CANCEL_PURCHASE_FAIL("PUR908", "발주 취소에 실패했습니다."),
     NOT_REGISTERED_PURCHASE_ITEM("PUR909", "등록된 발주 품목이 없습니다."),
-    CANNOT_SHIP_CANCELLED_PURCHASE("PUR910", "취소된 발주는 입고 처리할 수 없습니다."),
+    CANNOT_SHIP_CANCELED_PURCHASE("PUR910", "취소된 발주는 입고 처리할 수 없습니다."),
     ALREADY_SHIPPED_PURCHASE("PUR911", "이미 입고 처리된 발주입니다."),
     UPDATE_PURCHASE_STATUS_FAIL("PUR912", "발주 상태 변경에 실패했습니다."),
-    CANNOT_REVERT_CANCELLED_PURCHASE("PUR913", "취소된 발주는 상태를 되돌릴 수 없습니다."),
+    CANNOT_REVERT_CANCELED_PURCHASE("PUR913", "취소된 발주는 상태를 되돌릴 수 없습니다."),
     ALREADY_CONFIRMED_PURCHASE("PUR914", "이미 확정 상태의 발주입니다."),
 
     // INBOUND
@@ -127,11 +127,11 @@ public enum ErrorStatus {
     NOT_FOUND_ORDER("ORD1105", "존재하지 않는 주문입니다."),
     CANNOT_CANCEL_SHIPPED_ORDER("ORD1106", "출고된 주문은 취소할 수 없습니다."),
     CANCEL_ORDER_FAIL("ORD1107", "주문 취소에 실패했습니다."),
-    ALREADY_CANCELLED_ORDER("ORD1108", "이미 취소된 주문입니다."),
-    CANNOT_SHIP_CANCELLED_ORDER("ORD1109", "취소된 주문은 출고 처리할 수 없습니다."),
+    ALREADY_CANCELED_ORDER("ORD1108", "이미 취소된 주문입니다."),
+    CANNOT_SHIP_CANCELED_ORDER("ORD1109", "취소된 주문은 출고 처리할 수 없습니다."),
     ALREADY_SHIPPED_ORDER("ORD1110", "이미 출고 처리된 주문입니다."),
     UPDATE_ORDER_STATUS_FAIL("ORD1111", "주문 상태 변경에 실패했습니다."),
-    CANNOT_REVERT_CANCELLED_ORDER("ORD1112", "취소된 주문은 상태를 되돌릴 수 없습니다."), ALREADY_CONFIRMED_ORDER(
+    CANNOT_REVERT_CANCELED_ORDER("ORD1112", "취소된 주문은 상태를 되돌릴 수 없습니다."), ALREADY_CONFIRMED_ORDER(
             "ORD1113", "이미 확정 상태의 주문입니다."),
 
     // OUTBOUND

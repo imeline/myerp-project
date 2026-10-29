@@ -1,5 +1,5 @@
 package erp.order.enums;
 
 public enum OrderStatus {
-    CONFIRMED, SHIPPED, CANCELLED
+    CONFIRMED, SHIPPED, CANCELED
 }

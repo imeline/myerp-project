@@ -181,7 +181,7 @@ public class OutboundServiceImpl implements OutboundService {
             // on_hand 먼저 복구
             stockService.increaseOnHand(row.itemId(), row.quantity(), tenantId);
             // 예약재고 복구
-            stockService.increaseAllocatedIfEnoughOnHand(tenantId, row.itemId(), row.quantity());
+            stockService.increaseAllocatedIfEnoughAvailable(tenantId, row.itemId(), row.quantity());
         }
 
         // 4) 출고 상태를 CANCELED로 변경 (ACTIVE일 때만)

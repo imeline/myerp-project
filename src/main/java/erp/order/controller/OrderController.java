@@ -78,7 +78,7 @@ public class OrderController {
     }
 
     /**
-     * 주문 취소 — status를 CANCELLED로 변경. SHIPPED/이미 CANCELLED면 불가
+     * 주문 취소 — status를 CANCELED로 변경. SHIPPED/이미 CANCELED면 불가
      * 성공 시 예약재고(allocated) 롤백
      */
     @DeleteMapping("/{orderId}")

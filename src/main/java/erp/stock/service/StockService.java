@@ -26,7 +26,7 @@ public interface StockService {
 
     void decreaseOnHand(long itemId, int delta, long tenantId);
 
-    void increaseAllocatedIfEnoughOnHand(long tenantId, long itemId, int quantity);
+    void increaseAllocatedIfEnoughAvailable(long tenantId, long itemId, int quantity);
 
     void decreaseAllocated(long tenantId, long itemId, int quantity);
 

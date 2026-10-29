@@ -275,9 +275,9 @@ public class PurchaseServiceImpl implements PurchaseService {
         // 1) 존재/활성(삭제 제외) 선검증
         purchaseValidator.validPurchaseIdIfPresent(purchaseId, tenantId);
 
-        // 2) 조건부 업데이트: CONFIRMED 상태일때만 CANCELLED로 변경 (SHIPPED는 불가)
+        // 2) 조건부 업데이트: CONFIRMED 상태일때만 CANCELED로 변경 (SHIPPED는 불가)
         int affectedRowCount = purchaseMapper.updateStatusToIfConfirmed(tenantId,
-                purchaseId, PurchaseStatus.CANCELLED);
+                purchaseId, PurchaseStatus.CANCELED);
 
         // 3) 성공 시 즉시 종료 (추가 조회 불필요)
         if (affectedRowCount == 1) {
@@ -289,7 +289,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new GlobalException(ErrorStatus.CANNOT_CANCEL_SHIPPED_PURCHASE);
         }
 
-        // 5) 그 외(이미 CANCELLED 등) 일반 실패
+        // 5) 그 외(이미 CANCELED 등) 일반 실패
         throw new GlobalException(ErrorStatus.CANCEL_PURCHASE_FAIL);
     }
 
@@ -324,8 +324,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         switch (status) {
             case SHIPPED ->
                     throw new GlobalException(ErrorStatus.ALREADY_SHIPPED_PURCHASE);
-            case CANCELLED ->
-                    throw new GlobalException(ErrorStatus.CANNOT_SHIP_CANCELLED_PURCHASE);
+            case CANCELED ->
+                    throw new GlobalException(ErrorStatus.CANNOT_SHIP_CANCELED_PURCHASE);
         }
         throw new GlobalException(ErrorStatus.UPDATE_PURCHASE_STATUS_FAIL);
     }
@@ -342,8 +342,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         PurchaseStatus status = purchaseMapper.findStatusById(tenantId, purchaseId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.NOT_FOUND_PURCHASE));
         switch (status) {
-            case CANCELLED ->
-                    throw new GlobalException(ErrorStatus.CANNOT_REVERT_CANCELLED_PURCHASE);
+            case CANCELED ->
+                    throw new GlobalException(ErrorStatus.CANNOT_REVERT_CANCELED_PURCHASE);
             case CONFIRMED ->
                     throw new GlobalException(ErrorStatus.ALREADY_CONFIRMED_PURCHASE);
         }

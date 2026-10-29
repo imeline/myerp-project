@@ -63,8 +63,8 @@
             AND p.code LIKE '%' || #{code} || '%'
         </if>
 
-        <!-- CANCELLED 제외(항상) -->
-        AND p.status != 'CANCELLED'
+        <!-- CANCELED 제외(항상) -->
+        AND p.status != 'CANCELED'
 
         <!-- 상태 필터(선택) -->
         <if test="status != null">
@@ -134,7 +134,7 @@
         JOIN employee e
         ON e.employee_id = p.employee_id
         WHERE p.purchase_id = #{purchaseId}
-        AND p.status != 'CANCELLED'
+        AND p.status != 'CANCELED'
         AND
         <include refid="frag.tenantGuardAlias">
             <property name="alias" value="p"/>
@@ -188,7 +188,7 @@
         <if test="status != null">
             AND status = #{status}
         </if>
-        AND status != 'CANCELLED'
+        AND status != 'CANCELED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>
@@ -197,7 +197,7 @@
         SELECT CASE WHEN COUNT(1) = 1 THEN 1 ELSE 0 END
         FROM purchase
         WHERE purchase_id = #{purchaseId}
-        AND status != 'CANCELLED'
+        AND status != 'CANCELED'
         AND
         <include refid="frag.tenantGuard"/>
     </select>

@@ -36,7 +36,7 @@
     </insert>
 
     <delete id="deleteOlderThan">
-        DELETE FROM erp_log
+        DELETE FROM log
         WHERE type = #{type}
         AND SYSTIMESTAMP - NUMTODSINTERVAL(#{days}, 'DAY') > created_at
     </delete>

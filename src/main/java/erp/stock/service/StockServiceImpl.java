@@ -156,7 +156,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
-    public void increaseAllocatedIfEnoughOnHand(long tenantId, long itemId, int quantity) {
+    public void increaseAllocatedIfEnoughAvailable(long tenantId, long itemId, int quantity) {
         int affectedRowCount = stockMapper.increaseAllocatedIfEnoughOnHand(
                 tenantId, itemId, quantity
         );
